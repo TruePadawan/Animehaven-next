@@ -1,0 +1,20 @@
+.userItem {
+    width: max-content;
+    border-radius: 10px;
+    padding: 5px;
+    background-color: rgb(39, 39, 39);
+    color: antiquewhite;
+    display: flex;
+    gap: 5px;
+}
+
+.userItem img {
+    border-radius: 10px;
+    width: 65px;
+    height: auto;
+}
+
+.userItem small {
+    color: gray;
+    font-size: x-small;
+}

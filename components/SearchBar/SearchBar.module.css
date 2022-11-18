@@ -1,0 +1,25 @@
+.searchBar {
+    max-width: 900px;
+    width: 100%;
+    overflow: hidden;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    background-color: #2B2B2B;
+}
+
+.searchBar input {
+    border-radius: 0;
+}
+
+.searchBar select {
+    padding: 2px;
+    background: #141414;
+    color: #9C9C9C;
+    align-self: stretch;
+    border: none;
+}
+
+.searchBar select:focus {
+    outline: none;
+}

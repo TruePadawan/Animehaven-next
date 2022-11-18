@@ -1,0 +1,122 @@
+.page {
+    padding: 1%;
+    display: flex;
+    justify-content: space-between;
+}
+
+.main-section-container {
+    max-width: 600px;
+    width: 100%;
+}
+
+@media screen and (max-width: 1000px) {
+    .page {
+        flex-direction: column-reverse;
+    }
+
+    .main-section-container {
+        max-width: none;
+    }
+}
+
+.photo {
+    --bg-color: #FFCF88;
+    background-color: var(--bg-color);
+    box-sizing: content-box;
+    width: 200px;
+    min-height: 200px;
+    border-radius: 8px;
+    border: 4px solid var(--bg-color);
+}
+
+.photo img {
+    border-radius: 8px;
+    max-width: 100%;
+    height: 100%;
+}
+
+.name, .overview {
+    font-family: 'Ubuntu', sans-serif;
+}
+
+.overview {
+    text-align: justify;
+    margin-top: 1%;
+    white-space: pre-line;
+    font-size: small;
+    line-height: 1.5rem;
+    word-spacing: 3px;
+}
+
+.mainSection {
+    margin-bottom: 3rem;
+}
+
+.watchStatus {
+    appearance: none;
+    cursor: pointer;
+}
+
+.watchStatus, .btn {
+    border: 2px solid #748CBC;
+    background-color: transparent;
+    margin-top: 1%;
+    border-radius: 14px;
+    padding: 4px 1.6rem;
+    font-size: small;
+    color: #DADADA;
+    text-align: center;
+}
+
+.btn:hover, .recommended {
+    background-color: #F8E378;
+    color: black;
+}
+
+.btn:disabled, .watchStatus:disabled {
+    color: rgb(80, 80, 80);
+}
+
+.watchStatus:focus {
+    outline: none;
+}
+
+.watchStatus option {
+    background-color: lightblue;
+    color: black;
+}
+
+.extrainfo {
+    min-width: 270px;
+    margin-top: 0.8rem;
+    padding: 0.1rem 0.4rem;
+    background-color: #444444;
+    align-self: stretch;
+    border-radius: 8px 8px 0px 0px;
+    box-shadow: 2px 2px 2px #202020b4;
+}
+
+.category {
+    font-family: 'Lato', sans-serif;
+    color: #B9B9B9;
+}
+
+.score {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.score img {
+    margin-bottom: 2px;
+}
+
+.not_recommended {
+    background-color: transparent;
+}
+
+.select {
+    color: rgb(73, 73, 73);
+    background-color: #b6b6b6;
+    width: max-content;
+}

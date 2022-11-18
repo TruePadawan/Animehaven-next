@@ -1,0 +1,17 @@
+.select {
+    width: max-content;
+    padding: 5px;
+    border: none;
+    height: min-content;
+    border-radius: 1rem;
+    background-color: dimgray;
+    color: aliceblue;
+}
+
+.select option {
+    background-color: rgb(47, 47, 47);
+}
+
+.select:focus {
+    outline: none;
+}

@@ -1,0 +1,39 @@
+.item {
+    --padding-val: 0.25rem;
+    --image-width: 90px;
+    --gap-val: 4px;
+    padding: var(--padding-val);
+    background-color: #A3A3A3;
+    border-radius: 4px;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+    display: grid;
+    grid-template-columns: var(--image-width) calc(100% - (var(--image-width) + var(--padding-val) + var(--gap-val)));
+    gap: var(--gap-val);
+}
+
+.item img {
+    border-radius: 4px;
+    width: 90px;
+    height: 100px;
+    object-fit: cover;
+}
+
+.itemTitle {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: max-content;
+    color: black;
+}
+
+.review {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgb(30, 30, 30);
+    border-radius: 8px;
+    padding: 1%;
+    max-width: 450px;
+    width: 90%;
+}

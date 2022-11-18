@@ -1,0 +1,40 @@
+.list-item {
+    box-shadow: 3px 4px 6px rgba(20, 20, 20, 0.752);
+    border-radius: 0px 8px 8px 8px;
+    max-height: 140px;
+    padding: 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    background-color: antiquewhite;
+    color: black;
+}
+
+.title {
+    font-size: 16px;
+    font-weight: 500;
+    margin: 0;
+}
+
+.title:hover {
+    color: brown;
+}
+
+.creator {
+    font-size: small;
+    width: max-content;
+    color: rgb(150, 115, 69);
+}
+
+.creator:hover {
+    text-decoration: underline;
+}
+
+.desc {
+    font-family: 'Radio Canada', sans-serif;
+    font-size: 0.9rem;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    overflow: hidden;
+}

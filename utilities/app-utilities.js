@@ -1,0 +1,292 @@
+import { supabase } from "../supabase/config";
+
+// /**
+//  * Wrapper for 'setItem' to enable support for storing Arrays and Objects into localstorage
+//  * @param {string} key
+//  * @param {array | object} obj
+//  * @returns
+//  */
+// Storage.prototype.setObj = function (key, obj) {
+// 	return this.setItem(key, JSON.stringify(obj));
+// };
+
+// /**
+//  * Wrapper for 'getItem' to enable support for getting Arrays and Objects from localstorage
+//  * @param {string} key
+//  * @returns Array | Object
+//  */
+// Storage.prototype.getObj = function (key) {
+// 	return JSON.parse(this.getItem(key));
+// };
+
+// export function storeInLocalStorage(key, value, type = "string") {
+// 	if (type === "array" || type === "object") {
+// 		localStorage.setObj(key, value);
+// 	} else {
+// 		localStorage.setItem(key, value);
+// 	}
+// }
+
+// export function getFromLocalStorage(key, type = "string") {
+// 	if (type === "array" || type === "object") {
+// 		return localStorage.getObj(key);
+// 	} else {
+// 		return localStorage.getItem(key);
+// 	}
+// }
+
+export function getUsefulData(rawAnimeData) {
+	const id = rawAnimeData["mal_id"];
+	let title = rawAnimeData.title;
+	rawAnimeData.titles.forEach((lang) => {
+		if (lang["type"] === "English") {
+			title = lang["title"];
+		}
+	});
+	const imageURL = rawAnimeData.images.jpg["image_url"];
+	const type = rawAnimeData.type;
+	const score = rawAnimeData.score;
+	const genres = rawAnimeData.genres;
+	const overview = rawAnimeData["synopsis"];
+
+	return { id, title, imageURL, type, score, genres, overview };
+}
+
+export function getRandomInt(min, max) {
+	min = Math.ceil(min);
+	max = Math.floor(max);
+	return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+export function createProfile(accountData) {
+	return supabase.from("profiles").insert(accountData);
+}
+
+export const DEFAULT_AVATAR_URL =
+	"https://bkpyhkkjvgzfjojacrka.supabase.co/storage/v1/object/public/avatars/noprofilepic.jpg";
+
+export const LIST_GENRES = [
+	"Action",
+	"Adventure",
+	"Comedy",
+	"Drama",
+	"Ecchi",
+	"Horror",
+	"Sports",
+	"Supernatural",
+	"Romance",
+	"Suspense",
+	"Fantasy",
+	"Slice of Life",
+	"Sci-Fi",
+	"Boys Love",
+];
+
+export async function getCommentsData(instanceID) {
+	const { data } = await supabase
+		.from("comments")
+		.select()
+		.eq("instance_id", instanceID)
+		.limit(4)
+		.order("created_at", { ascending: false })
+		.throwOnError();
+	return data;
+}
+
+export async function getCommentData(commentID, fields = "*") {
+	const { data } = await supabase
+		.from("comments")
+		.select(fields)
+		.eq("id", commentID)
+		.throwOnError()
+		.limit(1)
+		.single();
+	return data;
+}
+
+export async function getProfileData(fields, profileID) {
+	const { data } = await supabase
+		.from("profiles")
+		.select(fields)
+		.eq("id", profileID)
+		.throwOnError()
+		.limit(1)
+		.single();
+	return data;
+}
+
+export async function getProfiles() {
+	const { data } = await supabase.from("profiles").select().throwOnError();
+	return data;
+}
+
+export async function getProfileID(accountName) {
+	const { data } = await supabase
+		.from("profiles")
+		.select("id")
+		.eq("account_name", accountName)
+		.throwOnError();
+	if (data.length === 1) {
+		return data[0].id;
+	}
+	return null;
+}
+
+export async function getReviewUpvoteList(reviewID) {
+	const { data } = await supabase
+		.from("item_reviews")
+		.select("upvoted_by")
+		.eq("id", reviewID)
+		.limit(1)
+		.single();
+	return data.upvoted_by;
+}
+
+export async function reviewExist(reviewID) {
+	const { count } = await supabase
+		.from("item_reviews")
+		.select("*", { count: "exact", head: true })
+		.eq("id", reviewID);
+	return count === 1;
+}
+
+export async function toggleUpvoteForReview(reviewID, profileID) {
+	if (!profileID) {
+		throw new Error("NO_PROFILE_ID_SPECIFIED");
+	}
+
+	// CONFIRM THAT REVIEW EXISTS
+	try {
+		const exist = await reviewExist(reviewID);
+		if (!exist) {
+			return {
+				status: "FAILED",
+				code: "REVIEW_NOT_FOUND",
+			};
+		}
+	} catch (error) {
+		throw new Error("REVIEW_EXISTENCE_NOT_CONFIRMED");
+	}
+
+	const { data } = await supabase
+		.from("item_reviews")
+		.select("upvoted_by,creator_id")
+		.eq("id", reviewID)
+		.throwOnError()
+		.limit(1)
+		.single();
+	const reviewCreatorID = data.creator_id;
+	if (reviewCreatorID === profileID) {
+		throw new Error("CANNOT UPVOTE OWN REVIEW");
+	}
+	let upvoteList = data.upvoted_by;
+	if (upvoteList.includes(profileID)) {
+		upvoteList = upvoteList.filter((id) => id !== profileID);
+		await supabase
+			.from("item_reviews")
+			.update({ upvoted_by: upvoteList })
+			.eq("id", reviewID)
+			.throwOnError();
+		return {
+			status: "COMPLETE",
+			code: "UPVOTE_REMOVED",
+		};
+	} else {
+		upvoteList.push(profileID);
+		await supabase
+			.from("item_reviews")
+			.update({ upvoted_by: upvoteList })
+			.eq("id", reviewID);
+		return {
+			status: "COMPLETE",
+			code: "UPVOTE_ADDED",
+		};
+	}
+}
+
+export async function deleteReview(reviewID, profileID) {
+	if (!profileID) {
+		throw new Error("NO_PROFILE_ID_SPECIFIED");
+	}
+
+	// CONFIRM THAT REVIEW EXISTS
+	try {
+		const exist = await reviewExist(reviewID);
+		if (!exist) {
+			return {
+				status: "FAILED",
+				code: "REVIEW_NOT_FOUND",
+			};
+		}
+	} catch (error) {
+		throw new Error("REVIEW_EXISTENCE_NOT_CONFIRMED");
+	}
+
+	await supabase
+		.from("item_reviews")
+		.delete()
+		.eq("id", reviewID)
+		.eq("creator_id", profileID)
+		.throwOnError();
+	return {
+		status: "COMPLETE",
+		code: "REVIEW_DELETED",
+	};
+}
+
+export async function toggleUpvoteForComment(commentID, profileID) {
+	if (!profileID) {
+		throw new Error("NO_PROFILE_ID_SPECIFIED");
+	}
+
+	let upvoteList = [];
+	try {
+		const { upvoted_by } = await getCommentData(commentID, "upvoted_by");
+		upvoteList = upvoted_by;
+	} catch (error) {
+		throw error;
+	}
+	if (upvoteList.includes(profileID)) {
+		upvoteList = upvoteList.filter((id) => id !== profileID);
+		await supabase
+			.from("comments")
+			.update({ upvoted_by: upvoteList })
+			.eq("id", commentID)
+			.select("upvoted_by")
+			.throwOnError();
+		return {
+			status: "COMPLETE",
+			code: "UPVOTE REMOVED",
+		};
+	} else {
+		upvoteList = upvoteList.concat(profileID);
+		await supabase
+			.from("comments")
+			.update({ upvoted_by: upvoteList })
+			.eq("id", commentID)
+			.select("upvoted_by")
+			.throwOnError();
+		return {
+			status: "COMPLETE",
+			code: "UPVOTE ADDED",
+		};
+	}
+}
+
+export async function getUserItemRecommendations(profileID) {
+	const response = await supabase
+		.from("item_recommendations")
+		.select()
+		.eq("recommended_by", profileID)
+		.throwOnError();
+	return response;
+}
+
+export async function getUserItemReviews(profileID) {
+	const response = await supabase
+		.from("item_reviews")
+		.select()
+		.eq("creator_id", profileID)
+		.throwOnError();
+	return response;
+}

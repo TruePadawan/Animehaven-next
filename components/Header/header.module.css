@@ -1,0 +1,15 @@
+.header {
+    padding: 20px 20px 0 20px;
+    background-color: #1E1E1E;
+    color: white;
+}
+
+.heading {
+    font-weight: 500;
+    font-size: 2rem;
+}
+
+.headerImg {
+    max-width: 50px;
+    height: auto;
+}

@@ -1,0 +1,23 @@
+.add-to-list-btn {
+    min-width: 108px;
+    background-color: transparent;
+    border-radius: 16px;
+    border: 2px solid #A1A1A1;
+    color: inherit;
+    padding: 0.8% 2.2%;
+}
+
+.add-to-list-btn:hover {
+    background-color: #A1A1A1;
+    color: black;
+}
+
+.add-to-list-btn:active {
+    --btn-pressed-bg-color: #888888;
+    border-color: var(--btn-pressed-bg-color);
+    background-color: var(--btn-pressed-bg-color);
+}
+
+.dialog-body {
+    padding: 4px 12px;
+}

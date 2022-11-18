@@ -1,0 +1,22 @@
+.discussions-main {
+    height: 100%;
+    position: relative;
+}
+
+.filter {
+    padding: 6px 12px 12px 12px;
+    background-color: rgb(63, 63, 60);
+    border-radius: 4px;
+}
+
+.title {
+    font-size: larger;
+    color: rgba(183, 180, 177, 0.939);
+}
+
+.tags {
+    background-color: transparent;
+    border: none;
+    display: flex;
+    flex-direction: column;
+}
