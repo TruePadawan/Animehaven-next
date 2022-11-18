@@ -19,6 +19,7 @@ import { getProfileData } from "../../utilities/app-utilities";
 import Head from "next/head";
 import { supabase } from "../../supabase/config";
 import Image from "next/image";
+import { useRouter } from "next/router";
 
 const ExtraInfo = (props) => {
 	return (
@@ -59,7 +60,7 @@ const getItemStudio = (itemData) => {
 	return studios;
 };
 
-const compileItemInfo = (data) => {
+const transformAnimeData = (data) => {
 	let { title, imageURL, type, score, overview } = getUsefulData(data);
 	// REMOVE 'WRITTEN BY MAL REWRITE' TEXT AT THE END OF THE SYNOPSIS
 	if (overview) {
@@ -86,7 +87,7 @@ const compileItemInfo = (data) => {
 
 const defaultSnackbarState = { open: false, severity: "info", text: "" };
 
-const AnimeDetails = ({ animeID }) => {
+const AnimeDetails = () => {
 	const { profileID } = useContext(UserAuthContext);
 	const [loading, setLoading] = useState(true);
 	const [snackbarData, setSnackbarData] = useState(defaultSnackbarState);
@@ -110,10 +111,11 @@ const AnimeDetails = ({ animeID }) => {
 	const [watchStatusElDisabled, setWatchStatusElDisabled] = useState(false);
 	const [categoryVal, setCategoryVal] = useState("COMMENTS");
 	const [loadingFailed, setLoadingFailed] = useState(false);
+	const router = useRouter();
+	const animeID = router.query?.animeID;
 
 	// ALLOW SNACKBAR STATE TO BE CUSTOMIZED
 	const triggerAlert = useCallback((text, options) => {
-		console.log(options.error)
 		const alertSeverity = options?.severity;
 		setSnackbarData({
 			open: true,
@@ -136,69 +138,72 @@ const AnimeDetails = ({ animeID }) => {
 
 	// LOAD DATA FOR ITEM AND RENDER IT IN UI
 	useEffect(() => {
-		const loadItem = async () => {
-			try {
-				const animeData = await getAnimeByID(animeID);
-				const itemInfo = compileItemInfo(animeData);
-				setInfo(itemInfo.main);
-				setExtraInfo(itemInfo.extra);
-			} catch (error) {
-				triggerAlert("Failed to load anime info", { severity: "error", error });
-				setLoading(false);
-				setLoadingFailed(true);
-				return;
-			}
+		if (router.isReady) {
+			const { animeID } = router.query;
+			getAnimeByID(animeID)
+			.then((animeData) => {
+					const { main, extra } = transformAnimeData(animeData);
+					setInfo(main);
+					setExtraInfo(extra);
 
-			if (profileID && !loadingFailed) {
-				setWatchStatusElDisabled(true);
-				setRecommendBtnDisabled(true);
-				// LOAD ITEM WATCH STATUS
-				try {
-					const { items_watch_status } = await getProfileData(
-						"items_watch_status",
-						profileID
-					);
-					const itemIDs = Object.keys(items_watch_status);
-					if (itemIDs.includes(animeID) === false) {
-						items_watch_status[animeID] = "NOT_WATCHED";
-						await supabase
-							.from("profiles")
-							.update({ items_watch_status: items_watch_status })
-							.eq("id", profileID);
-					} else {
-						setWatchStatus(items_watch_status[animeID]);
+					if (profileID && !loadingFailed) {
+						setWatchStatusElDisabled(true);
+						setRecommendBtnDisabled(true);
+						// LOAD ANIME WATCH STATUS FOR SIGNED IN USER
+						getProfileData("items_watch_status", profileID)
+							.then(({ items_watch_status }) => {
+								const itemIDs = Object.keys(items_watch_status);
+								if (itemIDs.includes(animeID) === false) {
+									items_watch_status[animeID] = "NOT_WATCHED";
+									supabase
+										.from("profiles")
+										.update({ items_watch_status: items_watch_status })
+										.eq("id", profileID);
+								} else {
+									setWatchStatus(items_watch_status[animeID]);
+								}
+								setWatchStatusElDisabled(false);
+							})
+							.catch((error) => {
+								triggerAlert("Failed to load anime watch status", {
+									severity: "error",
+									error,
+								});
+							});
+
+						// CHECK IF ITEM IS RECOMMENDED
+						getUserItemRecommendations(profileID)
+							.then(({ data: rows }) => {
+								const isRecommended = rows.some(
+									(row) => row.item_id === animeID
+								);
+								if (isRecommended) {
+									setRecommendationStatus("recommended");
+								} else {
+									setRecommendationStatus("not_recommended");
+								}
+								setRecommendBtnDisabled(false);
+							})
+							.catch((error) => {
+								triggerAlert("Failed to load anime recommendation status", {
+									severity: "error",
+									error,
+								});
+							});
 					}
-					setWatchStatusElDisabled(false);
-				} catch (error) {
-					triggerAlert("Failed to load anime watch status", {
+				})
+				.catch((error) => {
+					triggerAlert("Failed to load anime info", {
 						severity: "error",
 						error,
 					});
-					return;
-				}
-
-				// CHECK IF ITEM IS RECOMMENDED
-				try {
-					const { data: rows } = await getUserItemRecommendations(profileID);
-					const isRecommended = rows.some((row) => row.item_id === animeID);
-					if (isRecommended) {
-						setRecommendationStatus("recommended");
-					} else {
-						setRecommendationStatus("not_recommended");
-					}
-					setRecommendBtnDisabled(false);
-				} catch (error) {
-					triggerAlert("Failed to load anime recommendation status", {
-						severity: "error",
-						error,
-					});
-					return;
-				}
-			}
-			setLoading(false);
-		};
-		loadItem();
-	}, [profileID, animeID, loadingFailed, triggerAlert]);
+					setLoadingFailed(true);
+				})
+				.finally(() => {
+					setLoading(false);
+				});
+		}
+	}, [profileID, router, loadingFailed, triggerAlert]);
 
 	// RECOMMEND ITEM OR REMOVE RECOMMENDATION
 	const recommendItem = async () => {
@@ -279,14 +284,14 @@ const AnimeDetails = ({ animeID }) => {
 			{loading && <Loading />}
 			{errorWhileLoading && (
 				<Error
-					title="Error occurred while loading item"
+					title="Error occurred while loading anime"
 					extraText="Consider reloading the page!"
 				/>
 			)}
 			{loadingSuccessful && (
 				<PageContainer className={styles.page}>
 					<Head>
-						<title>Animehaven | {info.title}</title>
+						<title>{`Animehaven | ${info.title}`}</title>
 						<meta name="description" content={info.overview} />
 						<meta property="og:title" content={`Animehaven | ${info.title}`} />
 						<meta property="og:description" content={info.overview} />
@@ -346,7 +351,12 @@ const AnimeDetails = ({ animeID }) => {
 					</Box>
 					<div className="d-flex flex-column gap-1 align-items-center">
 						<span className={styles.photo}>
-							<Image src={info.photoURL} alt={info.title} width={200} height={300} />
+							<Image
+								src={info.photoURL}
+								alt={info.title}
+								width={200}
+								height={300}
+							/>
 						</span>
 						{profileID && (
 							<span className="d-flex gap-2">
@@ -390,13 +400,5 @@ const AnimeDetails = ({ animeID }) => {
 		</Fragment>
 	);
 };
-
-export function getServerSideProps(context) {
-	return {
-		props: {
-			animeID: context.params.animeID,
-		},
-	};
-}
 
 export default AnimeDetails;
