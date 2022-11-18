@@ -1,4 +1,4 @@
-import { memo, useRef, useState } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/router";
 import { v4 as uuid } from "uuid";
 import SearchInput from "../Input/SearchInput/SearchInput";
@@ -7,15 +7,20 @@ import styles from "./SearchBar.module.css";
 const SearchBar = ({ searchCategories, searchText, searchCategory }) => {
 	const router = useRouter();
 	const [inputVal, setInputVal] = useState(searchText || "");
-	const [selectVal, setSelectVal] = useState(() => {
-		if (searchCategory) return searchCategory.toUpperCase();
-		return searchCategories[0].toUpperCase();
-	});
+	const [selectVal, setSelectVal] = useState(searchCategories[0]);
 	const selectRef = useRef();
 
 	const updatePageURL = (searchText, searchCategory) => {
 		router.push(`/search?cat=${searchCategory}&text=${searchText}`);
 	};
+
+	useEffect(() => {
+		setInputVal(searchText || "");
+		setSelectVal(() => {
+			if (searchCategory) return searchCategory.toUpperCase();
+			return searchCategories[0].toUpperCase();
+		});
+	}, [searchCategory, searchCategories, searchText]);
 
 	const searchHandler = (e) => {
 		e.preventDefault();

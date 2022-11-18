@@ -4,9 +4,13 @@
     color: white;
 }
 
-.heading {
+.heading > h1 {
     font-weight: 500;
     font-size: 2rem;
+}
+
+.heading:hover {
+    color: antiquewhite;
 }
 
 .headerImg {

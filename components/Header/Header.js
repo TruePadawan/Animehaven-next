@@ -36,7 +36,7 @@ const getTabValue = (router) => {
 
 const Header = () => {
 	const router = useRouter();
-	const [tabValue, setTabValue] = useState(getTabValue(router));
+	const [tabValue, setTabValue] = useState(0);
 	const matchesSmallDevice = useMediaQuery("(max-width:480px)");
 
 	useEffect(() => {
@@ -50,7 +50,7 @@ const Header = () => {
 	const headerContent = matchesSmallDevice ? (
 		<Image src={HeaderLogo} alt="animehaven" width={50} height={50} className={styles.headerImg} />
 	) : (
-		<h1 className={styles.heading}>Animehaven</h1>
+		<h1>Animehaven</h1>
 	);
 	
 	const currentRoute = router.pathname.split("/").at(1);
@@ -72,7 +72,7 @@ const Header = () => {
 					alignItems: "center",
 					marginBottom: "5px",
 				}}>
-				<Link href="/">{headerContent}</Link>
+				<Link className={styles.heading} href="/">{headerContent}</Link>
 				<Authentication />
 			</Box>
 			<Box

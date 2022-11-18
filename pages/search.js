@@ -79,6 +79,7 @@ export default function Search() {
 		}
 	}, []);
 
+	// LOOK FOR SEARCH PARAMS IN PAGE URL
 	useEffect(() => {
 		if (searchText && searchCategory) {
 			searchFunc(searchText, searchCategory.toUpperCase());
