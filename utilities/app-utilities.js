@@ -1,40 +1,5 @@
 import { supabase } from "../supabase/config";
 
-// /**
-//  * Wrapper for 'setItem' to enable support for storing Arrays and Objects into localstorage
-//  * @param {string} key
-//  * @param {array | object} obj
-//  * @returns
-//  */
-// Storage.prototype.setObj = function (key, obj) {
-// 	return this.setItem(key, JSON.stringify(obj));
-// };
-
-// /**
-//  * Wrapper for 'getItem' to enable support for getting Arrays and Objects from localstorage
-//  * @param {string} key
-//  * @returns Array | Object
-//  */
-// Storage.prototype.getObj = function (key) {
-// 	return JSON.parse(this.getItem(key));
-// };
-
-// export function storeInLocalStorage(key, value, type = "string") {
-// 	if (type === "array" || type === "object") {
-// 		localStorage.setObj(key, value);
-// 	} else {
-// 		localStorage.setItem(key, value);
-// 	}
-// }
-
-// export function getFromLocalStorage(key, type = "string") {
-// 	if (type === "array" || type === "object") {
-// 		return localStorage.getObj(key);
-// 	} else {
-// 		return localStorage.getItem(key);
-// 	}
-// }
-
 export function getUsefulData(rawAnimeData) {
 	const id = rawAnimeData["mal_id"];
 	let title = rawAnimeData.title;
@@ -43,7 +8,7 @@ export function getUsefulData(rawAnimeData) {
 			title = lang["title"];
 		}
 	});
-	const imageURL = rawAnimeData.images.jpg["image_url"];
+	const imageURL = rawAnimeData.images.jpg["large_image_url"];
 	const type = rawAnimeData.type;
 	const score = rawAnimeData.score;
 	const genres = rawAnimeData.genres;

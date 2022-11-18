@@ -9,7 +9,7 @@ import {
 	getUsefulData,
 	getUserItemRecommendations,
 } from "../../utilities/app-utilities";
-import styles from "../../styles/item.module.css";
+import styles from "../../styles/anime.module.css";
 import CommentsList from "../../components/Comments-Reviews/Comments/CommentsList";
 import ReviewsList from "../../components/Comments-Reviews/Reviews/ReviewsList";
 import Loading from "../../components/Loading/Loading";
@@ -18,6 +18,7 @@ import Error from "../../components/Error/Error";
 import { getProfileData } from "../../utilities/app-utilities";
 import Head from "next/head";
 import { supabase } from "../../supabase/config";
+import Image from "next/image";
 
 const ExtraInfo = (props) => {
 	return (
@@ -345,7 +346,7 @@ const AnimeDetails = ({ animeID }) => {
 					</Box>
 					<div className="d-flex flex-column gap-1 align-items-center">
 						<span className={styles.photo}>
-							<img src={info.photoURL} alt={info.title} />
+							<Image src={info.photoURL} alt={info.title} width={200} height={300} />
 						</span>
 						{profileID && (
 							<span className="d-flex gap-2">

@@ -15,6 +15,7 @@ import { getUsefulData } from "../../utilities/app-utilities";
 import { getAnimeByID } from "../../utilities/mal-api";
 import { UserAuthContext } from "../../context/UserAuthContext";
 import { useRouter } from "next/router";
+import Image from "next/image";
 
 const Item = ({ itemID, itemTitle, index }) => {
 	const [loading, setLoading] = useState(true);
@@ -26,7 +27,7 @@ const Item = ({ itemID, itemTitle, index }) => {
 
 	useEffect(() => {
 		// LAZY REQEUST DUE TO RATE LIMITING
-		const timeout = index > 0 ? index * 800 : 0;
+		const timeout = index > 0 ? index * 500 : 0;
 		setTimeout(() => {
 			getAnimeByID(itemID)
 				.then((data) => {
@@ -57,7 +58,7 @@ const Item = ({ itemID, itemTitle, index }) => {
 			)}
 			{!loading && (
 				<Fragment>
-					<img src={imageURL} alt={title} />
+					<Image src={imageURL} alt={title} width={90} height={112} />
 					<div className="d-flex flex-column h-100" style={{ minWidth: "0" }}>
 						<Link href={`/anime/${itemID}`} className={styles["item-title"]}>
 							{title}
