@@ -1,13 +1,13 @@
-import { Fragment } from "react";
 import Header from "../components/Header/Header";
+import { UserAuthContextProvider } from "../context/UserAuthContext";
 import "../styles/global.css";
 
 function MyApp({ Component, pageProps }) {
 	return (
-		<Fragment>
+		<UserAuthContextProvider>
 			<Header />
 			<Component {...pageProps} />
-		</Fragment>
+		</UserAuthContextProvider>
 	);
 }
 
