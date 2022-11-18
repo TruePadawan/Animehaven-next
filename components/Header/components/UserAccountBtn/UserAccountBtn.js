@@ -2,7 +2,6 @@ import { Fragment, useEffect, useState } from "react";
 import {
 	Menu,
 	MenuItem,
-	Tooltip,
 	IconButton,
 	Avatar,
 	CircularProgress,
@@ -11,7 +10,7 @@ import Link from "next/link";
 import { DEFAULT_AVATAR_URL } from "../../../../utilities/app-utilities";
 import { supabase } from "../../../../supabase/config";
 import { getProfileData } from "../../../../utilities/app-utilities";
-
+import Image from "next/image";
 
 const UserAccountBtn = ({ profileID, errorHandler }) => {
 	const [accountName, setAccountName] = useState("");
@@ -53,15 +52,22 @@ const UserAccountBtn = ({ profileID, errorHandler }) => {
 		<Fragment>
 			{!loading && (
 				<Fragment>
-					<Tooltip title="Account" enterDelay={200}>
-						<IconButton
-							onClick={openMenu}
-							aria-controls={isMenuOpen ? "account-menu" : undefined}
-							aria-haspopup="true"
-							aria-expanded={isMenuOpen ? "true" : undefined}>
-							<Avatar alt={accountName} src={photoSrc} />
-						</IconButton>
-					</Tooltip>
+					<IconButton
+						onClick={openMenu}
+						aria-controls={isMenuOpen ? "account-menu" : undefined}
+						aria-haspopup="true"
+						aria-expanded={isMenuOpen ? "true" : undefined}>
+						<Avatar alt={accountName} sx={{ color: "black" }}>
+							<Image
+								style={{ objectFit: "cover" }}
+								src={photoSrc}
+								width={40}
+								height={40}
+								quality={100}
+								title="Account"
+							/>
+						</Avatar>
+					</IconButton>
 					<Menu
 						id="account-menu"
 						anchorEl={menuAnchorEl}
