@@ -21,7 +21,7 @@ export default function ProfileLayout(props) {
 		if (!profileExists) return;
 		if (!profileID) {
 			setIsAccountEditable(false);
-		} else if (profileID && !profileExists) {
+		} else if (profileID && profileExists) {
 			getProfileData("account_name", profileID).then(({ account_name }) => {
 				setIsAccountEditable(account_name === props.accountName);
 			});
