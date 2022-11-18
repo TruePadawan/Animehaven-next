@@ -23,12 +23,13 @@
     "date-fns": "^2.29.2",
     "framer-motion": "^7.1.1",
     "material-ui-popup-state": "^4.1.0",
-    "prop-types": "^15.8.1",
-    "uuid": "^8.3.2",
-    "web-vitals": "^3.0.4",
     "next": "13.0.3",
+    "prop-types": "^15.8.1",
     "react": "18.2.0",
-    "react-dom": "18.2.0"
+    "react-dom": "18.2.0",
+    "sharp": "^0.31.2",
+    "uuid": "^8.3.2",
+    "web-vitals": "^3.0.4"
   },
   "devDependencies": {
     "jest": "^27.5.1"
