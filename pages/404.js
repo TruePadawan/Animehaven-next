@@ -8,6 +8,7 @@ const NO_PAGE = () => {
 				<title>Animehaven | Page not Found</title>
 				<meta name="description" content="Page not Found!" />
 				<meta property="og:title" content="Animehaven | Page not Found" />
+				<meta property="og:url" content="https://animehaven.vercel.app/404" />
 				<meta property="og:description" content="Page not Found!" />
 				<meta name="twitter:title" content="Animehaven | Page not Found" />
 				<meta name="twitter:description" content="Page not Found!" />

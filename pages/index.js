@@ -126,6 +126,7 @@ const Home = (props) => {
 					content="Get information on the latest animes, compile and share lists of animes and have discussions about your favorite animes on Animehaven."
 				/>
 				<meta property="og:title" content="Animehaven" />
+				<meta property="og:url" content="https://animehaven.vercel.app/" />
 				<meta
 					property="og:description"
 					content="Get information on the latest animes, compile and share lists of animes and have discussions about your favorite animes on Animehaven."

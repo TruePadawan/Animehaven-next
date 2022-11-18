@@ -32,7 +32,6 @@ export default function Document() {
 					content="MbWwC0AH37Bl4t4o11N6R-L1mhx8SblAYiIzU8AGT0U"
 				/>
 				<meta property="og:type" content="website" />
-				<meta property="og:url" content="https://animehaven.vercel.app/" />
 				<meta property="og:image" content="/animehaven.JPG" />
 				<meta property="og:image:alt" content="Animehaven home page" />
 				<meta name="twitter:card" content="summary_large_image" />
