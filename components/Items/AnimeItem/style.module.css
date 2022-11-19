@@ -34,7 +34,7 @@
 .anime-item img, .popoverItemImg {
     border-radius: inherit;
     object-fit: cover;
-    max-width: 200px;
+    max-width: 100%;
     flex-grow: 1;
 }
 
