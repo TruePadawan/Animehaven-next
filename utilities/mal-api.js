@@ -11,13 +11,13 @@ const afterYear = (year, item, type) => {
 }
 
 const isFlagged = (item, type) => {
-  const hasNoImage = item.images.jpg["large_image_url"] === "https://cdn.myanimelist.net/img/sp/icon/apple-touch-icon-256.png";
-  const notYetAired = item.status === "Not yet aired";
-  const isNotTVSeries = item.type !== "TV";
+  const acceptedTypes = ["TV", "OVA"];
+  const hasNoImage = item.images.jpg["image_url"] === "https://cdn.myanimelist.net/img/sp/icon/apple-touch-icon-256.png";
+  const hasNoDescription = item.synopsis === null;
+  const hasWrongType = item.type !== null && acceptedTypes.includes(item.type.toUpperCase()) === false;
   const notSFW = isNSFW(item);
-  const tooOld = afterYear(2010, item, type) === false;
-  
-  return (hasNoImage || notYetAired || notSFW || tooOld || isNotTVSeries )
+    
+  return (hasNoImage || hasWrongType || hasNoDescription || notSFW );
 }
 
 // RETURN A RANDOM MANGA FROM MYANIMELIST THAT ISN'T HENTAI
