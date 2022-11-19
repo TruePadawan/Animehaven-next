@@ -59,10 +59,10 @@ const UserAccountBtn = ({ profileID, errorHandler }) => {
 						aria-expanded={isMenuOpen ? "true" : undefined}>
 						<Avatar alt={accountName} sx={{ color: "black" }}>
 							<Image
-								style={{ objectFit: "cover" }}
+								style={{ objectFit: "contain" }}
 								src={photoSrc}
-								width={40}
-								height={40}
+								width={100}
+								height={100}
 								quality={100}
 								title="Account"
 							/>
