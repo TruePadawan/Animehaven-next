@@ -12,7 +12,7 @@
     border-radius: 0;
 }
 
-.searchBar select {
+.searchCategory {
     padding: 2px;
     background: #141414;
     color: #9C9C9C;
@@ -20,6 +20,6 @@
     border: none;
 }
 
-.searchBar select:focus {
+.searchCategory:focus {
     outline: none;
 }
