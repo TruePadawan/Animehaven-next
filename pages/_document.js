@@ -35,8 +35,8 @@ export default function Document() {
 				<meta property="og:image" content="/animehaven.JPG" />
 				<meta property="og:image:alt" content="Animehaven home page" />
 				<meta name="twitter:card" content="summary_large_image" />
-				<meta name="twitter:image" content="/animehaven.JPG" />
-				<meta name="twitter:image:alt" content="Animehaven front page" />
+				<meta name="twitter:image" content="https://bkpyhkkjvgzfjojacrka.supabase.co/storage/v1/object/public/misc/animehaven.JPG" />
+				<meta name="twitter:image:alt" content="Animehaven home page" />
 				<meta name="twitter:site" content="@thetruepadawan" />
 				<meta name="twitter:creator" content="@thetruepadawan" />
 				<link rel="apple-touch-icon" href="/logo.png" />
