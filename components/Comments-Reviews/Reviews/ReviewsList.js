@@ -5,26 +5,26 @@ import ReviewItem from "./ReviewItem";
 import styles from "../Comments-Reviews.module.css";
 import { supabase } from "../../../supabase/config";
 
-const getItemReviews = async (itemID, count = 4) => {
+const getItemReviews = async (animeID, count = 4) => {
 	const { data: reviews } = await supabase
-		.rpc("get_item_reviews", { itemid: itemID, n_reviews: count + 1 })
+		.rpc("get_item_reviews", { itemid: animeID, n_reviews: count + 1 })
 		.throwOnError();
 	return reviews;
 };
 
-const getReview = async (itemID, userID) => {
+const getReview = async (animeID, userID) => {
 	const { data } = await supabase
 		.from("item_reviews")
 		.select()
 		.eq("creator_id", userID)
-		.eq("item_id", itemID)
+		.eq("item_id", animeID)
 		.throwOnError()
 		.limit(1)
 		.single();
 	return data;
 };
 
-const ReviewsList = ({ profileID, itemID, triggerAlert }) => {
+const ReviewsList = ({ profileID, animeID, triggerAlert }) => {
 	const [reviewText, setReviewText] = useState("");
 	const [reviewListData, setReviewListData] = useState([]);
 	const [rating, setRating] = useState(1);
@@ -40,7 +40,7 @@ const ReviewsList = ({ profileID, itemID, triggerAlert }) => {
 	useEffect(() => {
 		// IF USER IS SIGNED IN, CHECK IF USER HAS REVIEW THE ANIME AND SHOW THEIRS AT THE TOP
 		if (profileID !== null) {
-			getReview(itemID, profileID)
+			getReview(animeID, profileID)
 				.then((reviewData) => {
 					const { id, review, rating, upvoted_by } = reviewData;
 					setReviewListData((snapshot) => {
@@ -69,7 +69,7 @@ const ReviewsList = ({ profileID, itemID, triggerAlert }) => {
 					setReviewListData([]);
 				});
 		}
-		getItemReviews(itemID)
+		getItemReviews(animeID)
 			.then((reviews) => {
 				const list = [];
 				reviews.forEach((reviewData) => {
@@ -95,7 +95,7 @@ const ReviewsList = ({ profileID, itemID, triggerAlert }) => {
 				handleError("Failed to retrieve reviews", error);
 				setReviewListData([]);
 			});
-	}, [itemID, profileID, handleError]);
+	}, [animeID, profileID, handleError]);
 
 	const updateRating = (e, newVal) => setRating(newVal < 1 ? 1 : newVal);
 	const textAreaChangeHandler = (e) => setReviewText(e.target.value);
@@ -109,7 +109,7 @@ const ReviewsList = ({ profileID, itemID, triggerAlert }) => {
 		const { data } = await supabase
 			.from("item_reviews")
 			.select()
-			.eq("item_id", itemID)
+			.eq("item_id", animeID)
 			.eq("creator_id", profileID)
 			.throwOnError();
 		const hasReview = data.length === 1;
@@ -119,7 +119,7 @@ const ReviewsList = ({ profileID, itemID, triggerAlert }) => {
 				await supabase
 					.from("item_reviews")
 					.insert({
-						item_id: itemID,
+						item_id: animeID,
 						creator_id: profileID,
 						review: reviewText,
 						rating,
@@ -128,10 +128,9 @@ const ReviewsList = ({ profileID, itemID, triggerAlert }) => {
 					.throwOnError();
 
 				// GET THE ID OF THE POSTED REVIEW AND UPDATE THE REVIEW LIST SO UI CAN BE UPDATED WITH NEW REVIEW
-				const reviewData = await getReview(itemID, profileID);
+				const reviewData = await getReview(animeID, profileID);
 				setReviewListData((currentReviews) => {
 					currentReviews.unshift({
-						itemID,
 						reviewID: reviewData.id,
 						reviewText: reviewData.review,
 						rating,
@@ -157,7 +156,7 @@ const ReviewsList = ({ profileID, itemID, triggerAlert }) => {
 						review: reviewText,
 						rating,
 					})
-					.eq("item_id", itemID)
+					.eq("item_id", animeID)
 					.eq("creator_id", profileID)
 					.throwOnError();
 
