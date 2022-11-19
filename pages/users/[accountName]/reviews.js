@@ -1,36 +1,13 @@
-import ProfileLayout from "../../../components/Profile/ProfileLayout"
-import { UserReviews } from "../../../components/Profile/ProfileSections/ProfileSections"
-import { getProfileData, getProfileID } from "../../../utilities/app-utilities";
+import { useRouter } from "next/router";
+import ProfileLayout from "../../../components/Profile/ProfileLayout";
+import { UserReviews } from "../../../components/Profile/ProfileSections/ProfileSections";
 
-export default function Reviews(props) {
-    return (
-        <ProfileLayout {...props}>
-            <UserReviews accountName={props.accountName} />
-        </ProfileLayout>
-    )
-}
-
-export async function getServerSideProps(context) {
-	const { accountName } = context.params;
-	const id = await getProfileID(accountName);
-	if (id === null) {
-		return {
-			props: {
-				profileExists: false,
-				accountName,
-			},
-		};
-	}
-	const { avatar_url, display_name, bio } = await getProfileData("*", id);
-	return {
-		props: {
-			profileExists: true,
-			accountName,
-			data: {
-				avatar_url,
-				display_name,
-				bio,
-			},
-		},
-	};
+export default function Reviews() {
+	const router = useRouter();
+	const { accountName } = router.query;
+	return (
+		<ProfileLayout router={router}>
+			<UserReviews accountName={accountName} />
+		</ProfileLayout>
+	);
 }

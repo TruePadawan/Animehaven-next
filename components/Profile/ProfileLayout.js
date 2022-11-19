@@ -4,35 +4,80 @@ import { IconButton, SwipeableDrawer, useMediaQuery } from "@mui/material";
 import ViewSidebarIcon from "@mui/icons-material/ViewSidebar";
 import Head from "next/head";
 import { EditProfile } from "./ProfileSections/ProfileSections";
-import { getProfileData } from "../../utilities/app-utilities";
+import { getProfileData, getProfileID } from "../../utilities/app-utilities";
 import { UserAuthContext } from "../../context/UserAuthContext";
 import styles from "./profile-layout.module.css";
+import Image from "next/image";
+import Loading from "../Loading/Loading";
+import NoAccount from "../NoAccount/NoAccount";
 
 export default function ProfileLayout(props) {
 	const { profileID } = useContext(UserAuthContext);
+	const [profileData, setProfileData] = useState({
+		profileExists: null,
+		accountName: null,
+		data: {},
+	});
 	const [isAccountEditable, setIsAccountEditable] = useState(false);
 	const [editProfileDialog, setShowEditProfileDialog] = useState(false);
 	const [sidebarIsOpen, setSidebarIsOpen] = useState(false);
 	const matchesSmallDevice = useMediaQuery("(max-width: 768px)");
-	const { profileExists } = props;
+	const { router } = props;
+
+	// CONFIRM THAT PROFILE EXISTS THEN RETRIEVE ITS DATA
+	useEffect(() => {
+		if (router.isReady) {
+			const { accountName } = router.query;
+			getProfileID(accountName).then((id) => {
+				if (id === null) {
+					setProfileData({
+						profileExists: false,
+						accountName,
+						data: {},
+					});
+				} else {
+					getProfileData("*", id).then(({ avatar_url, display_name, bio }) => {
+						setProfileData({
+							profileExists: true,
+							accountName,
+							data: {
+								avatar_url,
+								display_name,
+								bio,
+							},
+						});
+					});
+				}
+			});
+		}
+	}, [router]);
 
 	// PROFILE CAN'T BE EDITED IF NO USER SIGNED IN OR PROFILE ISN'T SAME AS CURRENLTY SIGNED IN
 	useEffect(() => {
+		const { profileExists, accountName } = profileData;
 		if (!profileExists) return;
+
 		if (!profileID) {
 			setIsAccountEditable(false);
 		} else if (profileID && profileExists) {
 			getProfileData("account_name", profileID).then(({ account_name }) => {
-				setIsAccountEditable(account_name === props.accountName);
+				setIsAccountEditable(account_name === accountName);
 			});
 		}
-	}, [profileID, profileExists]);
+	}, [profileID, profileData]);
 
-	const toggleSidebar = (value) => setSidebarIsOpen(value);
+	function toggleSidebar(value) {
+		setSidebarIsOpen(value);
+	}
 
-	const { accountName } = props;
-	const { bio, avatar_url, display_name } = props.data;
+	const { profileExists } = profileData;
+	const loading = profileExists === null;
+	if (loading) {
+		return <Loading />;
+	}
 
+	const { accountName } = router.query;
+	const { bio, avatar_url, display_name } = profileData.data;
 	const sidebar = (
 		<aside
 			className={`d-flex flex-column py-5 px-4 align-items-center ${styles.sidebar} text-white`}>
@@ -41,7 +86,7 @@ export default function ProfileLayout(props) {
 			<Link href={`/users/${accountName}/savedLists`}>Saved Lists</Link>
 			<Link href={`/users/${accountName}/watching`}>Watching</Link>
 			<Link href={`/users/${accountName}/watched`}>Watched</Link>
-			<Link href={`/users/${accountName}/recommendedItems`}>Recommended</Link>
+			<Link href={`/users/${accountName}/recommended`}>Recommended</Link>
 			<Link href={`/users/${accountName}/reviews`}>Reviews</Link>
 			{isAccountEditable && (
 				<button
@@ -56,9 +101,7 @@ export default function ProfileLayout(props) {
 	return (
 		<Fragment>
 			{!profileExists && (
-				<div className="text-white d-flex justify-content-center align-items-center flex-column h-100">
-					<span className="fs-3">{`Account '${accountName}' doesn't exist`}</span>
-				</div>
+				<NoAccount accountName={accountName} />
 			)}
 			{profileExists && (
 				<Fragment>
@@ -109,10 +152,13 @@ export default function ProfileLayout(props) {
 						{!matchesSmallDevice && sidebar}
 						<main className="d-flex flex-column flex-grow-1 p-2 mw-100">
 							<div className="d-flex flex-column align-items-center gap-1 p-4 text-white">
-								<img
+								<Image
 									src={avatar_url}
 									alt="profile pic"
 									className={styles.photo}
+									width={200}
+									height={200}
+									quality={100}
 								/>
 								<div className="d-flex flex-column align-items-center">
 									<span className="fs-4">{display_name}</span>

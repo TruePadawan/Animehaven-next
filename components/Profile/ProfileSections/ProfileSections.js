@@ -36,26 +36,15 @@ const ProfileSectionContainer = ({ title, children }) => {
 export function UserDiscussions() {
 	return (
 		<ProfileSectionContainer title="Discussions">
-			<div className={styles.discussions}>
-				<DiscussionItem
-					id="asd2"
-					title="Manga Recommendations"
-					author="Hermes"
-					dataLoaded
-				/>
-				<DiscussionItem
-					id="asd2"
-					title="Manga Recommendations"
-					author="Hermes"
-					dataLoaded
-				/>
-				<DiscussionItem
-					id="asd2"
-					title="Manga Recommendations"
-					author="Hermes"
-					dataLoaded
-				/>
-			</div>
+			<Box
+				sx={{
+					display: "flex",
+					justifyContent: "center",
+					alignItems: "center",
+					height: "100%",
+				}}>
+				<p>COMING SOON</p>
+			</Box>
 		</ProfileSectionContainer>
 	);
 }
