@@ -4,7 +4,7 @@ import styles from "../../styles/discussions.module.css";
 
 export default function Discussions() {
 	return (
-		<PageContainer className={styles["discussions-main"]}>
+		<PageContainer className={styles.discussions}>
 			<Head>
 				<title>Animehaven | Discussions</title>
 				<meta property="og:url" content="https://animehaven.vercel.app/discussions" />

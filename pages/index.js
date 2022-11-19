@@ -17,7 +17,7 @@ const getNSkeletonItems = (number = 1) => {
 	return items;
 };
 
-const DEFAULT_N_LOADED_ITEMS = 20;
+const DEFAULT_N_LOADED_ITEMS = 10;
 const ANIME_ITEMS_SKELETONS = getNSkeletonItems(DEFAULT_N_LOADED_ITEMS);
 const default_error_state = { occurred: false, text: "" };
 const Home = (props) => {
@@ -115,7 +115,7 @@ const Home = (props) => {
 		} catch (err) {
 			handleError("Problem loading animes");
 		}
-	}
+	};
 
 	return (
 		<Fragment>
@@ -152,10 +152,10 @@ const Home = (props) => {
 					<ul className={styles["anime-list"]}>{popularAnimes}</ul>
 				</Section>
 				<Snackbar open={error.occurred} onClose={resetError}>
-				<Alert onClose={resetError} severity="error" sx={{ width: "100%" }}>
-					{error.text}
-				</Alert>
-			</Snackbar>
+					<Alert onClose={resetError} severity="error" sx={{ width: "100%" }}>
+						{error.text}
+					</Alert>
+				</Snackbar>
 			</PageContainer>
 		</Fragment>
 	);
@@ -163,15 +163,17 @@ const Home = (props) => {
 
 export async function getStaticProps() {
 	const randomAnimes = await requestNRandomAnime(DEFAULT_N_LOADED_ITEMS);
-
-	const airingAnimes = await getListOfAnimes("airing", DEFAULT_N_LOADED_ITEMS);
+	const airingAnimes = await getListOfAnimes(
+		"airing",
+		DEFAULT_N_LOADED_ITEMS + 5
+	);
 	const upcomingAnimes = await getListOfAnimes(
 		"upcoming",
-		DEFAULT_N_LOADED_ITEMS
+		DEFAULT_N_LOADED_ITEMS + 5
 	);
 	const popularAnimes = await getListOfAnimes(
 		"bypopularity",
-		DEFAULT_N_LOADED_ITEMS
+		DEFAULT_N_LOADED_ITEMS + 5
 	);
 
 	return {
@@ -183,7 +185,7 @@ export async function getStaticProps() {
 				popularAnimes,
 			},
 		},
-		revalidate: 300
+		revalidate: 300,
 	};
 }
 
