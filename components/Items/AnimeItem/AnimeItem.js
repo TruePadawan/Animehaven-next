@@ -4,14 +4,14 @@ import { Fragment, useRef, useState } from "react";
 import Link from "next/link";
 import styles from "./style.module.css";
 import Image from "next/image";
-import ItemPopover from "./ItemPopover";
+import ItemPopper from "./ItemPopper";
 
 const AnimeItem = (props) => {
 	const [anchorEl, setAnchorEl] = useState(null);
 	const mouseOverElRef = useRef(false);
 	const matchesMobileDevice = useMediaQuery("(max-width: 768px)");
 
-	const openPopover = (event) => {
+	const openPopper = (event) => {
 		mouseOverElRef.current = true;
 		const targetEl = event.currentTarget;
 
@@ -21,11 +21,12 @@ const AnimeItem = (props) => {
 			}
 		}, 300);
 	};
-	const closePopover = () => {
+	const closePopper = () => {
 		setAnchorEl(null);
 	};
 	const handleMouseLeave = () => {
 		mouseOverElRef.current = false;
+		setAnchorEl(null);
 	};
 
 	return (
@@ -42,7 +43,7 @@ const AnimeItem = (props) => {
 			)}
 			{!props.skeleton && (
 				<Fragment>
-					<li onMouseEnter={openPopover} onMouseLeave={handleMouseLeave}>
+					<li onMouseEnter={openPopper} onMouseLeave={handleMouseLeave}>
 						<Link href={`/anime/${props.id}`} className={styles["anime-item"]}>
 							<Image
 								src={props.image}
@@ -54,7 +55,7 @@ const AnimeItem = (props) => {
 						</Link>
 					</li>
 					{!matchesMobileDevice && (
-						<ItemPopover
+						<ItemPopper
 							image={props.image}
 							id={props.id}
 							alt={props.title}
@@ -63,7 +64,7 @@ const AnimeItem = (props) => {
 							score={props.score}
 							genres={props.genres}
 							anchorEl={anchorEl}
-							onClose={closePopover}
+							onClose={closePopper}
 						/>
 					)}
 				</Fragment>

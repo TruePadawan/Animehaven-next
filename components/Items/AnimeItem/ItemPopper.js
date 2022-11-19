@@ -1,11 +1,11 @@
-import { Chip, Popover, Tooltip, Zoom } from "@mui/material";
+import { Chip, Popper } from "@mui/material";
 import Image from "next/image";
 import Link from "next/link";
 import { v4 as uuid } from "uuid";
 import starIcon from "../../../assets/star.png";
 import styles from "./style.module.css";
 
-const ItemPopover = (props) => {
+const ItemPopper = (props) => {
 	const open = Boolean(props.anchorEl);
 	const genres = props.genres.map((genre) => {
 		return (
@@ -23,17 +23,19 @@ const ItemPopover = (props) => {
 		);
 	});
 	if (genres.length > 3) genres.length = 3;
-
+	const popperStyles = {
+		"& > div": {
+			backgroundColor: "transparent",
+		},
+	};
 	return (
-		<Popover
+		<Popper
 			anchorEl={props.anchorEl}
 			open={open}
 			onClose={props.onClose}
-			sx={{
-				"& > div": {
-					backgroundColor: "transparent",
-				},
-			}}>
+			disablePortal={true}
+			placement="left"
+			sx={popperStyles}>
 			<Link
 				className={styles.popover}
 				onMouseLeave={props.onClose}
@@ -46,9 +48,7 @@ const ItemPopover = (props) => {
 					height={300}
 				/>
 				<div className="d-flex flex-column align-self-stretch gap-1">
-					<Tooltip title={props.title} TransitionComponent={Zoom}>
-						<span className={styles.title}>{props.title}</span>
-					</Tooltip>
+					<span className={styles.title}>{props.title}</span>
 					<div className="d-flex justify-content-between">
 						<span className={styles.score}>
 							{props.score && (
@@ -63,8 +63,7 @@ const ItemPopover = (props) => {
 							sx={{
 								color: "white",
 								backgroundColor: "#616161",
-								fontWeight: "bold",
-								width: "60px",
+								width: "max-content",
 							}}
 						/>
 					</div>
@@ -73,8 +72,8 @@ const ItemPopover = (props) => {
 					)}
 				</div>
 			</Link>
-		</Popover>
+		</Popper>
 	);
 };
 
-export default ItemPopover;
+export default ItemPopper;
