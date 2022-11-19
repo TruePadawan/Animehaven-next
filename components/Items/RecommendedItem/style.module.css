@@ -11,7 +11,7 @@
     align-self: center;
     border-radius: 6px;
     width: 120px;
-    min-height: 160px;
+    max-height: 170px;
     height: auto;
 }
 

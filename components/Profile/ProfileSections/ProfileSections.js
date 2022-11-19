@@ -18,6 +18,7 @@ import {
 import { getProfileID, getProfileData } from "../../../utilities/app-utilities";
 import { supabase } from "../../../supabase/config";
 import { useRouter } from "next/router";
+import Image from "next/image";
 
 const ProfileSectionContainer = ({ title, children }) => {
 	return (
@@ -428,7 +429,7 @@ export function EditProfile({ open, closeDialog }) {
 								Update profile picture
 							</label>
 							<span className={styles.updateProfilePic}>
-								<img src={avatarURL} alt="#" />
+								<Image src={avatarURL} alt={accountName} width={100} height={100} quality={100} />
 								<IconButton
 									aria-label="upload picture"
 									sx={uploadBtnStyle}

@@ -14,6 +14,7 @@ import Link from "next/link";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import styles from "./style.module.css";
 import { supabase } from "../../../supabase/config";
+import Image from "next/image";
 
 export default function ReviewItem({ itemID, creatorID, index }) {
 	const [loading, setLoading] = useState(true);
@@ -72,7 +73,7 @@ export default function ReviewItem({ itemID, creatorID, index }) {
 				)}
 				{!loading && (
 					<>
-						<img src={itemData.photoSrc} alt={itemData.title} />
+						<Image src={itemData.photoSrc} alt={itemData.title} width={120} height={120} quality={100} />
 						<div className={`d-flex flex-column flex-grow-1`}>
 							<div className="d-flex justify-content-between flex-wrap">
 								<Link

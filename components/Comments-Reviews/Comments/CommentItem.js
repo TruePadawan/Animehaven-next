@@ -16,6 +16,7 @@ import EditCommentItem from "./EditCommentItem";
 import { bindMenu, bindTrigger } from "material-ui-popup-state";
 import { usePopupState } from "material-ui-popup-state/hooks";
 import { supabase } from "../../../supabase/config";
+import Image from "next/image";
 
 const CommentItem = (props) => {
 	const { commentData, setReplyData, triggerAlert, profileID } = props;
@@ -31,7 +32,6 @@ const CommentItem = (props) => {
 		creator_account_name: null,
 	});
 	const [parentCommentIsDeleted, setParentCommentIsDeleted] = useState(false);
-	const [loading, setLoading] = useState(false);
 	const [commentState, setCommentState] = useState("DEFAULT");
 	const [menuAnchorEl, setMenuAnchorEl] = useState(null);
 	const [btnIsDisabled, setBtnIsDisabled] = useState({
@@ -45,7 +45,6 @@ const CommentItem = (props) => {
 
 	// LOAD COMMENT
 	useEffect(() => {
-		setLoading(true);
 		const { creator_id, parent_comment_id } = commentData;
 
 		getProfileData("account_name,display_name,avatar_url", creator_id)
@@ -81,7 +80,6 @@ const CommentItem = (props) => {
 						}
 					}
 				}
-				setLoading(false);
 			})
 			.catch((error) => {
 				triggerAlert("Failed to load comment data", {
@@ -197,6 +195,7 @@ const CommentItem = (props) => {
 		closeMenu();
 	};
 
+	const loading = commentCreatorData.account_name === null;
 	if (loading) {
 		return (
 			<Fragment>
@@ -261,10 +260,13 @@ const CommentItem = (props) => {
 				/>
 				<div className={styles.comment}>
 					<Fragment>
-						<img
+						<Image
 							className={styles.userPhoto}
 							src={avatar_url}
 							alt={display_name}
+							width={40}
+							height={40}
+							quality={100}
 						/>
 						{!ON_EDIT_COMMENT && (
 							<div className="d-flex flex-column flex-grow-1">

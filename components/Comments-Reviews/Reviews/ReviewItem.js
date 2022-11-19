@@ -13,6 +13,7 @@ import {
 } from "../../../utilities/app-utilities";
 import { UserAuthContext } from "../../../context/UserAuthContext";
 import styles from "../Comments-Reviews.module.css";
+import Image from "next/image";
 
 const ReviewItem = ({
 	reviewID,
@@ -118,7 +119,14 @@ const ReviewItem = ({
 			)}
 			{reviewExists && (
 				<>
-					<img className={styles.userPhoto} src={avatarURL} alt={acctName} />
+					<Image
+						className={styles.userPhoto}
+						src={avatarURL}
+						alt={acctName}
+						width={40}
+						height={40}
+						quality={100}
+					/>
 					<div className="d-flex flex-column flex-grow-1">
 						<Link href={`/users/${acctName}`} className={styles.user}>
 							{displayName}
