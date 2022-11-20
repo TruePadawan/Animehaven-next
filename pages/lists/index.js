@@ -91,7 +91,7 @@ const Lists = () => {
 						setQueryOngoing(false);
 					}
 				);
-		} else if (listFilter === "my_lists" && profileID !== null) {
+		} else if (listFilter === "your_lists" && profileID !== null) {
 			supabase
 				.from("lists")
 				.select("id,genres")
@@ -135,7 +135,7 @@ const Lists = () => {
 					.rpc("search_list", { phrase: searchText })
 					.throwOnError();
 				filteredSearchResults = applyGenreFilter(searchResults, acceptedGenres);
-			} else if (listFilter === "my_lists" && profileID !== null) {
+			} else if (listFilter === "your_lists" && profileID !== null) {
 				let { data: searchResults } = await supabase
 					.rpc("search_list", { phrase: searchText, profile_id: profileID })
 					.throwOnError();
@@ -215,11 +215,11 @@ const Lists = () => {
 				<Fragment>
 					<div className="d-flex flex-column gap-3">
 						<Select
-							title="Sort and filter lists"
+							title="Filter lists"
 							onChange={onListFilterChanged}
 							value={listFilter}>
 							<option value="all">All</option>
-							{profileID && <option value="my_lists">My Lists</option>}
+							{profileID && <option value="your_lists">My Lists</option>}
 						</Select>
 						<CheckboxList
 							className="mt-2"
@@ -242,7 +242,7 @@ const Lists = () => {
 							onChange={onListFilterChanged}
 							value={listFilter}>
 							<option value="all">All</option>
-							{profileID && <option value="my_lists">My Lists</option>}
+							{profileID && <option value="your_lists">My Lists</option>}
 						</Select>
 						<CheckboxList
 							className="mt-2"
