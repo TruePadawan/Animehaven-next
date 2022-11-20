@@ -1,11 +1,11 @@
-.genre {
+.checkboxes {
     background-color: transparent;
     border: none;
     display: flex;
     flex-direction: column;
 }
 
-.filter {
+.component {
     padding: 6px 12px 12px 12px;
     background-color: rgb(63, 63, 60);
     border-radius: 4px;

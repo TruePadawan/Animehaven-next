@@ -19,8 +19,8 @@ import CreateList from "../../components/CreateList/CreateList";
 import { LIST_GENRES } from "../../utilities/app-utilities";
 import { supabase } from "../../supabase/config";
 import Loading from "../../components/Loading/Loading";
-import styles from "../../styles/lists.module.css";
 import Head from "next/head";
+import CheckboxList from "../../components/CheckboxList/CheckboxList";
 
 const applyGenreFilter = (lists, acceptedGenres) => {
 	const filtered = lists.filter((list) => {
@@ -221,10 +221,11 @@ const Lists = () => {
 							<option value="all">All</option>
 							{profileID && <option value="my_lists">My Lists</option>}
 						</Select>
-						<div className={`${styles["filter"]} mt-2`}>
-							<span className={styles["title"]}>Genre</span>
-							<ul className={styles["genre"]}>{genreElements}</ul>
-						</div>
+						<CheckboxList
+							className="mt-2"
+							label="Genre"
+							checkboxes={genreElements}
+						/>
 					</div>
 				</Fragment>
 			)}
@@ -243,10 +244,11 @@ const Lists = () => {
 							<option value="all">All</option>
 							{profileID && <option value="my_lists">My Lists</option>}
 						</Select>
-						<div className={`${styles["filter"]} mt-2`}>
-							<span className={styles["title"]}>Genre</span>
-							<ul className={styles["genre"]}>{genreElements}</ul>
-						</div>
+						<CheckboxList
+							className="mt-2"
+							label="Genre"
+							checkboxes={genreElements}
+						/>
 					</div>
 				</SwipeableDrawer>
 			)}
