@@ -93,10 +93,10 @@ const Header = () => {
 					<NavTab href="/lists">Lists</NavTab>
 					<NavTab href="/search">Search</NavTab>
 					{isAtProfilePage && (
-						<NavTab href={router.query.accountName}>Profile</NavTab>
+						<NavTab href={router.query.accountName || ""}>Profile</NavTab>
 					)}
 					{isAtAnimeDetailsPage && (
-						<NavTab href={router.query.animeID}>Anime</NavTab>
+						<NavTab href={router.query.animeID || ""}>Anime</NavTab>
 					)}
 				</Tabs>
 			</Box>
