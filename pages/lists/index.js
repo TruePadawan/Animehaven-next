@@ -75,7 +75,7 @@ const Lists = () => {
 		setQueryOngoing(true);
 		if (listFilter === "all") {
 			supabase
-				.from("lists")
+				.from("anime_lists")
 				.select("id,genres")
 				.order("created_at", { ascending: false })
 				.throwOnError()
@@ -93,7 +93,7 @@ const Lists = () => {
 				);
 		} else if (listFilter === "your_lists" && profileID !== null) {
 			supabase
-				.from("lists")
+				.from("anime_lists")
 				.select("id,genres")
 				.eq("creator_id", profileID)
 				.order("created_at", { ascending: false })

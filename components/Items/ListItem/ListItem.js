@@ -28,7 +28,7 @@ export default function ListItem({ listID, skeleton = false }) {
 			return;
 		}
 		supabase
-			.from("lists")
+			.from("anime_lists")
 			.select()
 			.eq("id", listID)
 			.throwOnError()

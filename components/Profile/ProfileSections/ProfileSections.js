@@ -57,7 +57,7 @@ export function UserLists({ accountName }) {
 	useEffect(() => {
 		getProfileID(accountName).then((id) => {
 			supabase
-				.from("lists")
+				.from("anime_lists")
 				.select("id")
 				.eq("creator_id", id)
 				.throwOnError()

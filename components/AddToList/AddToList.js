@@ -28,7 +28,7 @@ const Item = ({
 	const addAnimeToList = async () => {
 		try {
 			const { data } = await supabase
-				.from("lists")
+				.from("anime_lists")
 				.select("items")
 				.eq("id", id)
 				.throwOnError()
@@ -39,7 +39,7 @@ const Item = ({
 			if (!itemInList) {
 				items.push(itemData);
 				await supabase
-					.from("lists")
+					.from("anime_lists")
 					.update({ items })
 					.eq("id", id)
 					.throwOnError();
@@ -78,7 +78,7 @@ const AddToList = ({ itemData, profileID, triggerAlert }) => {
 		if (dialogOpen === false) return;
 		setQueryOngoing(true);
 		supabase
-			.from("lists")
+			.from("anime_lists")
 			.select("id,title,is_public")
 			.eq("creator_id", profileID)
 			.throwOnError()

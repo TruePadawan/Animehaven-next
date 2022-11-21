@@ -90,7 +90,7 @@ const List = () => {
 	useEffect(() => {
 		if (listID === undefined) return;
 		supabase
-			.from("lists")
+			.from("anime_lists")
 			.select()
 			.eq("id", listID)
 			.throwOnError()

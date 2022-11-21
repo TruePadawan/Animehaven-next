@@ -167,7 +167,7 @@ const CreateList = (props) => {
 				throw new Error("no user signed in");
 			}
 
-			await supabase.from("lists").insert({
+			await supabase.from("anime_lists").insert({
 				title: listTitle,
 				description: listDesc,
 				genres: listGenres,
@@ -193,7 +193,7 @@ const CreateList = (props) => {
 			}
 
 			await supabase
-				.from("lists")
+				.from("anime_lists")
 				.update({
 					title: listTitle,
 					description: listDesc,
@@ -215,7 +215,7 @@ const CreateList = (props) => {
 			if (!props.defaultValues.id) {
 				throw new Error("Couldn't get ID of the list, try reloading the page!");
 			}
-			await supabase.from("lists").delete().eq("id", props.defaultValues.id).throwOnError();
+			await supabase.from("anime_lists").delete().eq("id", props.defaultValues.id).throwOnError();
 			router.replace("/lists");
 		} catch (error) {
 			triggerAlert("Failed to delete list", { severity: "error", error });
