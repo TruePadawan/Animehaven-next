@@ -2,10 +2,8 @@ import { Alert, Button, ButtonGroup, Snackbar, styled } from "@mui/material";
 import { useContext, useState } from "react";
 import { UserAuthContext } from "../../../../context/UserAuthContext";
 import UserAccountBtn from "../UserAccountBtn/UserAccountBtn";
-import { supabase } from "../../../../supabase/config";
 import { Fragment } from "react";
-import Signup from "./components/Signup";
-import Signin from "./components/Signin";
+import { useRouter } from "next/router";
 
 const AuthBtn = styled(Button)(() => ({
 	backgroundColor: "darkslategray",
@@ -18,36 +16,13 @@ const AuthBtn = styled(Button)(() => ({
 const Authentication = () => {
 	const { profileID } = useContext(UserAuthContext);
 	const [error, setError] = useState({ occurred: false, text: "" });
-	const [showSignupDialog, setShowSignupDialog] = useState(false);
-	const [showSigninDialog, setShowSigninDialog] = useState(false);
+	const router = useRouter();
 
 	const handleError = (text, error) => {
-		console.error(error);
 		setError({
 			occurred: true,
 			text: `${text} - ${error.message || error.error_description}`,
 		});
-	};
-
-	const closeSignupDialog = () => {
-		setShowSignupDialog(false);
-	};
-
-	const closeSigninDialog = () => {
-		setShowSigninDialog(false);
-	};
-
-	const handleGoogleAuth = async (e) => {
-		try {
-			const { error } = await supabase.auth.signInWithOAuth({
-				provider: "google",
-			});
-			if (error !== null) {
-				throw error;
-			}
-		} catch (error) {
-			handleError("Google auth process failed!", error);
-		}
 	};
 
 	const resetError = (event, reason) => {
@@ -64,33 +39,19 @@ const Authentication = () => {
 	};
 	return (
 		<>
-			{userSignedIn && <UserAccountBtn profileID={profileID} errorHandler={handleError} />}
+			{userSignedIn && (
+				<UserAccountBtn profileID={profileID} errorHandler={handleError} />
+			)}
 			{!userSignedIn && (
 				<Fragment>
 					<ButtonGroup>
-						<AuthBtn
-							variant="contained"
-							onClick={() => setShowSignupDialog(true)}>
+						<AuthBtn variant="contained" onClick={() => router.push("/signup")}>
 							Sign Up
 						</AuthBtn>
-						<AuthBtn
-							variant="contained"
-							onClick={() => setShowSigninDialog(true)}>
+						<AuthBtn variant="contained" onClick={() => router.push("/signin")}>
 							Sign In
 						</AuthBtn>
 					</ButtonGroup>
-					<Signup
-						showDialog={showSignupDialog}
-						closeDialog={closeSignupDialog}
-						handleGoogleAuth={handleGoogleAuth}
-						errorHandler={handleError}
-					/>
-					<Signin
-						showDialog={showSigninDialog}
-						closeDialog={closeSigninDialog}
-						handleGoogleAuth={handleGoogleAuth}
-						errorHandler={handleError}
-					/>
 					<Snackbar
 						open={error.occurred}
 						autoHideDuration={6000}

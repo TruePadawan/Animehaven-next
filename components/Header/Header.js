@@ -11,25 +11,24 @@ const NavTab = ({ children, ...props }) => {
 	const tabStyles = {
 		color: "gray",
 		"&:hover": {
-			color: "darkgray"
+			color: "darkgray",
 		},
 		"&.Mui-selected": {
-			color: "whitesmoke"
-		}
+			color: "whitesmoke",
+		},
 	};
 
-	return (
-		<Tab sx={tabStyles} component={Link} label={children} {...props} />
-	);
+	return <Tab sx={tabStyles} component={Link} label={children} {...props} />;
 };
 
-const routes = { discussions: 1, lists: 2, search: 3, users: 4, anime: 4 };
+const routes = { discussions: 1, lists: 2, search: 3 };
 
 const getTabValue = (router) => {
 	if (router.isReady) {
 		const currentRoute = router.pathname.split("/").at(1);
 		if (currentRoute === "") return 0;
-		return routes[currentRoute];
+		if (routes[currentRoute] === undefined) return 4;
+		else return routes[currentRoute];
 	}
 	return 0;
 };
@@ -48,14 +47,22 @@ const Header = () => {
 	};
 
 	const headerContent = matchesSmallDevice ? (
-		<Image src={HeaderLogo} alt="animehaven" width={50} height={50} className={styles.headerImg} />
+		<Image
+			src={HeaderLogo}
+			alt="animehaven"
+			width={50}
+			height={50}
+			className={styles.headerImg}
+		/>
 	) : (
 		<h1>Animehaven</h1>
 	);
-	
+
 	const currentRoute = router.pathname.split("/").at(1);
 	const isAtProfilePage = currentRoute === "users";
 	const isAtAnimeDetailsPage = currentRoute === "anime";
+	const isAtSignupPage = router.route === "/signup";
+	const isAtSigninPage = router.route === "/signin";
 
 	const tabsStyles = {
 		width: "100%",
@@ -72,7 +79,9 @@ const Header = () => {
 					alignItems: "center",
 					marginBottom: "5px",
 				}}>
-				<Link className={styles.heading} href="/">{headerContent}</Link>
+				<Link className={styles.heading} href="/">
+					{headerContent}
+				</Link>
 				<Authentication />
 			</Box>
 			<Box
@@ -97,6 +106,12 @@ const Header = () => {
 					)}
 					{isAtAnimeDetailsPage && (
 						<NavTab href={router.query.animeID || ""}>Anime</NavTab>
+					)}
+					{isAtSignupPage && (
+						<NavTab href={"/signup"}>Sign Up</NavTab>
+					)}
+					{isAtSigninPage && (
+						<NavTab href={"/signin"}>Sign In</NavTab>
 					)}
 				</Tabs>
 			</Box>
