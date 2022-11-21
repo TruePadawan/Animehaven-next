@@ -140,7 +140,7 @@ const CreateList = (props) => {
 	const searchFunction = async (e) => {
 		e.preventDefault();
 		setIsSearchOngoing(true);
-		const rawAnimesData = await searchAnime(searchText, 5);
+		const rawAnimesData = await searchAnime(searchText, 10);
 		const transformed_list = rawAnimesData.map((animeData) => {
 			const { id, title } = getUsefulData(animeData);
 			return (
