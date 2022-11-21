@@ -191,7 +191,7 @@ export default function SignUp() {
 			<div className={styles["auth-container"]}>
 				{!OTPVerificationPending && (
 					<form className={styles["auth-form"]} onSubmit={handleSignup}>
-						<h4 className="text-white fs-2">Sign Up</h4>
+						<h4 className="text-white fs-2 text-center mb-4">Sign Up</h4>
 						<Button startIcon={<GoogleIcon />} onClick={handleGoogleAuth}>
 							Continue with Google
 						</Button>
