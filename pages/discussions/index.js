@@ -23,10 +23,6 @@ export default function Discussions() {
 	const router = useRouter();
 	const matchesSmallDevice = useMediaQuery("(max-width: 600px)");
 
-	function routeToNewDiscussion() {
-		router.push("/discussions/new");
-	}
-
 	function toggleFilterDrawer(open) {
 		setFilterDrawerIsOpen(open);
 	}
@@ -105,7 +101,7 @@ export default function Discussions() {
 								text="New Discussion"
 								className="ms-auto"
 								icon={<Add />}
-								onClick={routeToNewDiscussion}
+								onClick={() => router.push("/discussions/create")}
 							/>
 						)}
 					</div>
