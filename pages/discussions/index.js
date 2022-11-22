@@ -1,7 +1,12 @@
 import { Add } from "@mui/icons-material";
+import {
+	SwipeableDrawer,
+	useMediaQuery,
+	Button as MUIButton,
+} from "@mui/material";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import { Fragment, useContext, useMemo } from "react";
+import { Fragment, useContext, useMemo, useState } from "react";
 import Button from "../../components/Button/Button";
 import Checkbox from "../../components/Checkbox/Checkbox";
 import CheckboxList from "../../components/CheckboxList/CheckboxList";
@@ -14,10 +19,16 @@ const TAGS = ["Announcement", "Support"];
 
 export default function Discussions() {
 	const { profileID } = useContext(UserAuthContext);
+	const [filterDrawerIsOpen, setFilterDrawerIsOpen] = useState(false);
 	const router = useRouter();
+	const matchesSmallDevice = useMediaQuery("(max-width: 600px)");
 
 	function routeToNewDiscussion() {
 		router.push("/discussions/new");
+	}
+
+	function toggleFilterDrawer(open) {
+		setFilterDrawerIsOpen(open);
 	}
 
 	const tagsElements = useMemo(() => {
@@ -27,6 +38,7 @@ export default function Discussions() {
 			</li>
 		));
 	}, []);
+
 	return (
 		<Fragment>
 			<Head>
@@ -42,21 +54,52 @@ export default function Discussions() {
 				<meta name="twitter:description" content="COMING SOON" />
 			</Head>
 			<PageContainer className="d-flex gap-2">
-				<div className="d-flex flex-column gap-3">
-					<Select title="Filter discussions">
-						<option value="all">All</option>
-						{profileID && (
-							<option value="your_discussions">Your Discussions</option>
-						)}
-					</Select>
-					<CheckboxList
-						className="mt-2"
-						label="Tags"
-						checkboxes={tagsElements}
-					/>
-				</div>
+				{!matchesSmallDevice && (
+					<div className="d-flex flex-column gap-3">
+						<Select title="Filter discussions">
+							<option value="all">All</option>
+							{profileID && (
+								<option value="your_discussions">Your Discussions</option>
+							)}
+						</Select>
+						<CheckboxList
+							className="mt-2"
+							label="Tags"
+							checkboxes={tagsElements}
+						/>
+					</div>
+				)}
+				{matchesSmallDevice && (
+					<SwipeableDrawer
+						anchor="right"
+						PaperProps={{ sx: { backgroundColor: "#1E1E1E" } }}
+						open={filterDrawerIsOpen}
+						onClose={toggleFilterDrawer.bind(this, false)}
+						onOpen={toggleFilterDrawer.bind(this, true)}>
+						<div className="d-flex flex-column gap-3 p-2">
+							<Select title="Filter discussions">
+								<option value="all">All</option>
+								{profileID && (
+									<option value="your_discussions">Your Discussions</option>
+								)}
+							</Select>
+							<CheckboxList
+								className="mt-2"
+								label="Tags"
+								checkboxes={tagsElements}
+							/>
+						</div>
+					</SwipeableDrawer>
+				)}
 				<div className="flex-grow-1 d-flex flex-column gap-2">
 					<div className="d-flex justify-content-between">
+						{matchesSmallDevice && (
+							<MUIButton
+								onClick={toggleFilterDrawer.bind(this, true)}
+								sx={{ color: "whitesmoke" }}>
+								Filter
+							</MUIButton>
+						)}
 						{profileID && (
 							<Button
 								text="New Discussion"
