@@ -4,8 +4,7 @@ const Input = ({ className = "", compRef, ...inputAttr }) => {
   return (
     <input
       type="text"
-      className={`${styles.searchInput} ${className}`}
-      aria-label="Search"
+      className={`${styles.input} ${className}`}
       ref={compRef}
       {...inputAttr}
     />
