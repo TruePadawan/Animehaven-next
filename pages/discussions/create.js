@@ -36,7 +36,7 @@ export default function Create() {
 						</label>
 						<Input
 							className={styles["title-field"]}
-							spellcheck="false"
+							spellCheck="false"
 							id="title-field"
 							minLength={5}
 							required
