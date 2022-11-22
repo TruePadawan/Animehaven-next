@@ -56,7 +56,6 @@ const Lists = () => {
 	const matchesSmallDevice = useMediaQuery("(max-width: 600px)");
 
 	const handleError = (text, error) => {
-		console.error(error);
 		setError({
 			occurred: true,
 			text: `${text} - ${error.message || error.error_description}`,
@@ -177,12 +176,6 @@ const Lists = () => {
 		horizontal: "center",
 	};
 
-	const filterButtonStyles = {
-		fontWeight: "bold",
-		fontFamily: "inherit",
-		color: "whitesmoke",
-	};
-
 	return (
 		<PageContainer className="d-flex gap-2">
 			<Head>
@@ -212,26 +205,24 @@ const Lists = () => {
 				/>
 			)}
 			{!matchesSmallDevice && (
-				<Fragment>
-					<div className="d-flex flex-column gap-3">
-						<Select
-							title="Filter lists"
-							onChange={onListFilterChanged}
-							value={listFilter}>
-							<option value="all">All</option>
-							{profileID && <option value="your_lists">My Lists</option>}
-						</Select>
-						<CheckboxList
-							className="mt-2"
-							label="Genre"
-							checkboxes={genreElements}
-						/>
-					</div>
-				</Fragment>
+				<div className="d-flex flex-column gap-3">
+					<Select
+						title="Filter lists"
+						onChange={onListFilterChanged}
+						value={listFilter}>
+						<option value="all">All</option>
+						{profileID && <option value="your_lists">My Lists</option>}
+					</Select>
+					<CheckboxList
+						className="mt-2"
+						label="Genre"
+						checkboxes={genreElements}
+					/>
+				</div>
 			)}
 			{matchesSmallDevice && (
 				<SwipeableDrawer
-					anchor="left"
+					anchor="right"
 					PaperProps={{ sx: { backgroundColor: "#1E1E1E" } }}
 					open={filterDrawerIsOpen}
 					onClose={toggleFilterDrawer.bind(this, false)}
@@ -257,7 +248,7 @@ const Lists = () => {
 					{matchesSmallDevice && (
 						<MUIButton
 							onClick={toggleFilterDrawer.bind(this, true)}
-							sx={filterButtonStyles}>
+							sx={{ color: "whitesmoke" }}>
 							Filter
 						</MUIButton>
 					)}
