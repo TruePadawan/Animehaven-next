@@ -14,8 +14,7 @@ import SearchInput from "../../components/Input/SearchInput/SearchInput";
 import PageContainer from "../../components/PageContainer/PageContainer";
 import Select from "../../components/Select/Select";
 import { UserAuthContext } from "../../context/UserAuthContext";
-
-const TAGS = ["Announcement", "Support"];
+import { DISCUSSION_TAGS } from "../../utilities/app-utilities";
 
 export default function Discussions() {
 	const { profileID } = useContext(UserAuthContext);
@@ -28,7 +27,7 @@ export default function Discussions() {
 	}
 
 	const tagsElements = useMemo(() => {
-		return TAGS.map((tag) => (
+		return DISCUSSION_TAGS.map((tag) => (
 			<li key={tag}>
 				<Checkbox id={tag} label={tag} name={tag.toUpperCase()} />
 			</li>

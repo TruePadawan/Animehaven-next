@@ -3,8 +3,10 @@ import Head from "next/head";
 import { Fragment, useContext } from "react";
 import Input from "../../components/Input/Input";
 import TextArea from "../../components/Input/TextArea";
+import Select from "../../components/Select/Select";
 import { UserAuthContext } from "../../context/UserAuthContext";
 import styles from "../../styles/create-discussion.module.css";
+import { DISCUSSION_TAGS } from "../../utilities/app-utilities";
 
 export default function Create() {
 	const { profileID } = useContext(UserAuthContext);
@@ -47,6 +49,20 @@ export default function Create() {
 							Body
 						</label>
 						<TextArea minRows={6} id="body-field" required />
+					</div>
+					<div className="d-flex flex-column gap-1">
+						<span className={styles.label}>Tags</span>
+						<Select>
+							{DISCUSSION_TAGS.map((tag) => {
+								return (
+									<option
+										disabled={tag === "Announcement"}
+										value={tag.toLowerCase()}>
+										{tag}
+									</option>
+								);
+							})}
+						</Select>
 					</div>
 					<div className="d-flex gap-2 align-self-end">
 						<Button
