@@ -16,7 +16,7 @@ import { UserAuthContext } from "../../../context/UserAuthContext";
 
 const defaultSnackbarState = { open: false, severity: "info", text: "" };
 
-const CommentsList = ({ id }) => {
+const CommentsList = ({ id, className = "" }) => {
 	const { profileID } = useContext(UserAuthContext);
 	const [commentsData, setCommentsData] = useState([]);
 	const [snackbarData, setSnackbarData] = useState(defaultSnackbarState);
@@ -152,8 +152,9 @@ const CommentsList = ({ id }) => {
 		vertical: "bottom",
 		horizontal: "left",
 	};
+	const componentClassName = `${styles.component} ${className}`;
 	return (
-		<div className={styles.component}>
+		<div className={componentClassName}>
 			{profileID && (
 				<Fragment>
 					<CommentBox

@@ -1,5 +1,5 @@
 import { IconButton, Skeleton } from "@mui/material";
-import { Fragment, useContext, useEffect, useState } from "react";
+import { Fragment, useContext, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import Head from "next/head";
 import EditIcon from "@mui/icons-material/Edit";
@@ -76,15 +76,11 @@ const Item = ({ itemID, itemTitle, index }) => {
 const List = () => {
 	const { listID } = useRouter().query;
 	const { profileID } = useContext(UserAuthContext);
-	const [title, setTitle] = useState("");
-	const [creator, setCreator] = useState("");
-	const [desc, setDesc] = useState("");
-	const [items, setItems] = useState([]);
 	const [loading, setLoading] = useState(true);
 	const [isLocked, setIsLocked] = useState(false);
 	const [loadingFailed, setLoadingFailed] = useState(false);
 	const [showCreateListDialog, setShowCreateListDialog] = useState(false);
-	const [listCurrentValues, setListCurrentValues] = useState({});
+	const [listData, setListData] = useState({});
 
 	// REQUEST FOR AND LOAD LIST DATA TO UI
 	useEffect(() => {
@@ -97,8 +93,15 @@ const List = () => {
 			.limit(1)
 			.single()
 			.then((response) => {
-				const { title, description, creator_id, items, genres, is_public } =
-					response.data;
+				const {
+					title,
+					description,
+					creator_id,
+					items,
+					genres,
+					is_public,
+					comment_instance_id,
+				} = response.data;
 				supabase
 					.from("profiles")
 					.select("account_name")
@@ -108,9 +111,6 @@ const List = () => {
 					.single()
 					.then((profileQuery) => {
 						const { account_name } = profileQuery.data;
-						setTitle(title);
-						setCreator(account_name);
-						setDesc(description);
 						const transformed = items.map((item, index) => (
 							<Item
 								key={item.id}
@@ -119,14 +119,15 @@ const List = () => {
 								index={index}
 							/>
 						));
-						setItems(transformed);
-						setListCurrentValues({
+						setListData({
 							id: listID,
 							title,
 							desc: description,
+							creator: account_name,
 							items,
 							genres,
 							is_public,
+							comment_instance_id,
 						});
 						setLoading(false);
 					});
@@ -135,8 +136,6 @@ const List = () => {
 				// error code PGRST116 indicates that the user doesn't have permission to view resource
 				if (error.code === "PGRST116") {
 					setIsLocked(true);
-				} else {
-					console.error(error);
 				}
 				setLoading(false);
 				setLoadingFailed(true);
@@ -145,71 +144,75 @@ const List = () => {
 
 	const openCreateListDialog = () => setShowCreateListDialog(true);
 	const closeCreateListDialog = () => setShowCreateListDialog(false);
+
 	const errorOccurred = loadingFailed && !isLocked;
+
+	if (loading) {
+		return <Loading />;
+	}
+	if (errorOccurred) {
+		return (
+			<Error
+				title="Error occurred while loading list"
+				extraText="Consider reloading the page!"
+			/>
+		);
+	}
+	if (isLocked) {
+		return <Locked />;
+	}
+
+	const { title, desc, creator, items, comment_instance_id } = listData;
+	const transformedItems = items.map((item, index) => (
+		<Item key={item.id} itemID={item.id} itemTitle={item.title} index={index} />
+	));
+	
 	return (
 		<Fragment>
-			{loading && <Loading />}
-			{errorOccurred && (
-				<Error
-					title="Error occurred while loading list"
-					extraText="Consider reloading the page!"
+			<Head>
+				<title>Animehaven | List - {title}</title>
+				<meta name="description" content={desc} />
+				<meta property="og:title" content={`Animehaven | List - ${title}`} />
+				<meta property="og:description" content={desc} />
+				<meta
+					property="og:url"
+					content={`https://animehaven.vercel.app/lists/${listID}`}
 				/>
-			)}
-			{isLocked && <Locked />}
-			{!loading && !isLocked && (
-				<Fragment>
-					<Head>
-						<title>Animehaven | List - {title}</title>
-						<meta name="description" content={desc} />
-						<meta
-							property="og:title"
-							content={`Animehaven | List - ${title}`}
-						/>
-						<meta property="og:description" content={desc} />
-						<meta
-							property="og:url"
-							content={`https://animehaven.vercel.app/lists/${listID}`}
-						/>
-						<meta
-							name="twitter:title"
-							content={`Animehaven | List - ${title}`}
-						/>
-						<meta name="twitter:description" content={desc} />
-					</Head>
-					<PageContainer className="d-flex flex-column gap-2">
+				<meta name="twitter:title" content={`Animehaven | List - ${title}`} />
+				<meta name="twitter:description" content={desc} />
+			</Head>
+			<PageContainer className="d-flex flex-column gap-2">
+				{profileID && (
+					<CreateList
+						open={showCreateListDialog}
+						onClose={closeCreateListDialog}
+						profileID={profileID}
+						update={true}
+						defaultValues={listData}
+					/>
+				)}
+				<div id="list-info" className="d-flex flex-column">
+					<span className="d-flex gap-1">
+						<h2 className={styles.title}>{title}</h2>
 						{profileID && (
-							<CreateList
-								open={showCreateListDialog}
-								onClose={closeCreateListDialog}
-								profileID={profileID}
-								update={true}
-								defaultValues={listCurrentValues}
-							/>
+							<IconButton
+								title="Edit"
+								sx={{ color: "whitesmoke" }}
+								onClick={openCreateListDialog}>
+								<EditIcon />
+							</IconButton>
 						)}
-						<div id="list-info" className="d-flex flex-column">
-							<span className="d-flex gap-1">
-								<h2 className={styles.title}>{title}</h2>
-								{profileID && (
-									<IconButton
-										title="Edit"
-										sx={{ color: "whitesmoke" }}
-										onClick={openCreateListDialog}>
-										<EditIcon />
-									</IconButton>
-								)}
-							</span>
-							<Link className={styles.creator} href={`/users/${creator}`}>
-								{creator}
-							</Link>
-							<p className={styles.desc}>{desc}</p>
-						</div>
-						<ul id="list-items" className={styles.items}>
-							{items}
-						</ul>
-						<CommentsList id={listID} profileID={profileID} />
-					</PageContainer>
-				</Fragment>
-			)}
+					</span>
+					<Link className={styles.creator} href={`/users/${creator}`}>
+						{creator}
+					</Link>
+					<p className={styles.desc}>{desc}</p>
+				</div>
+				<ul id="list-items" className={styles.items}>
+					{transformedItems}
+				</ul>
+				<CommentsList className="mt-4" id={comment_instance_id} profileID={profileID} />
+			</PageContainer>
 		</Fragment>
 	);
 };

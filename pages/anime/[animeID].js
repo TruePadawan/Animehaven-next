@@ -312,8 +312,7 @@ const AnimeDetails = () => {
 									sx={{
 										color: "white",
 										backgroundColor: "#616161",
-										fontWeight: "bold",
-										width: "60px",
+										width: "max-content",
 									}}
 								/>
 								<span className={styles.score}>
