@@ -257,3 +257,15 @@ export async function getUserItemReviews(profileID) {
 		.throwOnError();
 	return response;
 }
+
+export async function getDiscussionsByTags(tags) {
+	if (!(tags instanceof Array)) {
+		throw new Error("Invalid params - tags must be an array");
+	}
+	const { data } = await supabase
+		.from("discussions")
+		.select()
+		.in("tag", tags)
+		.throwOnError();
+	return data;
+}
