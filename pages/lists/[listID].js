@@ -81,6 +81,7 @@ const List = () => {
 	const [loadingFailed, setLoadingFailed] = useState(false);
 	const [showCreateListDialog, setShowCreateListDialog] = useState(false);
 	const [listData, setListData] = useState({});
+	const [editAllowed, setEditAllowed] = useState(false);
 
 	// REQUEST FOR AND LOAD LIST DATA TO UI
 	useEffect(() => {
@@ -111,14 +112,6 @@ const List = () => {
 					.single()
 					.then((profileQuery) => {
 						const { account_name } = profileQuery.data;
-						const transformed = items.map((item, index) => (
-							<Item
-								key={item.id}
-								itemID={item.id}
-								itemTitle={item.title}
-								index={index}
-							/>
-						));
 						setListData({
 							id: listID,
 							title,
@@ -129,6 +122,7 @@ const List = () => {
 							is_public,
 							comment_instance_id,
 						});
+						setEditAllowed(profileID === creator_id);
 						setLoading(false);
 					});
 			})
@@ -140,7 +134,7 @@ const List = () => {
 				setLoading(false);
 				setLoadingFailed(true);
 			});
-	}, [listID]);
+	}, [listID, profileID]);
 
 	const openCreateListDialog = () => setShowCreateListDialog(true);
 	const closeCreateListDialog = () => setShowCreateListDialog(false);
@@ -182,7 +176,7 @@ const List = () => {
 				<meta name="twitter:description" content={desc} />
 			</Head>
 			<PageContainer className="d-flex flex-column gap-2">
-				{profileID && (
+				{editAllowed && (
 					<CreateList
 						open={showCreateListDialog}
 						onClose={closeCreateListDialog}
@@ -194,7 +188,7 @@ const List = () => {
 				<div id="list-info" className="d-flex flex-column">
 					<span className="d-flex gap-1">
 						<h2 className={styles.title}>{title}</h2>
-						{profileID && (
+						{editAllowed && (
 							<IconButton
 								title="Edit"
 								sx={{ color: "whitesmoke" }}

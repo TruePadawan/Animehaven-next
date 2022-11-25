@@ -1,7 +1,7 @@
 .component {
     overflow: hidden;
     min-height: 10rem;
-    max-width: 700px;
+    max-width: 800px;
     margin-bottom: 2rem;
     flex-grow: 1;
     display: flex;
