@@ -21,77 +21,77 @@ import DiscussionItem from "../../components/Items/DiscussionItem/DiscussionItem
 import Loading from "../../components/Loading/Loading";
 
 export default function Discussions() {
-	const { profileID } = useContext(UserAuthContext);
-	const [discussionsList, setDiscussionsList] = useState([]);
-	const [filterDrawerIsOpen, setFilterDrawerIsOpen] = useState(false);
-	const [filter, setFilter] = useState("all");
-	const [discussionTags, setDiscussionTags] = useState(() => {
-		const value = {};
-		DISCUSSION_TAGS.forEach((tag) => (value[tag] = true));
-		return value;
-	});
-	const [queryingDB, setQueryingDB] = useState(false);
-	const router = useRouter();
-	const matchesSmallDevice = useMediaQuery("(max-width: 600px)");
+	// const { profileID } = useContext(UserAuthContext);
+	// const [discussionsList, setDiscussionsList] = useState([]);
+	// const [filterDrawerIsOpen, setFilterDrawerIsOpen] = useState(false);
+	// const [filter, setFilter] = useState("all");
+	// const [discussionTags, setDiscussionTags] = useState(() => {
+	// 	const value = {};
+	// 	DISCUSSION_TAGS.forEach((tag) => (value[tag] = true));
+	// 	return value;
+	// });
+	// const [queryingDB, setQueryingDB] = useState(false);
+	// const router = useRouter();
+	// const matchesSmallDevice = useMediaQuery("(max-width: 600px)");
 
-	useEffect(() => {
-		const selectedTags = [];
-		for (const tag in discussionTags) {
-			if (discussionTags[tag] === true) {
-				selectedTags.push(tag.toLowerCase());
-			}
-		}
-		setQueryingDB(true);
-		getDiscussionsByTags(selectedTags)
-			.then((data) => {
-				setDiscussionsList(data);
-			})
-			.finally(() => {
-				setQueryingDB(false);
-			});
-	}, [discussionTags]);
+	// useEffect(() => {
+	// 	const selectedTags = [];
+	// 	for (const tag in discussionTags) {
+	// 		if (discussionTags[tag] === true) {
+	// 			selectedTags.push(tag.toLowerCase());
+	// 		}
+	// 	}
+	// 	setQueryingDB(true);
+	// 	getDiscussionsByTags(selectedTags)
+	// 		.then((data) => {
+	// 			setDiscussionsList(data);
+	// 		})
+	// 		.finally(() => {
+	// 			setQueryingDB(false);
+	// 		});
+	// }, [discussionTags]);
 
-	function toggleFilterDrawer(open) {
-		setFilterDrawerIsOpen(open);
-	}
+	// function toggleFilterDrawer(open) {
+	// 	setFilterDrawerIsOpen(open);
+	// }
 
-	function onSelectValueChanged(event) {
-		setFilter(event.target.value);
-	}
+	// function onSelectValueChanged(event) {
+	// 	setFilter(event.target.value);
+	// }
 
-	function onCheckboxValueChanged(event) {
-		setDiscussionTags((snapshot) => {
-			snapshot[event.target.name] = event.target.checked;
-			return { ...snapshot };
-		});
-	}
+	// function onCheckboxValueChanged(event) {
+	// 	setDiscussionTags((snapshot) => {
+	// 		snapshot[event.target.name] = event.target.checked;
+	// 		return { ...snapshot };
+	// 	});
+	// }
 
-	const tagsElements = useMemo(() => {
-		return DISCUSSION_TAGS.map((tag) => (
-			<li key={tag}>
-				<Checkbox
-					id={tag}
-					label={tag}
-					name={tag}
-					checked={discussionTags[tag]}
-					onChange={onCheckboxValueChanged}
-				/>
-			</li>
-		));
-	}, [discussionTags]);
+	// const tagsElements = useMemo(() => {
+	// 	return DISCUSSION_TAGS.map((tag) => (
+	// 		<li key={tag}>
+	// 			<Checkbox
+	// 				id={tag}
+	// 				label={tag}
+	// 				name={tag}
+	// 				checked={discussionTags[tag]}
+	// 				onChange={onCheckboxValueChanged}
+	// 			/>
+	// 		</li>
+	// 	));
+	// }, [discussionTags]);
 
-	const discussions = useMemo(() => {
-		return discussionsList.map((discussion) => {
-			return (
-				<DiscussionItem
-					id={discussion.id}
-					title={discussion.title}
-					tag={discussion.tag}
-					creatorID={discussion.creator_id}
-				/>
-			);
-		});
-	}, [discussionsList]);
+	// const discussions = useMemo(() => {
+	// 	return discussionsList.map((discussion) => {
+	// 		return (
+	// 			<DiscussionItem
+	// 				id={discussion.id}
+	// 				title={discussion.title}
+	// 				tag={discussion.tag}
+	// 				creatorID={discussion.creator_id}
+	// 			/>
+	// 		);
+	// 	});
+	// }, [discussionsList]);
 
 	return (
 		<Fragment>
@@ -116,77 +116,8 @@ export default function Discussions() {
 					content="Get information on the latest animes, compile and share lists of animes and have discussions about your favorite animes on Animehaven."
 				/>
 			</Head>
-			<PageContainer className="d-flex gap-2">
-				{!matchesSmallDevice && (
-					<div className="d-flex flex-column gap-3">
-						<Select
-							title="Filter discussions"
-							value={filter}
-							onChange={onSelectValueChanged}>
-							<option value="all">All</option>
-							{profileID && (
-								<option value="your_discussions">Your Discussions</option>
-							)}
-						</Select>
-						<CheckboxList
-							className="mt-2"
-							label="Tags"
-							checkboxes={tagsElements}
-						/>
-					</div>
-				)}
-				{matchesSmallDevice && (
-					<SwipeableDrawer
-						anchor="right"
-						PaperProps={{ sx: { backgroundColor: "#1E1E1E" } }}
-						open={filterDrawerIsOpen}
-						onClose={toggleFilterDrawer.bind(this, false)}
-						onOpen={toggleFilterDrawer.bind(this, true)}>
-						<div className="d-flex flex-column gap-3 p-2">
-							<Select title="Filter discussions">
-								<option value="all">All</option>
-								{profileID && (
-									<option value="your_discussions">Your Discussions</option>
-								)}
-							</Select>
-							<CheckboxList
-								className="mt-2"
-								label="Tags"
-								checkboxes={tagsElements}
-							/>
-						</div>
-					</SwipeableDrawer>
-				)}
-				<div className="flex-grow-1 d-flex flex-column gap-2">
-					<div className="d-flex justify-content-between">
-						{matchesSmallDevice && (
-							<MUIButton
-								onClick={toggleFilterDrawer.bind(this, true)}
-								sx={{ color: "whitesmoke" }}>
-								Filter
-							</MUIButton>
-						)}
-						{profileID && (
-							<Button
-								text="New Discussion"
-								className="ms-auto"
-								icon={<Add />}
-								onClick={() => router.push("/discussions/create")}
-							/>
-						)}
-					</div>
-					<div className="d-flex flex-column flex-grow-1">
-						<SearchInput
-							placeholder="Search Discussions"
-							minLength={4}
-							spellCheck={false}
-						/>
-						{queryingDB && <Loading />}
-						{!queryingDB && (
-							<ul style={{ marginTop: "10px" }}>{discussions}</ul>
-						)}
-					</div>
-				</div>
+			<PageContainer className="d-flex gap-2 justify-content-center">
+				<h2>COMING SOON</h2>
 			</PageContainer>
 		</Fragment>
 	);
