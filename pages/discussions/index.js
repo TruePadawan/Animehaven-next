@@ -34,64 +34,64 @@ export default function Discussions() {
 	const router = useRouter();
 	const matchesSmallDevice = useMediaQuery("(max-width: 640px)");
 
-	// useEffect(() => {
-	// 	const selectedTags = [];
-	// 	for (const tag in discussionTags) {
-	// 		if (discussionTags[tag] === true) {
-	// 			selectedTags.push(tag.toLowerCase());
-	// 		}
-	// 	}
-	// 	setQueryingDB(true);
-	// 	getDiscussionsByTags(selectedTags)
-	// 		.then((data) => {
-	// 			setDiscussionsList(data);
-	// 		})
-	// 		.finally(() => {
-	// 			setQueryingDB(false);
-	// 		});
-	// }, [discussionTags]);
+	useEffect(() => {
+		const selectedTags = [];
+		for (const tag in discussionTags) {
+			if (discussionTags[tag] === true) {
+				selectedTags.push(tag.toLowerCase());
+			}
+		}
+		setQueryingDB(true);
+		getDiscussionsByTags(selectedTags)
+			.then((data) => {
+				setDiscussionsList(data);
+			})
+			.finally(() => {
+				setQueryingDB(false);
+			});
+	}, [discussionTags]);
 
-	// function toggleFilterDrawer(open) {
-	// 	setFilterDrawerIsOpen(open);
-	// }
+	function toggleFilterDrawer(open) {
+		setFilterDrawerIsOpen(open);
+	}
 
-	// function onSelectValueChanged(event) {
-	// 	setFilter(event.target.value);
-	// }
+	function onSelectValueChanged(event) {
+		setFilter(event.target.value);
+	}
 
-	// function onCheckboxValueChanged(event) {
-	// 	setDiscussionTags((snapshot) => {
-	// 		snapshot[event.target.name] = event.target.checked;
-	// 		return { ...snapshot };
-	// 	});
-	// }
+	function onCheckboxValueChanged(event) {
+		setDiscussionTags((snapshot) => {
+			snapshot[event.target.name] = event.target.checked;
+			return { ...snapshot };
+		});
+	}
 
-	// const tagsElements = useMemo(() => {
-	// 	return DISCUSSION_TAGS.map((tag) => (
-	// 		<li key={tag}>
-	// 			<Checkbox
-	// 				id={tag}
-	// 				label={tag}
-	// 				name={tag}
-	// 				checked={discussionTags[tag]}
-	// 				onChange={onCheckboxValueChanged}
-	// 			/>
-	// 		</li>
-	// 	));
-	// }, [discussionTags]);
+	const tagsElements = useMemo(() => {
+		return DISCUSSION_TAGS.map((tag) => (
+			<li key={tag}>
+				<Checkbox
+					id={tag}
+					label={tag}
+					name={tag}
+					checked={discussionTags[tag]}
+					onChange={onCheckboxValueChanged}
+				/>
+			</li>
+		));
+	}, [discussionTags]);
 
-	// const discussions = useMemo(() => {
-	// 	return discussionsList.map((discussion) => {
-	// 		return (
-	// 			<DiscussionItem
-	// 				id={discussion.id}
-	// 				title={discussion.title}
-	// 				tag={discussion.tag}
-	// 				creatorID={discussion.creator_id}
-	// 			/>
-	// 		);
-	// 	});
-	// }, [discussionsList]);
+	const discussions = useMemo(() => {
+		return discussionsList.map((discussion) => {
+			return (
+				<DiscussionItem
+					id={discussion.id}
+					title={discussion.title}
+					tag={discussion.tag}
+					creatorID={discussion.creator_id}
+				/>
+			);
+		});
+	}, [discussionsList]);
 
 	return (
 		<Fragment>
