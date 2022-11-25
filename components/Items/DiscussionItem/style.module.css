@@ -5,7 +5,7 @@
     background-color: #252525;
     border-radius: 8px;
     padding: 6px;
-    box-shadow: 1px 3px 2px rgb(36, 36, 36);
+    box-shadow: 1px 3px 2px rgba(31, 31, 31, 0.767);
 }
 
 .title {
@@ -13,15 +13,16 @@
     font-size: larger;
 }
 
-.title:hover {
-    font-size: 20px;
-}
-
-.author {
+.creator {
     font-size: 0.8rem;
-    color: azure;
+    color: bisque;
 }
 
-.author a {
-    color: bisque;
+.creator a:hover {
+    color: darkgray;
+}
+
+.tag {
+    font-size: small;
+    color: gray;
 }
