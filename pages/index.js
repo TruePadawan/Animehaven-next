@@ -185,7 +185,7 @@ export async function getStaticProps() {
 				popularAnimes,
 			},
 		},
-		revalidate: 300,
+		revalidate: 600,
 	};
 }
 
