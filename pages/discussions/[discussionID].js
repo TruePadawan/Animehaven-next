@@ -110,9 +110,12 @@ const Discussion = () => {
 							</IconButton>
 						)}
 					</span>
-					<Link className={styles.creator} href={`/users/${creator}`}>
-						{creator}
-					</Link>
+					<div className={styles.creator}>
+						Created by{" "}
+						<Link href={`/users/${creator}`}>
+							{creator}
+						</Link>
+					</div>
 					<p className={styles.body}>{body}</p>
 				</div>
 				<CommentsList

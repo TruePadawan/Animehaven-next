@@ -32,7 +32,7 @@ export default function Discussions() {
 	});
 	const [queryingDB, setQueryingDB] = useState(false);
 	const router = useRouter();
-	const matchesSmallDevice = useMediaQuery("(max-width: 600px)");
+	const matchesSmallDevice = useMediaQuery("(max-width: 640px)");
 
 	useEffect(() => {
 		const selectedTags = [];
@@ -181,7 +181,7 @@ export default function Discussions() {
 							minLength={4}
 							spellCheck={false}
 						/>
-						{queryingDB && <Loading />}
+						{queryingDB && <Loading sx={{ marginTop: "10px" }} />}
 						{!queryingDB && (
 							<ul style={{ marginTop: "10px" }}>{discussions}</ul>
 						)}

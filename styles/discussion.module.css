@@ -3,18 +3,22 @@
 }
 
 .creator {
+    color: antiquewhite;
     width: max-content;
+    font-family: 'Roboto', sans-serif;
+}
+
+.creator a {
     color: #a37e5c;
-    font-weight: 600;
+}
+
+.creator a:hover {
+    text-decoration: underline;
 }
 
 .body {
     color: gainsboro;
-    margin-top: 10px;
+    margin-top: 1.2rem;
     margin-bottom: 2rem;
     max-width: 600px;
-}
-
-.creator {
-    font-family: 'Lato', sans-serif;
 }
