@@ -11,7 +11,7 @@ import Error from "../../components/Error/Error";
 import CommentsList from "../../components/Comments-Reviews/Comments/CommentsList";
 import PageContainer from "../../components/PageContainer/PageContainer";
 import { supabase } from "../../supabase/config";
-import { getUsefulData } from "../../utilities/app-utilities";
+import { getListByID, getUsefulData } from "../../utilities/app-utilities";
 import { getAnimeByID } from "../../utilities/mal-api";
 import { UserAuthContext } from "../../context/UserAuthContext";
 import { useRouter } from "next/router";
@@ -77,22 +77,15 @@ const List = () => {
 	const { listID } = useRouter().query;
 	const { profileID } = useContext(UserAuthContext);
 	const [loading, setLoading] = useState(true);
-	const [isLocked, setIsLocked] = useState(false);
-	const [loadingFailed, setLoadingFailed] = useState(false);
 	const [showCreateListDialog, setShowCreateListDialog] = useState(false);
 	const [listData, setListData] = useState({});
 	const [editAllowed, setEditAllowed] = useState(false);
+	const [error, setError] = useState({ occurred: false, text: "" });
 
 	// REQUEST FOR AND LOAD LIST DATA TO UI
 	useEffect(() => {
 		if (listID === undefined) return;
-		supabase
-			.from("anime_lists")
-			.select()
-			.eq("id", listID)
-			.throwOnError()
-			.limit(1)
-			.single()
+		getListByID(listID)
 			.then((response) => {
 				const {
 					title,
@@ -102,7 +95,7 @@ const List = () => {
 					genres,
 					is_public,
 					comment_instance_id,
-				} = response.data;
+				} = response;
 				supabase
 					.from("profiles")
 					.select("account_name")
@@ -127,40 +120,31 @@ const List = () => {
 					});
 			})
 			.catch((error) => {
-				// error code PGRST116 indicates that the user doesn't have permission to view resource
-				if (error.code === "PGRST116") {
-					setIsLocked(true);
-				}
+				setError({
+					occurred: true,
+					text: error.message || error.error_description,
+				});
 				setLoading(false);
-				setLoadingFailed(true);
 			});
 	}, [listID, profileID]);
 
 	const openCreateListDialog = () => setShowCreateListDialog(true);
 	const closeCreateListDialog = () => setShowCreateListDialog(false);
 
-	const errorOccurred = loadingFailed && !isLocked;
-
 	if (loading) {
 		return <Loading />;
 	}
-	if (errorOccurred) {
+	if (error.occurred) {
 		return (
-			<Error
-				title="Error occurred while loading list"
-				extraText="Consider reloading the page!"
-			/>
+			<Error title="Error occurred while loading list" extraText={error.text} />
 		);
-	}
-	if (isLocked) {
-		return <Locked />;
 	}
 
 	const { title, desc, creator, items, comment_instance_id } = listData;
 	const transformedItems = items.map((item, index) => (
 		<Item key={item.id} itemID={item.id} itemTitle={item.title} index={index} />
 	));
-	
+
 	return (
 		<Fragment>
 			<Head>
@@ -205,7 +189,11 @@ const List = () => {
 				<ul id="list-items" className={styles.items}>
 					{transformedItems}
 				</ul>
-				<CommentsList className="mt-4" id={comment_instance_id} profileID={profileID} />
+				<CommentsList
+					className="mt-4"
+					id={comment_instance_id}
+					profileID={profileID}
+				/>
 			</PageContainer>
 		</Fragment>
 	);
