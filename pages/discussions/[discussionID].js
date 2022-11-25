@@ -42,15 +42,13 @@ const Discussion = () => {
 								body: data.body,
 								commentInstanceID: data.comment_instance_id,
 							});
+							setLoading(false);
 							setEditAllowed(profileID === data.creator_id);
 						}
 					);
 				})
 				.catch(() => {
 					setErrorOccurred(true);
-				})
-				.finally(() => {
-					setLoading(false);
 				});
 		}
 	}, [router, profileID]);
