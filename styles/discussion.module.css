@@ -1,0 +1,20 @@
+.title {
+    font-family: 'Ubuntu', sans-serif;
+}
+
+.creator {
+    width: max-content;
+    color: #a37e5c;
+    font-weight: 600;
+}
+
+.body {
+    color: gainsboro;
+    margin-top: 10px;
+    margin-bottom: 2rem;
+    max-width: 600px;
+}
+
+.creator {
+    font-family: 'Lato', sans-serif;
+}
