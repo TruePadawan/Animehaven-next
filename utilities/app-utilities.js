@@ -269,3 +269,17 @@ export async function getDiscussionsByTags(tags) {
 		.throwOnError();
 	return data;
 }
+
+export async function getDiscussionByID(discussionID) {
+	if (!discussionID) {
+		throw new Error(`Invalid argument passed - ${discussionID}`);
+	}
+	const { data } = await supabase
+		.from("discussions")
+		.select()
+		.eq("id", discussionID)
+		.throwOnError()
+		.limit(1)
+		.single();
+	return data;
+}
