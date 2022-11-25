@@ -276,10 +276,27 @@ export async function getDiscussionByID(discussionID) {
 	}
 	const { data } = await supabase
 		.from("discussions")
-		.select()
+		.select("*", { count: "exact" })
 		.eq("id", discussionID)
 		.throwOnError()
 		.limit(1)
 		.single();
+	return data;
+}
+
+export async function getListByID(listID) {
+	if (!listID) {
+		throw new Error(`Invalid argument passed - ${listID}`);
+	}
+	const { data, count } = await supabase
+		.from("anime_lists")
+		.select("*", { count: "exact" })
+		.eq("id", listID)
+		.throwOnError()
+		.limit(1)
+		.single();
+	if (count === 0) {
+		throw new Error("Failed to access data!");
+	}
 	return data;
 }

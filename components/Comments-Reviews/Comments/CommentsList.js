@@ -134,6 +134,7 @@ const CommentsList = ({ id, className = "" }) => {
 	};
 
 	const replying = replyData.parentCommentID !== "";
+	const noComments = commentsData.length === 0;
 	const comments = useMemo(() => {
 		return commentsData.map((commentData) => {
 			return (
@@ -168,7 +169,14 @@ const CommentsList = ({ id, className = "" }) => {
 					/>
 				</Fragment>
 			)}
-			<ul className={styles.items}>{comments}</ul>
+			{!noComments && (
+				<ul className={styles.items}>
+					{comments}
+				</ul>
+			)}
+			{noComments && (
+				<div className="d-flex justify-content-center mt-4">No Comments</div>
+			)}
 			<Snackbar
 				open={snackbarData.open}
 				autoHideDuration={6000}

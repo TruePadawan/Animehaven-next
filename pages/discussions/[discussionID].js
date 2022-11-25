@@ -19,7 +19,7 @@ const Discussion = () => {
 	const router = useRouter();
 	const { profileID } = useContext(UserAuthContext);
 	const [loading, setLoading] = useState(false);
-	const [errorOccurred, setErrorOccurred] = useState(false);
+	const [error, setError] = useState({ occurred: false, text: "" });
 	const [data, setData] = useState({
 		title: null,
 		creator: null,
@@ -47,8 +47,12 @@ const Discussion = () => {
 						}
 					);
 				})
-				.catch(() => {
-					setErrorOccurred(true);
+				.catch((error) => {
+					setError({
+						occurred: true,
+						text: error.message || error.error_description,
+					});
+					setLoading(false);
 				});
 		}
 	}, [router, profileID]);
@@ -64,7 +68,7 @@ const Discussion = () => {
 		);
 	}
 
-	if (errorOccurred) {
+	if (error.occurred) {
 		return (
 			<Fragment>
 				<Head>
@@ -72,7 +76,7 @@ const Discussion = () => {
 				</Head>
 				<Error
 					title="Error occurred while loading discussion"
-					extraText="Consider reloading the page!"
+					extraText={error.text}
 				/>
 			</Fragment>
 		);
@@ -110,9 +114,9 @@ const Discussion = () => {
 							</IconButton>
 						)}
 					</span>
-					<Link className={styles.creator} href={`/users/${creator}`}>
-						{creator}
-					</Link>
+					<div className={styles.creator}>
+						Created by <Link href={`/users/${creator}`}>{creator}</Link>
+					</div>
 					<p className={styles.body}>{body}</p>
 				</div>
 				<CommentsList

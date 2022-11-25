@@ -89,7 +89,7 @@ const CommentItem = (props) => {
 			});
 	}, [commentData, triggerAlert]);
 
-	// LISTEN FOR WHEN PARENT COMMENT IS UPDATED
+	// LISTEN FOR WHEN PARENT COMMENT IS UPDATED OR DELETED
 	useEffect(() => {
 		const onParentCommentUpdated = (payload) => {
 			setParentCommentData((snapshot) => {
@@ -97,21 +97,31 @@ const CommentItem = (props) => {
 			});
 		};
 
-		const refCommentID = parentCommentData.id;
+		const onParentCommentDeleted = (payload) => {
+			setParentCommentIsDeleted(payload.old.id === parentCommentData.id);
+		}
+
+		const parentCommentID = parentCommentData.id;
 		let updatesChannel = null;
-		if (refCommentID !== null) {
+		if (parentCommentID !== null) {
 			updatesChannel = supabase
-				.channel(`public:comments:id=eq.${refCommentID}`)
+				.channel(`public:comments:id=eq.${parentCommentID}`)
 				.on(
 					"postgres_changes",
 					{
 						event: "UPDATE",
 						schema: "public",
 						table: "comments",
-						filter: `id=eq.${refCommentID}`,
+						filter: `id=eq.${parentCommentID}`,
 					},
 					onParentCommentUpdated
 				)
+				.on("postgres_changes", {
+					event: "DELETE",
+					schema: "public",
+					table: "comments",
+					filter: `id=eq.${parentCommentID}`,
+				}, onParentCommentDeleted)
 				.subscribe();
 		}
 
