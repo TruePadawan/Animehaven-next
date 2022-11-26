@@ -316,3 +316,34 @@ export function numberToString(count, appendString) {
 		return `${approxString}k+ ${appendString}s`;
 	}
 }
+
+export async function getReviewList(animeID, profileID = null) {
+	let list = [];
+	if (profileID !== null) {
+		const { data: profileReview } = await supabase
+			.from("item_reviews")
+			.select()
+			.eq("item_id", animeID)
+			.eq("creator_id", profileID)
+			.limit(1)
+			.single()
+			.throwOnError();
+		list.push(profileReview);
+
+		const { data } = await supabase
+			.from("item_reviews")
+			.select()
+			.eq("item_id", animeID)
+			.neq("creator_id", profileID)
+			.throwOnError();
+		list = list.concat(data);
+	} else {
+		const { data } = await supabase
+			.from("item_reviews")
+			.select()
+			.eq("item_id", animeID)
+			.throwOnError();
+		list = list.concat(data);
+	}
+	return list;
+}

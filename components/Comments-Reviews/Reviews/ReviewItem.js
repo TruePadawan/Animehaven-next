@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import Link from "next/link";
 import { IconButton, Rating, Skeleton } from "@mui/material";
 import ThumbUpOffAltIcon from "@mui/icons-material/ThumbUpOffAlt";
@@ -11,52 +11,46 @@ import {
 	getProfileData,
 	getReviewUpvoteList,
 } from "../../../utilities/app-utilities";
-import { UserAuthContext } from "../../../context/UserAuthContext";
 import styles from "../Comments-Reviews.module.css";
 import Image from "next/image";
 
-const ReviewItem = ({
-	reviewID,
-	text,
-	accountID,
-	rating,
-	upvotedBy,
-	upvoted = false,
-	own = false,
-	handleError,
-}) => {
-	const { profileID } = useContext(UserAuthContext);
-	const [avatarURL, setAvatarURL] = useState(DEFAULT_AVATAR_URL);
-	const [acctName, setAcctName] = useState("");
-	const [displayName, setDisplayName] = useState("User");
+const ReviewItem = ({ reviewData, profileID, handleError }) => {
+	const [profileData, setProfileData] = useState({
+		avatar_url: DEFAULT_AVATAR_URL,
+		account_name: "",
+		display_name: "",
+	});
 	const [loading, setLoading] = useState(true);
-	const [nUpvotes, setNUpvotes] = useState(upvotedBy.length);
+	const [nUpvotes, setNUpvotes] = useState(reviewData.upvoted_by.length);
 	const [upvoteIcon, setUpvoteIcon] = useState(() => {
-		if (upvoted) return <ThumbUpAltIcon />;
+		const isUpvoted = reviewData.upvoted_by.includes(profileID);
+		if (isUpvoted) return <ThumbUpAltIcon />;
 		return <ThumbUpOffAltIcon />;
 	});
 	const [reviewState, setReviewState] = useState({
 		deleted: false,
 		info: "",
 	});
+	const ownReview = reviewData.creator_id === profileID;
 
+	// LOAD REVIEW
 	useEffect(() => {
-		getProfileData("*", accountID)
+		const { creator_id } = reviewData;
+		getProfileData("account_name,display_name,avatar_url", creator_id)
 			.then((data) => {
-				const { avatar_url, display_name, account_name } = data;
-				setAvatarURL(avatar_url);
-				setDisplayName(display_name);
-				setAcctName(account_name);
+				setProfileData(data);
 				setLoading(false);
 			})
 			.catch((error) => {
-				handleError("Failed to load review data", error);
+				handleError("Failed to load review", error);
 			});
-	}, [accountID, handleError]);
+	}, [reviewData, handleError]);
 
-	const upvoteBtnClickHandler = async () => {
-		if (own || !profileID) return;
 
+	const onUpvoteButtonClicked = async () => {
+		if (ownReview || profileID === null) return;
+
+		const { id: reviewID } = reviewData;
 		try {
 			const { status, code } = await toggleUpvoteForReview(reviewID, profileID);
 			if (status === "COMPLETE") {
@@ -72,16 +66,17 @@ const ReviewItem = ({
 					deleted: true,
 					info: "Review no longer exists",
 				});
-				return;
 			}
 		} catch (error) {
 			handleError("Failed to complete action", error);
 		}
 	};
 
-	const deleteBtnClickHandler = async () => {
-		if (!own || !profileID) return;
+	
+	const onDeleteButtonClicked = async () => {
+		if (!ownReview || profileID === null) return;
 
+		const { id: reviewID } = reviewData;
 		try {
 			const { status } = await deleteReview(reviewID, profileID);
 			if (status === "COMPLETE") {
@@ -95,18 +90,20 @@ const ReviewItem = ({
 		}
 	};
 
-	const upvoteBtnDisabled = !profileID || own;
-	const deleteBtnDisabled = !profileID || !own;
+	const upvoteBtnDisabled = !profileID || ownReview;
+	const deleteBtnDisabled = !profileID || !ownReview;
 
 	const reviewExists = !loading && !reviewState.deleted;
 	const reviewDeleted = !loading && reviewState.deleted;
 
-	const reviewClassName = `${styles.review} ${own ? styles.own : ""}`;
-
+	const reviewClassName = `${styles.review} ${
+		ownReview ? styles.ownReview : ""
+	}`;
+	const { avatar_url, display_name, account_name } = profileData;
 	return (
 		<li className={reviewClassName}>
 			{loading && (
-				<>
+				<Fragment>
 					<Skeleton variant="circular" width={40} height={40} />
 					<div className="d-flex flex-column flex-grow-1">
 						<Skeleton variant="text" sx={{ fontSize: "1rem", width: "30%" }} />
@@ -115,31 +112,36 @@ const ReviewItem = ({
 							sx={{ fontSize: "0.6rem", width: "100%" }}
 						/>
 					</div>
-				</>
+				</Fragment>
 			)}
 			{reviewExists && (
-				<>
+				<Fragment>
 					<Image
 						className={styles.userPhoto}
-						src={avatarURL}
-						alt={acctName}
+						src={avatar_url}
+						alt={account_name}
 						width={40}
 						height={40}
 						quality={100}
 					/>
 					<div className="d-flex flex-column flex-grow-1">
-						<Link href={`/users/${acctName}`} className={styles.user}>
-							{displayName}
+						<Link href={`/users/${account_name}`} className={styles.user}>
+							{display_name}
 						</Link>
-						<Rating value={rating} readOnly size="small" precision={0.5} />
-						<p className={styles.reviewText}>{text}</p>
+						<Rating
+							value={reviewData.rating}
+							size="small"
+							precision={0.5}
+							readOnly
+						/>
+						<p className={styles.reviewText}>{reviewData.review}</p>
 						<div className="d-flex justify-content-end gap-2">
 							<span className={styles.upvote}>
 								<IconButton
 									aria-label="upvote"
 									size="small"
 									disabled={upvoteBtnDisabled}
-									onClick={upvoteBtnClickHandler}>
+									onClick={onUpvoteButtonClicked}>
 									{upvoteIcon}
 								</IconButton>
 								<span>{nUpvotes}</span>
@@ -148,12 +150,12 @@ const ReviewItem = ({
 								aria-label="delete"
 								size="small"
 								disabled={deleteBtnDisabled}
-								onClick={deleteBtnClickHandler}>
+								onClick={onDeleteButtonClicked}>
 								<DeleteIcon />
 							</IconButton>
 						</div>
 					</div>
-				</>
+				</Fragment>
 			)}
 			{reviewDeleted && (
 				<p className="text-center m-0 w-100">{reviewState.info}</p>

@@ -5,7 +5,10 @@ import ReviewItem from "./ReviewItem";
 import styles from "../Comments-Reviews.module.css";
 import { supabase } from "../../../supabase/config";
 import ShareButton from "../../ShareButton/ShareButton";
-import { numberToString } from "../../../utilities/app-utilities";
+import {
+	getReviewList,
+	numberToString,
+} from "../../../utilities/app-utilities";
 import ReviewsIcon from "@mui/icons-material/Reviews";
 
 const getItemReviews = async (animeID, count = 4) => {
@@ -42,57 +45,9 @@ const ReviewsList = ({ profileID, animeID, triggerAlert }) => {
 
 	useEffect(() => {
 		// IF USER IS SIGNED IN, CHECK IF USER HAS REVIEW THE ANIME AND SHOW THEIRS AT THE TOP
-		if (profileID !== null) {
-			getReview(animeID, profileID)
-				.then((reviewData) => {
-					const { id, review, rating, upvoted_by } = reviewData;
-					setReviewListData((snapshot) => {
-						const reviewAlreadyInArray = snapshot.some(
-							(item) => item.reviewID === id
-						);
-						if (!reviewAlreadyInArray) {
-							snapshot.unshift({
-								reviewID: id,
-								reviewText: review,
-								rating,
-								accountID: profileID,
-								upvotedBy: upvoted_by,
-								upvoted: true,
-								own: true,
-							});
-							return [...snapshot];
-						}
-						return snapshot;
-					});
-				})
-				.catch((error) => {
-					if (error.code !== "PGRST116") {
-						handleError("Failed to retrieve reviews", error);
-					}
-					setReviewListData([]);
-				});
-		}
-		getItemReviews(animeID)
-			.then((reviews) => {
-				const list = [];
-				reviews.forEach((reviewData) => {
-					const { id, creator_id, review, rating, upvoted_by } = reviewData;
-					if (profileID !== creator_id) {
-						const isUpvoted = upvoted_by.includes(profileID);
-						list.push({
-							reviewID: id,
-							reviewText: review,
-							rating,
-							accountID: creator_id,
-							upvotedBy: upvoted_by,
-							upvoted: isUpvoted,
-							own: false,
-						});
-					}
-				});
-				setReviewListData((snapshot) => {
-					return snapshot.concat(list);
-				});
+		getReviewList(animeID, profileID)
+			.then((list) => {
+				setReviewListData(list);
 			})
 			.catch((error) => {
 				handleError("Failed to retrieve reviews", error);
@@ -130,20 +85,8 @@ const ReviewsList = ({ profileID, animeID, triggerAlert }) => {
 					})
 					.throwOnError();
 
-				// GET THE ID OF THE POSTED REVIEW AND UPDATE THE REVIEW LIST SO UI CAN BE UPDATED WITH NEW REVIEW
-				const reviewData = await getReview(animeID, profileID);
-				setReviewListData((currentReviews) => {
-					currentReviews.unshift({
-						reviewID: reviewData.id,
-						reviewText: reviewData.review,
-						rating,
-						accountID: profileID,
-						upvotedBy: reviewData.upvoted_by,
-						upvoted: true,
-						own: true,
-					});
-					return [...currentReviews];
-				});
+				const list = await getReviewList(animeID, profileID);
+				setReviewListData(list);
 				setReviewText("");
 			} catch (error) {
 				handleError("Failed to add review", error);
@@ -151,9 +94,7 @@ const ReviewsList = ({ profileID, animeID, triggerAlert }) => {
 		} else {
 			try {
 				// UPDATE REVIEW
-				const upvotedBy = data[0].upvoted_by;
-				const reviewID = data[0].id;
-				await supabase
+				const { data: updatedData } = await supabase
 					.from("item_reviews")
 					.update({
 						review: reviewText,
@@ -161,19 +102,12 @@ const ReviewsList = ({ profileID, animeID, triggerAlert }) => {
 					})
 					.eq("item_id", animeID)
 					.eq("creator_id", profileID)
+					.select()
 					.throwOnError();
 
-				setReviewListData((currentReviews) => {
-					currentReviews[0] = {
-						reviewID,
-						reviewText,
-						rating,
-						accountID: profileID,
-						upvotedBy,
-						upvoted: true,
-						own: true,
-					};
-					return [...currentReviews];
+				setReviewListData((snapshot) => {
+					snapshot[0] = updatedData[0];
+					return [...snapshot];
 				});
 				setReviewText("");
 			} catch (error) {
@@ -197,19 +131,14 @@ const ReviewsList = ({ profileID, animeID, triggerAlert }) => {
 		return reviewListData.map((review) => {
 			return (
 				<ReviewItem
-					key={review.reviewID}
-					reviewID={review.reviewID}
-					text={review.reviewText}
-					rating={review.rating}
-					accountID={review.accountID}
-					upvotedBy={review.upvotedBy}
-					upvoted={review.upvoted}
-					own={review.own}
+					key={review.id}
+					reviewData={review}
+					profileID={profileID}
 					handleError={handleError}
 				/>
 			);
 		});
-	}, [reviewListData, handleError]);
+	}, [reviewListData, handleError, profileID]);
 
 	return (
 		<div className={styles.component}>
