@@ -4,8 +4,18 @@
 
 .creator {
     width: max-content;
-    color: #a37e5c;
-    font-weight: 600;
+    font-family: 'Baloo Tamma 2', cursive;
+    font-size: 14px;
+    color: #B5B5B5;
+}
+
+.creator a {
+    font-weight: 500;
+    color: #80884E;
+}
+
+.creator a:hover {
+    color: #9da75f;
 }
 
 .desc {
@@ -15,7 +25,7 @@
     max-width: 600px;
 }
 
-.creator, .item-title {
+.item-title {
     font-family: 'Lato', sans-serif;
 }
 

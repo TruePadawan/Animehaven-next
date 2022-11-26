@@ -24,7 +24,7 @@ export default function Document() {
 					crossOrigin="true"
 				/>
 				<link
-					href="https://fonts.googleapis.com/css2?family=Josefin+Sans&family=Lato:wght@400;700&family=Radio+Canada:wght@400;500&family=Roboto:wght@300;400;500;700&family=Rubik:wght@400;500&family=Ubuntu:wght@400;500&display=swap"
+					href="https://fonts.googleapis.com/css2?family=Baloo+Tamma+2:wght@400;500&family=Josefin+Sans&family=Lato:wght@400;700&family=Radio+Canada:wght@400;500&family=Roboto:wght@300;400;500;700&family=Rubik:wght@400;500&family=Ubuntu:wght@400;500&display=swap"
 					rel="stylesheet"
 				/>
 				<meta
@@ -35,7 +35,10 @@ export default function Document() {
 				<meta property="og:image" content="/animehaven.JPG" />
 				<meta property="og:image:alt" content="Animehaven home page" />
 				<meta name="twitter:card" content="summary_large_image" />
-				<meta name="twitter:image" content="https://bkpyhkkjvgzfjojacrka.supabase.co/storage/v1/object/public/misc/animehaven.jpg" />
+				<meta
+					name="twitter:image"
+					content="https://bkpyhkkjvgzfjojacrka.supabase.co/storage/v1/object/public/misc/animehaven.jpg"
+				/>
 				<meta name="twitter:image:alt" content="Animehaven home page" />
 				<meta name="twitter:site" content="@thetruepadawan" />
 				<meta name="twitter:creator" content="@thetruepadawan" />

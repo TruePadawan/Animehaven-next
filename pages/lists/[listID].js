@@ -170,6 +170,10 @@ const List = () => {
 					/>
 				)}
 				<div id="list-info" className="d-flex flex-column">
+					<span className={styles.creator}>
+						Created by{" "}
+						<Link href={`/users/${creator}`}>{creator}</Link>
+					</span>
 					<span className="d-flex gap-1">
 						<h2 className={styles.title}>{title}</h2>
 						{editAllowed && (
@@ -181,9 +185,6 @@ const List = () => {
 							</IconButton>
 						)}
 					</span>
-					<Link className={styles.creator} href={`/users/${creator}`}>
-						{creator}
-					</Link>
 					<p className={styles.desc}>{desc}</p>
 				</div>
 				<ul id="list-items" className={styles.items}>
