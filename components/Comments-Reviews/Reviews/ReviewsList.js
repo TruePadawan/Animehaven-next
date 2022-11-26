@@ -1,9 +1,12 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import { Rating, TextareaAutosize } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
 import ReviewItem from "./ReviewItem";
 import styles from "../Comments-Reviews.module.css";
 import { supabase } from "../../../supabase/config";
+import ShareButton from "../../ShareButton/ShareButton";
+import { numberToString } from "../../../utilities/app-utilities";
+import ReviewsIcon from "@mui/icons-material/Reviews";
 
 const getItemReviews = async (animeID, count = 4) => {
 	const { data: reviews } = await supabase
@@ -180,6 +183,16 @@ const ReviewsList = ({ profileID, animeID, triggerAlert }) => {
 		setDisableAddReviewBtn(false);
 	};
 
+	function onShareSuccess() {
+		triggerAlert("Link Copied!", { severity: "success" });
+	}
+	function onShareFailed() {
+		triggerAlert("Failed to Copy Link!", { severity: "warning" });
+	}
+
+	const noReviews = reviewListData.length === 0;
+	const reviewsCountText = numberToString(reviewListData.length, "Review");
+
 	const reviewList = useMemo(() => {
 		return reviewListData.map((review) => {
 			return (
@@ -201,7 +214,7 @@ const ReviewsList = ({ profileID, animeID, triggerAlert }) => {
 	return (
 		<div className={styles.component}>
 			{profileID && (
-				<>
+				<Fragment>
 					<Rating
 						value={rating}
 						onChange={updateRating}
@@ -226,9 +239,24 @@ const ReviewsList = ({ profileID, animeID, triggerAlert }) => {
 							<SendIcon />
 						</button>
 					</form>
-				</>
+				</Fragment>
 			)}
-			<ul className={styles.items}>{reviewList}</ul>
+			<div className="d-flex flex-column gap-1 w-100">
+				<div className="d-flex justify-content-between align-items-center mx-2">
+					<span className="d-flex gap-1">
+						<ReviewsIcon />
+						<span>{reviewsCountText}</span>
+					</span>
+					<ShareButton
+						onShareSuccess={onShareSuccess}
+						onShareFailed={onShareFailed}
+					/>
+				</div>
+				{noReviews && (
+					<div className="d-flex justify-content-center mt-4">No Reviews</div>
+				)}
+				{!noReviews && <ul className={styles.items}>{reviewList}</ul>}
+			</div>
 		</div>
 	);
 };

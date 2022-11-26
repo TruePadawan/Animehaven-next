@@ -11,8 +11,13 @@ import CommentBox from "./CommentBox";
 import styles from "../Comments-Reviews.module.css";
 import { Alert, Snackbar } from "@mui/material";
 import { supabase } from "../../../supabase/config";
-import { getCommentsData } from "../../../utilities/app-utilities";
+import {
+	getCommentsData,
+	numberToString,
+} from "../../../utilities/app-utilities";
 import { UserAuthContext } from "../../../context/UserAuthContext";
+import CommentIcon from "@mui/icons-material/Comment";
+import ShareButton from "../../ShareButton/ShareButton";
 
 const defaultSnackbarState = { open: false, severity: "info", text: "" };
 
@@ -133,8 +138,17 @@ const CommentsList = ({ id, className = "" }) => {
 		setReplyData({ parentCommentID: "", accountName: "" });
 	};
 
+	function onShareSuccess() {
+		triggerAlert("Link Copied!", { severity: "success" });
+	}
+	function onShareFailed() {
+		triggerAlert("Failed to Copy Link!", { severity: "warning" });
+	}
+
 	const replying = replyData.parentCommentID !== "";
 	const noComments = commentsData.length === 0;
+	const commentsCountText = numberToString(commentsData.length, "Comment");
+
 	const comments = useMemo(() => {
 		return commentsData.map((commentData) => {
 			return (
@@ -169,14 +183,22 @@ const CommentsList = ({ id, className = "" }) => {
 					/>
 				</Fragment>
 			)}
-			{!noComments && (
-				<ul className={styles.items}>
-					{comments}
-				</ul>
-			)}
-			{noComments && (
-				<div className="d-flex justify-content-center mt-4">No Comments</div>
-			)}
+			<div className="d-flex flex-column gap-1 w-100">
+				<div className="d-flex justify-content-between align-items-center mx-2">
+					<span className="d-flex gap-1">
+						<CommentIcon />
+						<span>{commentsCountText}</span>
+					</span>
+					<ShareButton
+						onShareSuccess={onShareSuccess}
+						onShareFailed={onShareFailed}
+					/>
+				</div>
+				{noComments && (
+					<div className="d-flex justify-content-center mt-4">No Comments</div>
+				)}
+				{!noComments && <ul className={styles.items}>{comments}</ul>}
+			</div>
 			<Snackbar
 				open={snackbarData.open}
 				autoHideDuration={6000}

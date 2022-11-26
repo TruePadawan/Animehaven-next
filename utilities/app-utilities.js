@@ -300,3 +300,19 @@ export async function getListByID(listID) {
 	}
 	return data;
 }
+
+export function numberToString(count, appendString) {
+	if (count === 0) {
+		return `0 ${appendString}s`;
+	} else if (count === 1) {
+		return `1 ${appendString}`;
+	}
+
+	const nCommentsString = `${count}`;
+	const approxString = nCommentsString.slice(0, nCommentsString.length - 3);
+	if (count <= 1000) {
+		return `${count} ${appendString}s`;
+	} else {
+		return `${approxString}k+ ${appendString}s`;
+	}
+}
