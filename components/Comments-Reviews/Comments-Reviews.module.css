@@ -114,6 +114,10 @@
     font-weight: 500;
 }
 
+.user:hover {
+    color: gray;
+}
+
 .upvote {
     display: flex;
     align-items: center;
