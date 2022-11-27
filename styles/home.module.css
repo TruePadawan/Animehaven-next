@@ -14,7 +14,7 @@
 }
 
 .anime-list::-webkit-scrollbar {
-    height: 8px;
+    height: 13px;
 }
 
 .anime-list::-webkit-scrollbar-track {
