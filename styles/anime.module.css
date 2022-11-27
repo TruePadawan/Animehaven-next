@@ -101,16 +101,6 @@
     color: #B9B9B9;
 }
 
-.score {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-}
-
-.score img {
-    margin-bottom: 2px;
-}
-
 .not_recommended {
     background-color: transparent;
 }

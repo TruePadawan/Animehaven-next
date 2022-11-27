@@ -1,8 +1,9 @@
 import { Chip, Popper } from "@mui/material";
 import Image from "next/image";
 import Link from "next/link";
+import { Fragment } from "react";
 import { v4 as uuid } from "uuid";
-import starIcon from "../../../assets/star.png";
+import StarIcon from '@mui/icons-material/Star';
 import styles from "./style.module.css";
 
 const ItemPopper = (props) => {
@@ -52,10 +53,10 @@ const ItemPopper = (props) => {
 					<div className="d-flex justify-content-between">
 						<span className={styles.score}>
 							{props.score && (
-								<>
-									<img src={starIcon.src} alt="star" />
+								<Fragment>
+									<StarIcon sx={{ color: "goldenrod", marginBottom: "2px" }} />
 									<small>{props.score}</small>
-								</>
+								</Fragment>
 							)}
 						</span>
 						<Chip

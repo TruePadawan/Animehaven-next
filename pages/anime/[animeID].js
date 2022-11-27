@@ -1,5 +1,5 @@
 import PageContainer from "../../components/PageContainer/PageContainer";
-import starIcon from "../../assets/star.png";
+import StarIcon from '@mui/icons-material/Star';
 import { Box, Chip, Snackbar, Alert } from "@mui/material";
 import { Fragment, useCallback, useContext, useEffect, useState } from "react";
 import { getAnimeByID } from "../../utilities/mal-api";
@@ -315,8 +315,8 @@ const AnimeDetails = () => {
 										width: "max-content",
 									}}
 								/>
-								<span className={styles.score}>
-									<img src={starIcon.src} alt="star" />
+								<span className="d-flex align-items-center gap-2">
+									<StarIcon sx={{ color: "goldenrod", marginBottom: "2px" }} />
 									<small>{info.score}</small>
 								</span>
 								{profileID && (
