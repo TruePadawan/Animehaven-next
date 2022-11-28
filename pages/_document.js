@@ -27,10 +27,6 @@ export default function Document() {
 					href="https://fonts.googleapis.com/css2?family=Baloo+Tamma+2:wght@400;500&family=Josefin+Sans&family=Lato:wght@400;700&family=Radio+Canada:wght@400;500&family=Roboto:wght@300;400;500;700&family=Rubik:wght@400;500&family=Ubuntu:wght@400;500&display=swap"
 					rel="stylesheet"
 				/>
-				<meta
-					name="google-site-verification"
-					content="MbWwC0AH37Bl4t4o11N6R-L1mhx8SblAYiIzU8AGT0U"
-				/>
 				<meta property="og:type" content="website" />
 				<meta property="og:image" content="/animehaven.JPG" />
 				<meta property="og:image:alt" content="Animehaven home page" />
