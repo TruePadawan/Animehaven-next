@@ -317,24 +317,29 @@ export function numberToString(count, appendString) {
 	}
 }
 
-export async function getReviewList(animeID, profileID = null) {
+export async function getReviewByUser(animeID, userProfileID) {
+	const { data } = await supabase
+		.from("item_reviews")
+		.select()
+		.eq("item_id", animeID)
+		.eq("creator_id", userProfileID)
+		.throwOnError();
+	return data;
+}
+
+export async function getReviewList(animeID, userProfileID = null) {
 	let list = [];
-	if (profileID !== null) {
-		const { data: profileReview } = await supabase
-			.from("item_reviews")
-			.select()
-			.eq("item_id", animeID)
-			.eq("creator_id", profileID)
-			.limit(1)
-			.single()
-			.throwOnError();
-		list.push(profileReview);
+	if (userProfileID !== null) {
+		const userReview = await getReviewByUser(animeID, userProfileID);
+		if (userReview.length > 0) {
+			list.push(userReview[0]);
+		}
 
 		const { data } = await supabase
 			.from("item_reviews")
 			.select()
 			.eq("item_id", animeID)
-			.neq("creator_id", profileID)
+			.neq("creator_id", userProfileID)
 			.throwOnError();
 		list = list.concat(data);
 	} else {

@@ -6,6 +6,7 @@ import styles from "../Comments-Reviews.module.css";
 import { supabase } from "../../../supabase/config";
 import ShareButton from "../../ShareButton/ShareButton";
 import {
+	getReviewByUser,
 	getReviewList,
 	numberToString,
 } from "../../../utilities/app-utilities";
@@ -58,64 +59,66 @@ const ReviewsList = ({ profileID, animeID, triggerAlert }) => {
 	const updateRating = (e, newVal) => setRating(newVal < 1 ? 1 : newVal);
 	const textAreaChangeHandler = (e) => setReviewText(e.target.value);
 
-	const postReview = async (e) => {
-		e.preventDefault();
+	async function addReview() {
+		try {
+			await supabase
+				.from("item_reviews")
+				.insert({
+					item_id: animeID,
+					creator_id: profileID,
+					review: reviewText,
+					rating,
+					upvoted_by: [profileID],
+				})
+				.throwOnError();
+
+			const list = await getReviewList(animeID, profileID);
+			setReviewListData(list);
+			setReviewText("");
+		} catch (error) {
+			handleError("Failed to add review", error);
+		}
+	}
+
+	async function updateReview() {
+		try {
+			// UPDATE REVIEW
+			const { data: updatedData } = await supabase
+				.from("item_reviews")
+				.update({
+					review: reviewText,
+					rating,
+				})
+				.eq("item_id", animeID)
+				.eq("creator_id", profileID)
+				.select()
+				.throwOnError();
+
+			setReviewListData((snapshot) => {
+				snapshot[0] = updatedData[0];
+				return [...snapshot];
+			});
+			setReviewText("");
+		} catch (error) {
+			handleError("Failed to update review", error);
+		}
+	}
+
+	async function formSubmitHandler(event) {
+		event.preventDefault();
+		// SAFETUY CHECK - THERE MUST BE A SIGNEDIN USER BEFORE REVIEW CAN BE POSTED OR UPDATED
 		if (profileID === null) return;
-		// CHECK TO SEE IF THERE IS ALREADY A REVIEW BY THE USER AND UPDATE IT BECAUSE ONLY ONE REVIEW PER ITEM ELSE CREATE ONE
 		setDisableAddReviewBtn(true);
-
-		const { data } = await supabase
-			.from("item_reviews")
-			.select()
-			.eq("item_id", animeID)
-			.eq("creator_id", profileID)
-			.throwOnError();
-		const hasReview = data.length === 1;
-		// POST REVIEW
-		if (hasReview === false) {
-			try {
-				await supabase
-					.from("item_reviews")
-					.insert({
-						item_id: animeID,
-						creator_id: profileID,
-						review: reviewText,
-						rating,
-						upvoted_by: [profileID],
-					})
-					.throwOnError();
-
-				const list = await getReviewList(animeID, profileID);
-				setReviewListData(list);
-				setReviewText("");
-			} catch (error) {
-				handleError("Failed to add review", error);
-			}
+		// CHECK TO SEE IF THERE IS ALREADY A REVIEW BY THE USER AND UPDATE IT BECAUSE ONLY ONE REVIEW PER ITEM ELSE CREATE ONE
+		const reviewData = await getReviewByUser(animeID, profileID);
+		const userHasReviewedItem = reviewData.length === 1;
+		if (userHasReviewedItem) {
+			await updateReview();
 		} else {
-			try {
-				// UPDATE REVIEW
-				const { data: updatedData } = await supabase
-					.from("item_reviews")
-					.update({
-						review: reviewText,
-						rating,
-					})
-					.eq("item_id", animeID)
-					.eq("creator_id", profileID)
-					.select()
-					.throwOnError();
-
-				setReviewListData((snapshot) => {
-					snapshot[0] = updatedData[0];
-					return [...snapshot];
-				});
-				setReviewText("");
-			} catch (error) {
-				handleError("Failed to update review", error);
-			}
+			await addReview();
 		}
 		setDisableAddReviewBtn(false);
-	};
+	}
 
 	function onShareSuccess() {
 		triggerAlert("Link Copied!", { severity: "success" });
@@ -151,7 +154,7 @@ const ReviewsList = ({ profileID, animeID, triggerAlert }) => {
 						sx={{ width: "max-content" }}
 						size="small"
 					/>
-					<form className={styles.interface} onSubmit={postReview}>
+					<form className={styles.interface} onSubmit={formSubmitHandler}>
 						<TextareaAutosize
 							className={styles.inputfield}
 							title="Review"
