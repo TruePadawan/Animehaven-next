@@ -1,5 +1,5 @@
 import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
-import { Rating, TextareaAutosize } from "@mui/material";
+import { Alert, Rating, TextareaAutosize } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
 import ReviewItem from "./ReviewItem";
 import styles from "../Comments-Reviews.module.css";
@@ -12,24 +12,12 @@ import {
 } from "../../../utilities/app-utilities";
 import ReviewsIcon from "@mui/icons-material/Reviews";
 
-const getItemReviews = async (animeID, count = 4) => {
-	const { data: reviews } = await supabase
-		.rpc("get_item_reviews", { itemid: animeID, n_reviews: count + 1 })
-		.throwOnError();
-	return reviews;
-};
-
-const getReview = async (animeID, userID) => {
-	const { data } = await supabase
-		.from("item_reviews")
-		.select()
-		.eq("creator_id", userID)
-		.eq("item_id", animeID)
-		.throwOnError()
-		.limit(1)
-		.single();
-	return data;
-};
+// const getItemReviews = async (animeID, count = 4) => {
+// 	const { data: reviews } = await supabase
+// 		.rpc("get_item_reviews", { itemid: animeID, n_reviews: count + 1 })
+// 		.throwOnError();
+// 	return reviews;
+// };
 
 const ReviewsList = ({ profileID, animeID, triggerAlert }) => {
 	const [reviewText, setReviewText] = useState("");
@@ -158,11 +146,16 @@ const ReviewsList = ({ profileID, animeID, triggerAlert }) => {
 		<div className={styles.component}>
 			{profileID && (
 				<Fragment>
+					<Alert severity="info">
+						Only 1 review allowed per anime. Adding another simply updates the
+						existing review.
+					</Alert>
 					<Rating
 						value={rating}
 						onChange={updateRating}
 						precision={0.5}
 						sx={{ width: "max-content" }}
+						className="mt-2"
 						size="small"
 					/>
 					<form className={styles.interface} onSubmit={formSubmitHandler}>
