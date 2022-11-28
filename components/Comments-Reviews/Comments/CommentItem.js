@@ -13,10 +13,10 @@ import ThumbUpAltIcon from "@mui/icons-material/ThumbUpAlt";
 import ThumbUpOffAltIcon from "@mui/icons-material/ThumbUpOffAlt";
 import styles from "../Comments-Reviews.module.css";
 import EditCommentItem from "./EditCommentItem";
-import { bindMenu, bindTrigger } from "material-ui-popup-state";
-import { usePopupState } from "material-ui-popup-state/hooks";
 import { supabase } from "../../../supabase/config";
 import Image from "next/image";
+import MoreOptions from "../MoreOptions";
+import { usePopupState } from "material-ui-popup-state/hooks";
 
 const CommentItem = (props) => {
 	const { commentData, setReplyData, triggerAlert, profileID } = props;
@@ -33,7 +33,6 @@ const CommentItem = (props) => {
 	});
 	const [parentCommentIsDeleted, setParentCommentIsDeleted] = useState(false);
 	const [commentState, setCommentState] = useState("DEFAULT");
-	const [menuAnchorEl, setMenuAnchorEl] = useState(null);
 	const [btnIsDisabled, setBtnIsDisabled] = useState({
 		upvote: profileID === null,
 		reply: profileID === null,
@@ -99,7 +98,7 @@ const CommentItem = (props) => {
 
 		const onParentCommentDeleted = (payload) => {
 			setParentCommentIsDeleted(payload.old.id === parentCommentData.id);
-		}
+		};
 
 		const parentCommentID = parentCommentData.id;
 		let updatesChannel = null;
@@ -116,12 +115,16 @@ const CommentItem = (props) => {
 					},
 					onParentCommentUpdated
 				)
-				.on("postgres_changes", {
-					event: "DELETE",
-					schema: "public",
-					table: "comments",
-					filter: `id=eq.${parentCommentID}`,
-				}, onParentCommentDeleted)
+				.on(
+					"postgres_changes",
+					{
+						event: "DELETE",
+						schema: "public",
+						table: "comments",
+						filter: `id=eq.${parentCommentID}`,
+					},
+					onParentCommentDeleted
+				)
 				.subscribe();
 		}
 
@@ -143,13 +146,6 @@ const CommentItem = (props) => {
 			triggerAlert("Failed to delete comment", { severity: "error", error });
 		}
 		closeMenu();
-	};
-
-	const openMenu = (event) => {
-		setMenuAnchorEl(event.currentTarget);
-	};
-	const closeMenu = () => {
-		setMenuAnchorEl(null);
 	};
 
 	// REFERENCE A COMMENT IN A REPLY
@@ -217,28 +213,11 @@ const CommentItem = (props) => {
 			</Fragment>
 		);
 	}
-
-	const menuOpen = Boolean(menuAnchorEl);
-	const menuPaperProps = {
-		sx: {
-			backgroundColor: "#1B1B1B",
-			color: "white",
-		},
-	};
-	const menuAnchorOrigin = {
-		vertical: "top",
-		horizontal: "right",
-	};
 	const menuItemStyles = { fontFamily: "'Rubik', sans-serif" };
 	const dividerStyles = {
 		backgroundColor: "darkgrey",
 		height: "2px",
 		margin: "0px!important",
-	};
-	const moreOptionsBtnStyles = {
-		alignSelf: "flex-start",
-		padding: "0",
-		color: "whitesmoke",
 	};
 	const { avatar_url, display_name, account_name } = commentCreatorData;
 	const ON_EDIT_COMMENT = commentState === "EDITING";
@@ -248,7 +227,7 @@ const CommentItem = (props) => {
 		text: parentCommentText,
 	} = parentCommentData;
 
-	const allowCommentModification =
+	const showMoreOptions =
 		profileID !== null && profileID === commentData.creator_id;
 
 	const upvoteList = commentData.upvoted_by;
@@ -289,45 +268,20 @@ const CommentItem = (props) => {
 										</Link>
 										<p className={styles.commentText}>{commentData.text}</p>
 									</div>
-									{allowCommentModification && (
-										<Fragment>
-											<IconButton
-												aria-label="more"
-												id="more-options-btn"
-												aria-controls={
-													menuOpen ? "more-options-menu" : undefined
-												}
-												aria-expanded={menuOpen ? "true" : undefined}
-												aria-haspopup="true"
-												onClick={openMenu}
-												sx={moreOptionsBtnStyles}
-												{...bindTrigger(popupState)}>
-												<MoreVertIcon />
-											</IconButton>
-											<Menu
-												id="more-options-menu"
-												MenuListProps={{
-													"aria-labelledby": "more-options-btn",
-												}}
-												anchorEl={menuAnchorEl}
-												open={menuOpen}
-												onClose={closeMenu}
-												PaperProps={menuPaperProps}
-												anchorOrigin={menuAnchorOrigin}
-												{...bindMenu(popupState)}>
-												<MenuItem
-													sx={menuItemStyles}
-													onClick={handleEditing.bind(this, popupState.close)}>
-													Edit
-												</MenuItem>
-												<Divider sx={dividerStyles} />
-												<MenuItem
-													sx={menuItemStyles}
-													onClick={deleteComment.bind(this, popupState.close)}>
-													Delete
-												</MenuItem>
-											</Menu>
-										</Fragment>
+									{showMoreOptions && (
+										<MoreOptions popupState={popupState}>
+											<MenuItem
+												sx={menuItemStyles}
+												onClick={handleEditing.bind(this, popupState.close)}>
+												Edit
+											</MenuItem>
+											<Divider sx={dividerStyles} />
+											<MenuItem
+												sx={menuItemStyles}
+												onClick={deleteComment.bind(this, popupState.close)}>
+												Delete
+											</MenuItem>
+										</MoreOptions>
 									)}
 								</div>
 
@@ -335,6 +289,7 @@ const CommentItem = (props) => {
 									<span className={styles.upvote}>
 										<IconButton
 											aria-label="upvote"
+											title="upvote"
 											size="small"
 											type="button"
 											onClick={handleUpvote}
@@ -346,6 +301,7 @@ const CommentItem = (props) => {
 
 									<IconButton
 										aria-label="reply"
+										title="reply"
 										size="small"
 										type="button"
 										disabled={btnIsDisabled.reply}

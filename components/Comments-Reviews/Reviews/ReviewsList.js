@@ -59,7 +59,7 @@ const ReviewsList = ({ profileID, animeID, triggerAlert }) => {
 	const updateRating = (e, newVal) => setRating(newVal < 1 ? 1 : newVal);
 	const textAreaChangeHandler = (e) => setReviewText(e.target.value);
 
-	async function addReview() {
+	async function addReview(onReviewAdded) {
 		try {
 			await supabase
 				.from("item_reviews")
@@ -74,15 +74,14 @@ const ReviewsList = ({ profileID, animeID, triggerAlert }) => {
 
 			const list = await getReviewList(animeID, profileID);
 			setReviewListData(list);
-			setReviewText("");
+			onReviewAdded();
 		} catch (error) {
 			handleError("Failed to add review", error);
 		}
 	}
 
-	async function updateReview() {
+	async function updateReview(onReviewUpdated) {
 		try {
-			// UPDATE REVIEW
 			const { data: updatedData } = await supabase
 				.from("item_reviews")
 				.update({
@@ -98,10 +97,15 @@ const ReviewsList = ({ profileID, animeID, triggerAlert }) => {
 				snapshot[0] = updatedData[0];
 				return [...snapshot];
 			});
-			setReviewText("");
+			onReviewUpdated();
 		} catch (error) {
 			handleError("Failed to update review", error);
 		}
+	}
+
+	function editReview(text = "", ratingValue = 1) {
+		setReviewText(text);
+		setRating(ratingValue);
 	}
 
 	async function formSubmitHandler(event) {
@@ -113,9 +117,15 @@ const ReviewsList = ({ profileID, animeID, triggerAlert }) => {
 		const reviewData = await getReviewByUser(animeID, profileID);
 		const userHasReviewedItem = reviewData.length === 1;
 		if (userHasReviewedItem) {
-			await updateReview();
+			await updateReview(() => {
+				setReviewText("");
+				setRating(1);
+			});
 		} else {
-			await addReview();
+			await addReview(() => {
+				setReviewText("");
+				setRating(1);
+			});
 		}
 		setDisableAddReviewBtn(false);
 	}
@@ -137,6 +147,7 @@ const ReviewsList = ({ profileID, animeID, triggerAlert }) => {
 					key={review.id}
 					reviewData={review}
 					profileID={profileID}
+					editReview={editReview}
 					handleError={handleError}
 				/>
 			);

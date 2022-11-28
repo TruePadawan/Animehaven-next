@@ -1,6 +1,6 @@
 import { Fragment, useEffect, useState } from "react";
 import Link from "next/link";
-import { IconButton, Rating, Skeleton } from "@mui/material";
+import { IconButton, Rating, Skeleton, MenuItem } from "@mui/material";
 import ThumbUpOffAltIcon from "@mui/icons-material/ThumbUpOffAlt";
 import ThumbUpAltIcon from "@mui/icons-material/ThumbUpAlt";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -13,8 +13,10 @@ import {
 } from "../../../utilities/app-utilities";
 import styles from "../Comments-Reviews.module.css";
 import Image from "next/image";
+import MoreOptions from "../MoreOptions";
+import { usePopupState } from "material-ui-popup-state/hooks";
 
-const ReviewItem = ({ reviewData, profileID, handleError }) => {
+const ReviewItem = ({ reviewData, profileID, editReview, handleError }) => {
 	const [profileData, setProfileData] = useState({
 		avatar_url: DEFAULT_AVATAR_URL,
 		account_name: "",
@@ -31,6 +33,10 @@ const ReviewItem = ({ reviewData, profileID, handleError }) => {
 		deleted: false,
 		info: "",
 	});
+	const popupState = usePopupState({
+		variant: "popover",
+		popupId: "more-options-menu-popup",
+	});
 	const ownReview = reviewData.creator_id === profileID;
 
 	// LOAD REVIEW
@@ -45,7 +51,6 @@ const ReviewItem = ({ reviewData, profileID, handleError }) => {
 				handleError("Failed to load review", error);
 			});
 	}, [reviewData, handleError]);
-
 
 	const onUpvoteButtonClicked = async () => {
 		if (ownReview || profileID === null) return;
@@ -72,7 +77,6 @@ const ReviewItem = ({ reviewData, profileID, handleError }) => {
 		}
 	};
 
-	
 	const onDeleteButtonClicked = async () => {
 		if (!ownReview || profileID === null) return;
 
@@ -90,6 +94,13 @@ const ReviewItem = ({ reviewData, profileID, handleError }) => {
 		}
 	};
 
+	const handleEditing = () => {
+		editReview(reviewData.review, reviewData.rating);
+		popupState.close();
+	};
+
+	const menuItemStyles = { fontFamily: "'Rubik', sans-serif" };
+
 	const upvoteBtnDisabled = !profileID || ownReview;
 	const deleteBtnDisabled = !profileID || !ownReview;
 
@@ -99,6 +110,9 @@ const ReviewItem = ({ reviewData, profileID, handleError }) => {
 	const reviewClassName = `${styles.review} ${
 		ownReview ? styles.ownReview : ""
 	}`;
+
+	const showMoreOptions =
+		profileID !== null && profileID === reviewData.creator_id;
 	const { avatar_url, display_name, account_name } = profileData;
 	return (
 		<li className={reviewClassName}>
@@ -125,21 +139,33 @@ const ReviewItem = ({ reviewData, profileID, handleError }) => {
 						quality={100}
 					/>
 					<div className="d-flex flex-column flex-grow-1">
-						<Link href={`/users/${account_name}`} className={styles.user}>
-							{display_name}
-						</Link>
-						<Rating
-							value={reviewData.rating}
-							size="small"
-							precision={0.5}
-							readOnly
-						/>
-						<p className={styles.reviewText}>{reviewData.review}</p>
+						<div className="d-flex justify-content-between">
+							<div className="d-flex flex-column">
+								<Link href={`/users/${account_name}`} className={styles.user}>
+									{display_name}
+								</Link>
+								<Rating
+									value={reviewData.rating}
+									size="small"
+									precision={0.5}
+									readOnly
+								/>
+								<p className={styles.reviewText}>{reviewData.review}</p>
+							</div>
+							{showMoreOptions && (
+								<MoreOptions popupState={popupState}>
+									<MenuItem sx={menuItemStyles} onClick={handleEditing}>
+										Edit
+									</MenuItem>
+								</MoreOptions>
+							)}
+						</div>
 						<div className="d-flex justify-content-end gap-2">
 							<span className={styles.upvote}>
 								<IconButton
 									aria-label="upvote"
 									size="small"
+									title="upvote"
 									disabled={upvoteBtnDisabled}
 									onClick={onUpvoteButtonClicked}>
 									{upvoteIcon}
@@ -149,6 +175,7 @@ const ReviewItem = ({ reviewData, profileID, handleError }) => {
 							<IconButton
 								aria-label="delete"
 								size="small"
+								title="delete"
 								disabled={deleteBtnDisabled}
 								onClick={onDeleteButtonClicked}>
 								<DeleteIcon />
