@@ -19,12 +19,15 @@
     background-color: #828282;
     color: black;
     height: 370px;
+    display: flex;
+    flex-direction: column;
 }
 
 .announcements {
     display: flex;
     flex-direction: column;
     gap: 5px;
+    flex-grow: 1;
 }
 
 @media screen and (max-width: 1199px) {

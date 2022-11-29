@@ -14,6 +14,10 @@
     box-shadow: 3px 1px 6px rgba(91, 91, 91, 0.47);
 }
 
+a.announcement-item:hover {
+    color: whitesmoke;
+}
+
 .announcement-item:hover {
     background-color: rgb(75, 75, 75);
 }
