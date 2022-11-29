@@ -8,6 +8,7 @@ const Loading = ({ sx = {}, progressElSx = {}, progressElAttr = {} }) => {
         justifyContent: "center",
         alignItems: "center",
         height: "100%",
+        width: "100%",
         ...sx
       }}
     >
