@@ -5,7 +5,7 @@ import styles from "./styles.module.css";
 const SearchResultItem = (props) => {
   return (
     <div className={styles.item}>
-      <Image src={props.photoURL} alt={props.title} width={100} height={100} />
+      <Image src={props.photoURL} alt={props.title} width={100} height={140} />
       <span className={styles["item-name"]} title={props.title}>
         {props.type === "item" ? (
           <Link href={`/anime/${props.itemID}`}>{props.title}</Link>
