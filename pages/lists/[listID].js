@@ -85,38 +85,40 @@ const List = () => {
 	useEffect(() => {
 		if (listID === undefined) return;
 		getListByID(listID)
-			.then((response) => {
-				const {
-					title,
-					description,
-					creator_id,
-					items,
-					genres,
-					is_public,
-					comment_instance_id,
-				} = response;
-				supabase
-					.from("profiles")
-					.select("account_name")
-					.eq("id", creator_id)
-					.throwOnError()
-					.limit(1)
-					.single()
-					.then((profileQuery) => {
-						const { account_name } = profileQuery.data;
-						setListData({
-							id: listID,
-							title,
-							desc: description,
-							creator: account_name,
-							items,
-							genres,
-							is_public,
-							comment_instance_id,
+			.then((data) => {
+				if (data.length === 1) {
+					const {
+						title,
+						description,
+						creator_id,
+						items,
+						genres,
+						is_public,
+						comment_instance_id,
+					} = data[0];
+					supabase
+						.from("profiles")
+						.select("account_name")
+						.eq("id", creator_id)
+						.throwOnError()
+						.limit(1)
+						.single()
+						.then((profileQuery) => {
+							const { account_name } = profileQuery.data;
+							setListData({
+								id: listID,
+								title,
+								desc: description,
+								creator: account_name,
+								items,
+								genres,
+								is_public,
+								comment_instance_id,
+							});
+							setEditAllowed(profileID === creator_id);
+							setLoading(false);
 						});
-						setEditAllowed(profileID === creator_id);
-						setLoading(false);
-					});
+				}
 			})
 			.catch((error) => {
 				setError({
@@ -199,5 +201,10 @@ const List = () => {
 export default List;
 
 List.getLayout = (page) => (
-	<PageContainer className="d-flex flex-column gap-2">{page}</PageContainer>
+	<Fragment>
+		<Head>
+			<title>Animehaven | List</title>
+		</Head>
+		<PageContainer className="d-flex flex-column gap-2">{page}</PageContainer>
+	</Fragment>
 );

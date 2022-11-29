@@ -292,11 +292,9 @@ export async function getListByID(listID) {
 		.from("anime_lists")
 		.select("*", { count: "exact" })
 		.eq("id", listID)
-		.throwOnError()
-		.limit(1)
-		.single();
+		.throwOnError();
 	if (count === 0) {
-		throw new Error("Failed to access data!");
+		throw new Error("List data could not be retrieved. It might be private or deleted!");
 	}
 	return data;
 }
