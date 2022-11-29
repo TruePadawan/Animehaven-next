@@ -2,7 +2,7 @@
 Animehaven allows users to view information on the latest anime, create and share lists of different animes, have discussions with other users on various topics.
 ## Tech Stack
 * [ReactJS](https://github.com/facebook/react/)
-* [NextJS](https://nextjs.org/)
+* [NextJS](https://github.com/vercel/next.js)
 * [Supabase](https://github.com/supabase/supabase)
 * [Material UI](https://github.com/mui/material-ui)
 * [Jikan API](https://github.com/jikan-me/jikan)
