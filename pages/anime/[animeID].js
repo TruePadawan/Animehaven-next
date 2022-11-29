@@ -1,5 +1,5 @@
 import PageContainer from "../../components/PageContainer/PageContainer";
-import StarIcon from '@mui/icons-material/Star';
+import StarIcon from "@mui/icons-material/Star";
 import { Box, Chip, Snackbar, Alert } from "@mui/material";
 import { Fragment, useCallback, useContext, useEffect, useState } from "react";
 import { getAnimeByID } from "../../utilities/mal-api";
@@ -141,7 +141,7 @@ const AnimeDetails = () => {
 		if (router.isReady) {
 			const { animeID } = router.query;
 			getAnimeByID(animeID)
-			.then((animeData) => {
+				.then((animeData) => {
 					const { main, extra } = transformAnimeData(animeData);
 					setInfo(main);
 					setExtraInfo(extra);
@@ -289,7 +289,7 @@ const AnimeDetails = () => {
 				/>
 			)}
 			{loadingSuccessful && (
-				<PageContainer className={styles.page}>
+				<Fragment>
 					<Head>
 						<title>{`Animehaven | ${info.title}`}</title>
 						<meta name="description" content={info.overview} />
@@ -394,10 +394,14 @@ const AnimeDetails = () => {
 							{snackbarData.text}
 						</Alert>
 					</Snackbar>
-				</PageContainer>
+				</Fragment>
 			)}
 		</Fragment>
 	);
 };
 
 export default AnimeDetails;
+
+AnimeDetails.getLayout = (page) => (
+	<PageContainer className={styles.page}>{page}</PageContainer>
+);

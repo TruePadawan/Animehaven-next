@@ -177,7 +177,7 @@ const Lists = () => {
 	};
 
 	return (
-		<PageContainer className="d-flex gap-2">
+		<Fragment>
 			<Head>
 				<title>Animehaven | Lists</title>
 				<meta
@@ -290,8 +290,12 @@ const Lists = () => {
 					{error.text}
 				</Alert>
 			</Snackbar>
-		</PageContainer>
+		</Fragment>
 	);
 };
 
 export default Lists;
+
+Lists.getLayout = (page) => (
+	<PageContainer className="d-flex gap-2">{page}</PageContainer>
+);

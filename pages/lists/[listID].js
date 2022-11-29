@@ -1,11 +1,10 @@
 import { IconButton, Skeleton } from "@mui/material";
-import { Fragment, useContext, useEffect, useMemo, useState } from "react";
+import { Fragment, useContext, useEffect, useState } from "react";
 import Link from "next/link";
 import Head from "next/head";
 import EditIcon from "@mui/icons-material/Edit";
 import styles from "../../styles/list.module.css";
 import Loading from "../../components/Loading/Loading";
-import Locked from "../../components/Locked/Locked";
 import CreateList from "../../components/CreateList/CreateList";
 import Error from "../../components/Error/Error";
 import CommentsList from "../../components/Comments-Reviews/Comments/CommentsList";
@@ -159,45 +158,46 @@ const List = () => {
 				<meta name="twitter:title" content={`Animehaven | List - ${title}`} />
 				<meta name="twitter:description" content={desc} />
 			</Head>
-			<PageContainer className="d-flex flex-column gap-2">
-				{editAllowed && (
-					<CreateList
-						open={showCreateListDialog}
-						onClose={closeCreateListDialog}
-						profileID={profileID}
-						update={true}
-						defaultValues={listData}
-					/>
-				)}
-				<div id="list-info" className="d-flex flex-column">
-					<span className={styles.creator}>
-						Created by{" "}
-						<Link href={`/users/${creator}`}>{creator}</Link>
-					</span>
-					<span className="d-flex gap-1">
-						<h2 className={styles.title}>{title}</h2>
-						{editAllowed && (
-							<IconButton
-								title="Edit"
-								sx={{ color: "whitesmoke" }}
-								onClick={openCreateListDialog}>
-								<EditIcon />
-							</IconButton>
-						)}
-					</span>
-					<p className={styles.desc}>{desc}</p>
-				</div>
-				<ul id="list-items" className={styles.items}>
-					{transformedItems}
-				</ul>
-				<CommentsList
-					className="mt-4"
-					id={comment_instance_id}
+			{editAllowed && (
+				<CreateList
+					open={showCreateListDialog}
+					onClose={closeCreateListDialog}
 					profileID={profileID}
+					update={true}
+					defaultValues={listData}
 				/>
-			</PageContainer>
+			)}
+			<div id="list-info" className="d-flex flex-column">
+				<span className={styles.creator}>
+					Created by <Link href={`/users/${creator}`}>{creator}</Link>
+				</span>
+				<span className="d-flex gap-1">
+					<h2 className={styles.title}>{title}</h2>
+					{editAllowed && (
+						<IconButton
+							title="Edit"
+							sx={{ color: "whitesmoke" }}
+							onClick={openCreateListDialog}>
+							<EditIcon />
+						</IconButton>
+					)}
+				</span>
+				<p className={styles.desc}>{desc}</p>
+			</div>
+			<ul id="list-items" className={styles.items}>
+				{transformedItems}
+			</ul>
+			<CommentsList
+				className="mt-4"
+				id={comment_instance_id}
+				profileID={profileID}
+			/>
 		</Fragment>
 	);
 };
 
 export default List;
+
+List.getLayout = (page) => (
+	<PageContainer className="d-flex flex-column gap-2">{page}</PageContainer>
+);

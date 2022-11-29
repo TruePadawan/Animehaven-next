@@ -104,29 +104,31 @@ const Discussion = () => {
 				/>
 				<meta name="twitter:description" content={body} />
 			</Head>
-			<PageContainer className="d-flex flex-column gap-2">
-				<div id="discussion-body" className="d-flex flex-column">
-					<span className="d-flex gap-1">
-						<h2 className={styles.title}>{title}</h2>
-						{editAllowed && (
-							<IconButton title="Edit" sx={{ color: "whitesmoke" }}>
-								<EditIcon />
-							</IconButton>
-						)}
-					</span>
-					<div className={styles.creator}>
-						Created by <Link href={`/users/${creator}`}>{creator}</Link>
-					</div>
-					<p className={styles.body}>{body}</p>
+			<div id="discussion-body" className="d-flex flex-column">
+				<span className="d-flex gap-1">
+					<h2 className={styles.title}>{title}</h2>
+					{editAllowed && (
+						<IconButton title="Edit" sx={{ color: "whitesmoke" }}>
+							<EditIcon />
+						</IconButton>
+					)}
+				</span>
+				<div className={styles.creator}>
+					Created by <Link href={`/users/${creator}`}>{creator}</Link>
 				</div>
-				<CommentsList
-					className="mt-4"
-					id={commentInstanceID}
-					profileID={profileID}
-				/>
-			</PageContainer>
+				<p className={styles.body}>{body}</p>
+			</div>
+			<CommentsList
+				className="mt-4"
+				id={commentInstanceID}
+				profileID={profileID}
+			/>
 		</Fragment>
 	);
 };
 
 export default Discussion;
+
+Discussion.getLayout = (page) => (
+	<PageContainer className="d-flex flex-column gap-2">{page}</PageContainer>
+);

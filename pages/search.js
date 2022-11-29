@@ -1,5 +1,5 @@
 import PageContainer from "../components/PageContainer/PageContainer";
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { useMemo } from "react";
 import { useCallback } from "react";
 import SearchBar from "../components/SearchBar/SearchBar";
@@ -18,7 +18,7 @@ export default function Search() {
 	const [loading, setLoading] = useState(false);
 	const [snackbarData, setSnackbarData] = useState(defaultSnackbarState);
 	const searchCategories = useMemo(() => ["Anime", "User"], []);
-    const router = useRouter();
+	const router = useRouter();
 	const queryParams = router.query;
 	const searchText = queryParams.text || null;
 	const searchCategory = queryParams.cat || null;
@@ -109,7 +109,7 @@ export default function Search() {
 		horizontal: "center",
 	};
 	return (
-		<PageContainer>
+		<Fragment>
 			<Head>
 				<title>Animehaven | Search</title>
 				<meta name="description" content="Search for the latest animes." />
@@ -155,6 +155,8 @@ export default function Search() {
 					{snackbarData.text}
 				</Alert>
 			</Snackbar>
-		</PageContainer>
+		</Fragment>
 	);
 }
+
+Search.getLayout = (page) => <PageContainer>{page}</PageContainer>;

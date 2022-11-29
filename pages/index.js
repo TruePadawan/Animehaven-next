@@ -91,20 +91,18 @@ const Home = (props) => {
 					content="Get information on the latest animes, compile and share lists of animes and have discussions about your favorite animes on Animehaven."
 				/>
 			</Head>
-			<PageContainer className={styles["home-main"]}>
-				<Section title={"Random"}>
-					<ul className={styles["anime-list"]}>{randomAnimes}</ul>
-				</Section>
-				<Section title={"Airing"}>
-					<ul className={styles["anime-list"]}>{airingAnimes}</ul>
-				</Section>
-				<Section title={"Upcoming"} className={styles["darker-section"]}>
-					<ul className={styles["anime-list"]}>{upcomingAnimes}</ul>
-				</Section>
-				<Section title={"Popular"} className={styles["darker-section"]}>
-					<ul className={styles["anime-list"]}>{popularAnimes}</ul>
-				</Section>
-			</PageContainer>
+			<Section title={"Random"}>
+				<ul className={styles["anime-list"]}>{randomAnimes}</ul>
+			</Section>
+			<Section title={"Airing"}>
+				<ul className={styles["anime-list"]}>{airingAnimes}</ul>
+			</Section>
+			<Section title={"Upcoming"} className={styles["darker-section"]}>
+				<ul className={styles["anime-list"]}>{upcomingAnimes}</ul>
+			</Section>
+			<Section title={"Popular"} className={styles["darker-section"]}>
+				<ul className={styles["anime-list"]}>{popularAnimes}</ul>
+			</Section>
 		</Fragment>
 	);
 };
@@ -138,3 +136,7 @@ export async function getStaticProps() {
 }
 
 export default Home;
+
+Home.getLayout = (page) => (
+	<PageContainer className={styles["home-main"]}>{page}</PageContainer>
+);
