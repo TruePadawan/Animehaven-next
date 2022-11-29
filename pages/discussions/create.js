@@ -141,10 +141,7 @@ export default function Create() {
 						<Select value={discussionData.tag} onChange={onSelectChanged}>
 							{DISCUSSION_TAGS.map((tag, index) => {
 								return (
-									<option
-										key={index}
-										disabled={tag === "Announcement"}
-										value={tag.toLowerCase()}>
+									<option key={index} value={tag.toLowerCase()}>
 										{tag}
 									</option>
 								);

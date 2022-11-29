@@ -47,7 +47,7 @@ export const LIST_GENRES = [
 	"Boys Love",
 ];
 
-export const DISCUSSION_TAGS = ["Chat", "Support", "Announcement"];
+export const DISCUSSION_TAGS = ["Chat", "Support"];
 
 export async function getCommentsData(instanceID) {
 	const { data } = await supabase
