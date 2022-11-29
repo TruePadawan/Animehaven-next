@@ -4,6 +4,7 @@ import { useContext } from "react";
 import { UserAuthContext } from "../../context/UserAuthContext";
 import { Box, useMediaQuery } from "@mui/material";
 import Announcements from "./Announcements";
+import Recent from "./Recent";
 // const ALLOWED_RECENT_ITEMS = ["animes", "lists", "discussions"];
 
 const PageContainer = ({ children, className, recentItems = "animes" }) => {
@@ -22,9 +23,9 @@ const PageContainer = ({ children, className, recentItems = "animes" }) => {
 						<Announcements />
 					</Section>
 					{profileID && (
-						<Section
-							title={"Recent"}
-							className={styles["recent-section"]}></Section>
+						<Section title={"Recent"} className={styles["recent-section"]}>
+							<Recent type={recentItems} profileID={profileID} />
+						</Section>
 					)}
 				</aside>
 			)}

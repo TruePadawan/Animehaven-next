@@ -23,7 +23,7 @@
     flex-direction: column;
 }
 
-.announcements {
+.announcements, .recent-items {
     display: flex;
     flex-direction: column;
     gap: 5px;

@@ -1,9 +1,9 @@
 import Loading from "../Loading/Loading";
 import useSWRImmutable from "swr/immutable";
 import AnnouncementItem from "../Items/AnnouncementItem/AnnouncementItem";
-import styles from "./pagecontainer.module.css";
 import { supabase } from "../../supabase/config";
-import AnnouncementIcon from "@mui/icons-material/Announcement";
+import AnnouncementOutlinedIcon from '@mui/icons-material/AnnouncementOutlined';
+import styles from "./pagecontainer.module.css";
 
 async function announcementsFetcher(tag) {
 	const { data } = await supabase
@@ -21,17 +21,17 @@ export default function Announcements() {
 	const loading = !data && !error;
 	let content = (
 		<div className="h-100 d-flex flex-column align-items-center justify-content-center">
-			<AnnouncementIcon sx={{ fontSize: "3rem" }} />
-			<span style={{ fontFamily: "'Roboto'" }}>No Announcements!</span>
+			<AnnouncementOutlinedIcon sx={{ fontSize: "3rem" }} />
+			<span style={{ fontFamily: "'Roboto'" }}>No announcements!</span>
 		</div>
 	);
 	if (loading) {
 		content = <Loading />;
 	} else if (error) {
 		content = (
-			<div className="w-100 h-100 text-center mt-2">
+			<li className="w-100 h-100 text-center mt-2">
 				Failed to load announcements!
-			</div>
+			</li>
 		);
 	} else if (data.length > 0) {
 		content = data.map((announcement) => (
