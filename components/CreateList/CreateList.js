@@ -74,7 +74,12 @@ const CreateList = (props) => {
 
 	const triggerAlert = (text, options) => {
 		const alertSeverity = options?.severity || "info";
-		const alertText = alertSeverity === "error" ? `${text} - ${options.error.message || options.error.error_description}` : text;
+		const alertText =
+			alertSeverity === "error"
+				? `${text} - ${
+						options.error.message || options.error.error_description
+				  }`
+				: text;
 		setSnackbarData({ text: alertText, open: true, severity: alertSeverity });
 	};
 
@@ -87,7 +92,7 @@ const CreateList = (props) => {
 
 	const cleanup = () => {
 		if (props.update === true) {
-			props.onClose();	
+			props.onClose();
 		} else {
 			setItems([]);
 			setSearchResults([]);
@@ -124,7 +129,7 @@ const CreateList = (props) => {
 			return [...snapshot];
 		});
 	};
-	
+
 	const deleteItem = (itemID) => {
 		setItems((snapshot) => {
 			for (let i = 0; i < snapshot.length; ++i) {
@@ -167,16 +172,23 @@ const CreateList = (props) => {
 				throw new Error("no user signed in");
 			}
 
-			await supabase.from("anime_lists").insert({
-				title: listTitle,
-				description: listDesc,
-				genres: listGenres,
-				items,
-				creator_id: props.profileID,
-				is_public: visibility === "public",
-			}).throwOnError();
+			await supabase
+				.from("anime_lists")
+				.insert({
+					title: listTitle,
+					description: listDesc,
+					genres: listGenres,
+					items,
+					creator_id: props.profileID,
+					is_public: visibility === "public",
+				})
+				.throwOnError();
 			cleanup();
-			setSnackbarData({ text: "List successfully created!", open: true, severity: "success" });
+			setSnackbarData({
+				text: "List successfully created!",
+				open: true,
+				severity: "success",
+			});
 		} catch (error) {
 			triggerAlert("Failed to create list", { severity: "error", error });
 		}
@@ -215,7 +227,11 @@ const CreateList = (props) => {
 			if (!props.defaultValues.id) {
 				throw new Error("Couldn't get ID of the list, try reloading the page!");
 			}
-			await supabase.from("anime_lists").delete().eq("id", props.defaultValues.id).throwOnError();
+			await supabase
+				.from("anime_lists")
+				.delete()
+				.eq("id", props.defaultValues.id)
+				.throwOnError();
 			router.replace("/lists");
 		} catch (error) {
 			triggerAlert("Failed to delete list", { severity: "error", error });
@@ -267,12 +283,14 @@ const CreateList = (props) => {
 					"& .MuiDialog-paper": {
 						backgroundColor: "#1e1e1e",
 						color: "white",
+						margin: "1%",
+						width: "100%",
 					},
 				}}>
 				<DialogTitle sx={{ fontSize: "1.4rem" }}>
 					{props.update ? "Update List" : "Create List"}
 				</DialogTitle>
-				<DialogContent>
+				<DialogContent sx={{ padding: "2%" }}>
 					<Box className={styles.component}>
 						<Box
 							component="form"
@@ -365,7 +383,9 @@ const CreateList = (props) => {
 						</Box>
 						<Box className={styles.addItems}>
 							<div className="d-flex flex-column gap-1">
-								<span className={styles.label}>{props.update ? "Items" : "Items (optional)" }</span>
+								<span className={styles.label}>
+									{props.update ? "Items" : "Items (optional)"}
+								</span>
 								<div className="d-flex flex-wrap gap-1">{transformedItems}</div>
 							</div>
 							<div className="d-flex flex-column">
