@@ -286,29 +286,30 @@ export async function getDiscussionByID(discussionID) {
 	}
 	const { data } = await supabase
 		.from("discussions")
-		.select("*", { count: "exact" })
+		.select("*")
 		.eq("id", discussionID)
-		.throwOnError()
-		.limit(1)
-		.single();
-	return data;
+		.throwOnError();
+	if (data.length === 0) {
+		throw new Error(`Discussion with id - ${discussionID} not found!`);
+	}
+	return data[0];
 }
 
 export async function getListByID(listID) {
 	if (!listID) {
 		throw new Error(`Invalid argument passed - ${listID}`);
 	}
-	const { data, count } = await supabase
+	const { data } = await supabase
 		.from("anime_lists")
-		.select("*", { count: "exact" })
+		.select("*")
 		.eq("id", listID)
 		.throwOnError();
-	if (count === 0) {
+	if (data.length === 0) {
 		throw new Error(
 			"List data could not be retrieved. It might be private or deleted!"
 		);
 	}
-	return data;
+	return data[0];
 }
 
 export function numberToString(count, appendString) {

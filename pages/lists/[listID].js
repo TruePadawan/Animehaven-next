@@ -90,39 +90,37 @@ const List = () => {
 		if (listID === undefined) return;
 		getListByID(listID)
 			.then((data) => {
-				if (data.length === 1) {
-					const {
-						title,
-						description,
-						creator_id,
-						items,
-						genres,
-						is_public,
-						comment_instance_id,
-					} = data[0];
-					supabase
-						.from("profiles")
-						.select("account_name")
-						.eq("id", creator_id)
-						.throwOnError()
-						.limit(1)
-						.single()
-						.then((profileQuery) => {
-							const { account_name } = profileQuery.data;
-							setListData({
-								id: listID,
-								title,
-								desc: description,
-								creator: account_name,
-								items,
-								genres,
-								is_public,
-								comment_instance_id,
-							});
-							setEditAllowed(profileID === creator_id);
-							setLoading(false);
+				const {
+					title,
+					description,
+					creator_id,
+					items,
+					genres,
+					is_public,
+					comment_instance_id,
+				} = data;
+				supabase
+					.from("profiles")
+					.select("account_name")
+					.eq("id", creator_id)
+					.throwOnError()
+					.limit(1)
+					.single()
+					.then((profileQuery) => {
+						const { account_name } = profileQuery.data;
+						setListData({
+							id: listID,
+							title,
+							desc: description,
+							creator: account_name,
+							items,
+							genres,
+							is_public,
+							comment_instance_id,
 						});
-				}
+						setEditAllowed(profileID === creator_id);
+						setLoading(false);
+					});
 			})
 			.catch((error) => {
 				setError({

@@ -1,20 +1,20 @@
 import { Skeleton } from "@mui/material";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { getListByID } from "../../utilities/app-utilities";
+import { getDiscussionByID } from "../../utilities/app-utilities";
 import styles from "./style.module.css";
 
-export default function List({ id }) {
+export default function Discussion({ id }) {
 	const [loading, setLoading] = useState(false);
-	const [data, setData] = useState({ title: "", description: "" });
+	const [data, setData] = useState({ title: "", body: "" });
 	const [notFound, setNotFound] = useState(false);
 
 	useEffect(() => {
 		setLoading(true);
-		getListByID(id)
+		getDiscussionByID(id)
 			.then((data) => {
-				const { title, description } = data;
-				setData({ title, description });
+				const { title, body } = data;
+				setData({ title, body });
 				setLoading(false);
 			})
 			.catch(() => {
@@ -26,7 +26,7 @@ export default function List({ id }) {
 	return (
 		<li>
 			{dataNotLoaded && (
-				<div className={styles.list}>
+				<div className={styles.discussion}>
 					<Skeleton
 						variant={"text"}
 						sx={{ fontSize: "1rem", backgroundColor: "#333333" }}
@@ -39,11 +39,11 @@ export default function List({ id }) {
 					/>
 				</div>
 			)}
-			{notFound && <span className="text-center">List not found!</span>}
+			{notFound && <span className="text-center">Discussion not found!</span>}
 			{!notFound && (
-				<Link className={styles.list} href={`/lists/${id}`}>
-					<span className={styles["list-title"]}>{data.title}</span>
-					<span className={styles["list-desc"]}>{data.description}</span>
+				<Link className={styles.discussion} href={`/discussions/${id}`}>
+					<span className={styles["discussion-title"]}>{data.title}</span>
+					<span className={styles["discussion-body"]}>{data.body}</span>
 				</Link>
 			)}
 		</li>

@@ -1,4 +1,4 @@
-.anime, .list {
+.anime, .list, .discussion {
     max-height: 110px;
     height: max-content;
     background-color: rgb(85, 85, 85);
@@ -23,21 +23,21 @@
     font-size: 14px;
 }
 
-.list {
+.list, .discussion {
     flex-direction: column;
     gap: 3px;
     color: whitesmoke;
     border-radius: 0px 8px 8px 0px;
 }
 
-.list-title {
+.list-title, .discussion-title {
     color: black;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
-.list-desc {
+.list-desc, .discussion-body {
     color: gainsboro;
     display: -webkit-box;
     -webkit-box-orient: vertical;

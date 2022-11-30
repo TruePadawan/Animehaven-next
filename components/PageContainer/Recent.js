@@ -5,6 +5,7 @@ import styles from "./pagecontainer.module.css";
 import { getRecentItems } from "../../utilities/app-utilities";
 import Anime from "../RecentItems/Anime";
 import List from "../RecentItems/List";
+import Discussion from "../RecentItems/Discussion";
 
 export default function Recent({ profileID, type }) {
 	const { data, error } = useSWRImmutable([type, profileID], getRecentItems);
@@ -38,6 +39,7 @@ export default function Recent({ profileID, type }) {
 				));
 				break;
 			case "discussions":
+				content = data.map((id) => <Discussion key={id} id={id} />);
 				break;
 			case "lists":
 				content = data.map((id) => <List key={id} id={id} />);
