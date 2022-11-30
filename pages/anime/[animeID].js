@@ -8,6 +8,7 @@ import Select from "../../components/Select/Select";
 import {
 	getUsefulData,
 	getUserItemRecommendations,
+	setRecentItem,
 } from "../../utilities/app-utilities";
 import styles from "../../styles/anime.module.css";
 import CommentsList from "../../components/Comments-Reviews/Comments/CommentsList";
@@ -146,7 +147,7 @@ const AnimeDetails = () => {
 					setInfo(main);
 					setExtraInfo(extra);
 
-					if (profileID && !loadingFailed) {
+					if (profileID !== null) {
 						setWatchStatusElDisabled(true);
 						setRecommendBtnDisabled(true);
 						// LOAD ANIME WATCH STATUS FOR SIGNED IN USER
@@ -171,7 +172,7 @@ const AnimeDetails = () => {
 								});
 							});
 
-						// CHECK IF ITEM IS RECOMMENDED
+						// CHECK IF ANIME IS RECOMMENDED BY SIGNED IN USER
 						getUserItemRecommendations(profileID)
 							.then(({ data: rows }) => {
 								const isRecommended = rows.some(
@@ -190,6 +191,9 @@ const AnimeDetails = () => {
 									error,
 								});
 							});
+						setRecentItem(profileID, "animes", animeID).catch((error) => {
+							triggerAlert("Error", { severity: "error", error });
+						});
 					}
 				})
 				.catch((error) => {
@@ -203,8 +207,8 @@ const AnimeDetails = () => {
 					setLoading(false);
 				});
 		}
-	}, [profileID, router, loadingFailed, triggerAlert]);
-
+	}, [profileID, router, triggerAlert]);
+	
 	// RECOMMEND ITEM OR REMOVE RECOMMENDATION
 	const recommendItem = async () => {
 		if (profileID === null) return;

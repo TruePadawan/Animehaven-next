@@ -294,7 +294,9 @@ export async function getListByID(listID) {
 		.eq("id", listID)
 		.throwOnError();
 	if (count === 0) {
-		throw new Error("List data could not be retrieved. It might be private or deleted!");
+		throw new Error(
+			"List data could not be retrieved. It might be private or deleted!"
+		);
 	}
 	return data;
 }
@@ -349,4 +351,30 @@ export async function getReviewList(animeID, userProfileID = null) {
 		list = list.concat(data);
 	}
 	return list;
+}
+
+export async function setRecentItem(profileID, type, item) {
+	// GET THE ITEMS, UNSHIFT NEW ITEM, IF LENGTH > 3: TRIM TO 3
+	const { data: recentItems } = await supabase
+		.from("recent_items")
+		.select(type)
+		.eq("profile_id", profileID)
+		.throwOnError();
+	if (!recentItems.includes(item)) {
+		recentItems.unshift(item);
+		if (recentItems.length > 3) {
+			recentItems = recentItems.slice(0, 3);
+		}
+		try {
+			await supabase
+				.from("recent_items")
+				.update({
+					[type]: recentItems,
+				})
+				.eq("profile_id", profileID)
+				.throwOnError();
+		} catch (error) {
+			throw new Error(`Failed to update recent items - ${type}`);
+		}
+	}
 }

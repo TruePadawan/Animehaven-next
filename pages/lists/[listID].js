@@ -10,7 +10,11 @@ import Error from "../../components/Error/Error";
 import CommentsList from "../../components/Comments-Reviews/Comments/CommentsList";
 import PageContainer from "../../components/PageContainer/PageContainer";
 import { supabase } from "../../supabase/config";
-import { getListByID, getUsefulData } from "../../utilities/app-utilities";
+import {
+	getListByID,
+	getUsefulData,
+	setRecentItem,
+} from "../../utilities/app-utilities";
 import { getAnimeByID } from "../../utilities/mal-api";
 import { UserAuthContext } from "../../context/UserAuthContext";
 import { useRouter } from "next/router";
@@ -127,6 +131,9 @@ const List = () => {
 				});
 				setLoading(false);
 			});
+		if (profileID !== null) {
+			setRecentItem(profileID, "lists", listID);
+		}
 	}, [listID, profileID]);
 
 	const openCreateListDialog = () => setShowCreateListDialog(true);
@@ -205,6 +212,8 @@ List.getLayout = (page) => (
 		<Head>
 			<title>Animehaven | List</title>
 		</Head>
-		<PageContainer className="d-flex flex-column gap-2" recentItems="lists">{page}</PageContainer>
+		<PageContainer className="d-flex flex-column gap-2" recentItems="lists">
+			{page}
+		</PageContainer>
 	</Fragment>
 );

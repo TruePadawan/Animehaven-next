@@ -11,6 +11,7 @@ import PageContainer from "../../components/PageContainer/PageContainer";
 import {
 	getDiscussionByID,
 	getProfileData,
+	setRecentItem,
 } from "../../utilities/app-utilities";
 import { UserAuthContext } from "../../context/UserAuthContext";
 import { useRouter } from "next/router";
@@ -54,6 +55,10 @@ const Discussion = () => {
 					});
 					setLoading(false);
 				});
+
+			if (profileID !== null) {
+				setRecentItem(profileID, "discussions", discussionID);
+			}
 		}
 	}, [router, profileID]);
 
@@ -130,5 +135,7 @@ const Discussion = () => {
 export default Discussion;
 
 Discussion.getLayout = (page) => (
-	<PageContainer className="d-flex flex-column gap-2" recentItems="discussions">{page}</PageContainer>
+	<PageContainer className="d-flex flex-column gap-2" recentItems="discussions">
+		{page}
+	</PageContainer>
 );
