@@ -4,6 +4,7 @@ import TurnedInNotIcon from "@mui/icons-material/TurnedInNot";
 import styles from "./pagecontainer.module.css";
 import { getRecentItems } from "../../utilities/app-utilities";
 import Anime from "../RecentItems/Anime";
+import List from "../RecentItems/List";
 
 export default function Recent({ profileID, type }) {
 	const { data, error } = useSWRImmutable([type, profileID], getRecentItems);
@@ -28,6 +29,7 @@ export default function Recent({ profileID, type }) {
 			case "animes":
 				content = data.map((item) => (
 					<Anime
+						key={item.id}
 						id={item.id}
 						label={item.title}
 						imgSrc={item.photoURL}
@@ -38,6 +40,7 @@ export default function Recent({ profileID, type }) {
 			case "discussions":
 				break;
 			case "lists":
+				content = data.map((id) => <List key={id} id={id} />);
 				break;
 			default:
 				break;
