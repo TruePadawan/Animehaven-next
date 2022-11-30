@@ -258,16 +258,26 @@ export async function getUserItemReviews(profileID) {
 	return response;
 }
 
-export async function getDiscussionsByTags(tags) {
+export async function getDiscussionsByTags(tags, profileID = null) {
 	if (!(tags instanceof Array)) {
 		throw new Error("Invalid params - tags must be an array");
 	}
-	const { data } = await supabase
-		.from("discussions")
-		.select()
-		.in("tag", tags)
-		.throwOnError();
-	return data;
+	if (profileID === null) {
+		const { data } = await supabase
+			.from("discussions")
+			.select()
+			.in("tag", tags)
+			.throwOnError();
+		return data;
+	} else {
+		const { data } = await supabase
+			.from("discussions")
+			.select()
+			.in("tag", tags)
+			.eq("creator_id", profileID)
+			.throwOnError();
+		return data;
+	}
 }
 
 export async function getDiscussionByID(discussionID) {

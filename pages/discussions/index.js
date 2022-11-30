@@ -42,14 +42,18 @@ export default function Discussions() {
 			}
 		}
 		setQueryingDB(true);
-		getDiscussionsByTags(selectedTags)
-			.then((data) => {
+		if (filter === "all") {
+			getDiscussionsByTags(selectedTags).then((data) => {
 				setDiscussionsList(data);
-			})
-			.finally(() => {
 				setQueryingDB(false);
 			});
-	}, [discussionTags]);
+		} else if (filter === "your_discussions" && profileID !== null) {
+			getDiscussionsByTags(selectedTags, profileID).then((data) => {
+				setDiscussionsList(data);
+				setQueryingDB(false);
+			});
+		}
+	}, [discussionTags, filter, profileID]);
 
 	function toggleFilterDrawer(open) {
 		setFilterDrawerIsOpen(open);
@@ -84,6 +88,7 @@ export default function Discussions() {
 		return discussionsList.map((discussion) => {
 			return (
 				<DiscussionItem
+					key={discussion.id}
 					id={discussion.id}
 					title={discussion.title}
 					tag={discussion.tag}
@@ -189,5 +194,7 @@ export default function Discussions() {
 }
 
 Discussions.getLayout = (page) => (
-	<PageContainer className="d-flex gap-2" recentItems="discussions">{page}</PageContainer>
+	<PageContainer className="d-flex gap-2" recentItems="discussions">
+		{page}
+	</PageContainer>
 );
