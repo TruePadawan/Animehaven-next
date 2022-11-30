@@ -9,7 +9,7 @@ import ItemPopper from "./ItemPopper";
 const AnimeItem = (props) => {
 	const [anchorEl, setAnchorEl] = useState(null);
 	const mouseOverElRef = useRef(false);
-	const matchesMobileDevice = useMediaQuery("(max-width: 768px)");
+	const matchesMobileDevice = useMediaQuery("(max-width: 1024px)");
 
 	const openPopper = (event) => {
 		mouseOverElRef.current = true;
@@ -48,7 +48,7 @@ const AnimeItem = (props) => {
 							<Image
 								src={props.image}
 								alt={props.title}
-								width={200}
+								width={204}
 								height={300}
 							/>
 							<span className={styles.title}>{props.title}</span>
