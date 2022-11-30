@@ -297,5 +297,5 @@ const Lists = () => {
 export default Lists;
 
 Lists.getLayout = (page) => (
-	<PageContainer className="d-flex gap-2">{page}</PageContainer>
+	<PageContainer className="d-flex gap-2" recentItems="lists">{page}</PageContainer>
 );

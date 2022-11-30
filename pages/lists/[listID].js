@@ -205,6 +205,6 @@ List.getLayout = (page) => (
 		<Head>
 			<title>Animehaven | List</title>
 		</Head>
-		<PageContainer className="d-flex flex-column gap-2">{page}</PageContainer>
+		<PageContainer className="d-flex flex-column gap-2" recentItems="lists">{page}</PageContainer>
 	</Fragment>
 );

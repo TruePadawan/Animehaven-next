@@ -1,7 +1,7 @@
 import useSWRImmutable from "swr/immutable";
 import { supabase } from "../../supabase/config";
 import Loading from "../Loading/Loading";
-import TurnedInNotIcon from '@mui/icons-material/TurnedInNot';
+import TurnedInNotIcon from "@mui/icons-material/TurnedInNot";
 import styles from "./pagecontainer.module.css";
 
 async function recentsFetcher(type, profileID) {
@@ -9,7 +9,6 @@ async function recentsFetcher(type, profileID) {
 		.from("recent_items")
 		.select(type)
 		.eq("id", profileID)
-		.limit(3)
 		.throwOnError();
 	return data;
 }

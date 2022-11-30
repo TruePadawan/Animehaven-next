@@ -130,5 +130,5 @@ const Discussion = () => {
 export default Discussion;
 
 Discussion.getLayout = (page) => (
-	<PageContainer className="d-flex flex-column gap-2">{page}</PageContainer>
+	<PageContainer className="d-flex flex-column gap-2" recentItems="discussions">{page}</PageContainer>
 );

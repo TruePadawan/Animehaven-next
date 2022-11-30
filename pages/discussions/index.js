@@ -189,5 +189,5 @@ export default function Discussions() {
 }
 
 Discussions.getLayout = (page) => (
-	<PageContainer className="d-flex gap-2">{page}</PageContainer>
+	<PageContainer className="d-flex gap-2" recentItems="discussions">{page}</PageContainer>
 );
