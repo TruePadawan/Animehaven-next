@@ -17,7 +17,7 @@ export default function Create() {
 	const [discussionData, setDiscussionData] = useState({
 		title: "",
 		body: "",
-		tag: DISCUSSION_TAGS[0].toLowerCase(),
+		tag: "",
 	});
 	const router = useRouter();
 
@@ -27,7 +27,7 @@ export default function Create() {
 		setDiscussionData({
 			title: cachedTitle || "",
 			body: cachedBody || "",
-			tag: DISCUSSION_TAGS[0],
+			tag: DISCUSSION_TAGS[0].toLowerCase(),
 		});
 	}, []);
 
