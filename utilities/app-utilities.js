@@ -295,6 +295,19 @@ export async function getDiscussionByID(discussionID) {
 	return data[0];
 }
 
+export async function getDiscussionByAccountName(accountName) {
+	if (!accountName) {
+		throw new Error(`Invalid argument passed - ${accountName}`);
+	}
+	const id = await getProfileID(accountName);
+	const { data } = await supabase
+		.from("discussions")
+		.select("*")
+		.eq("creator_id", id)
+		.throwOnError();
+	return data;
+}
+
 export async function getListByID(listID) {
 	if (!listID) {
 		throw new Error(`Invalid argument passed - ${listID}`);

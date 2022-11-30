@@ -12,6 +12,7 @@ import { UserAuthContext } from "../../../context/UserAuthContext";
 import styles from "./ProfileSections.module.css";
 import {
 	DEFAULT_AVATAR_URL,
+	getDiscussionByAccountName,
 	getUserItemRecommendations,
 	getUserItemReviews,
 } from "../../../utilities/app-utilities";
@@ -34,27 +35,48 @@ const ProfileSectionContainer = ({ title, children }) => {
 	);
 };
 
-export function UserDiscussions() {
+export function UserDiscussions({ accountName }) {
+	const [loading, setLoading] = useState(false);
+	const [items, setItems] = useState([]);
+
+	useEffect(() => {
+		setLoading(true);
+		getDiscussionByAccountName(accountName)
+			.then((data) => {
+				const list = data.map((discussion) => (
+					<DiscussionItem
+						key={discussion.id}
+						id={discussion.id}
+						title={discussion.title}
+						tag={discussion.tag}
+						creatorID={discussion.creator_id}
+					/>
+				));
+				setItems(list);
+			})
+			.finally(() => {
+				setLoading(false);
+			});
+	}, [accountName]);
+
 	return (
 		<ProfileSectionContainer title="Discussions">
-			<Box
-				sx={{
-					display: "flex",
-					justifyContent: "center",
-					alignItems: "center",
-					height: "100%",
-				}}>
-				<p>COMING SOON</p>
-			</Box>
+			{loading && <Loading />}
+			{!loading && (
+				<ul className={styles.discussions}>
+					{items}
+				</ul>
+			)}
 		</ProfileSectionContainer>
 	);
 }
 
 export function UserLists({ accountName }) {
 	const [lists, setLists] = useState([]);
-	const [loading, setLoading] = useState(true);
+	const [loading, setLoading] = useState(false);
 
 	useEffect(() => {
+		setLoading(true);
 		getProfileID(accountName).then((id) => {
 			supabase
 				.from("anime_lists")
@@ -94,7 +116,7 @@ export function UserLists({ accountName }) {
 }
 
 export function UserSavedLists({ accountName }) {
-	const [loading, setLoading] = useState(true);
+	const [loading, setLoading] = useState(false);
 	const [items, setItems] = useState([]);
 
 	useEffect(() => {
@@ -131,6 +153,7 @@ export function UserItems({ title, status, accountName }) {
 	const [items, setItems] = useState([]);
 
 	useEffect(() => {
+		setLoading(true);
 		getProfileID(accountName)
 			.then((profileID) => {
 				if (profileID === null) {
@@ -156,7 +179,6 @@ export function UserItems({ title, status, accountName }) {
 				);
 			})
 			.catch((error) => {
-				console.error(error);
 				setItems([]);
 			});
 	}, [accountName, status]);
@@ -175,9 +197,10 @@ export function UserItems({ title, status, accountName }) {
 
 export function UserRecommendedItems({ accountName }) {
 	const [items, setItems] = useState([]);
-	const [loading, setLoading] = useState(true);
+	const [loading, setLoading] = useState(false);
 
 	useEffect(() => {
+		setLoading(true);
 		getProfileID(accountName).then((profileID) => {
 			getUserItemRecommendations(profileID)
 				.then(({ data }) => {
@@ -209,9 +232,10 @@ export function UserRecommendedItems({ accountName }) {
 
 export function UserReviews({ accountName }) {
 	const [items, setItems] = useState([]);
-	const [loading, setLoading] = useState(true);
+	const [loading, setLoading] = useState(false);
 
 	useEffect(() => {
+		setLoading(true);
 		getProfileID(accountName).then((profileID) => {
 			getUserItemReviews(profileID)
 				.then(({ data }) => {
@@ -429,7 +453,13 @@ export function EditProfile({ open, closeDialog }) {
 								Update profile picture
 							</label>
 							<span className={styles.updateProfilePic}>
-								<Image src={avatarURL} alt={accountName} width={100} height={100} quality={100} />
+								<Image
+									src={avatarURL}
+									alt={accountName}
+									width={100}
+									height={100}
+									quality={100}
+								/>
 								<IconButton
 									aria-label="upload picture"
 									sx={uploadBtnStyle}

@@ -6,13 +6,6 @@
     border-bottom: 1px solid gainsboro;
 }
 
-.discussions {
-    padding: 1%;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-}
-
 .recommendedItems {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(322px, 1fr));
@@ -94,4 +87,17 @@
     width: 100px;
     height: 100px;
     object-fit: cover;
+}
+
+.discussions {
+    padding: 1%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+@media screen and (max-width: 1024px){
+    .discussions {
+        grid-template-columns: 1fr;
+    }
 }
