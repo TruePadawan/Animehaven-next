@@ -191,7 +191,7 @@ const AnimeDetails = () => {
 									error,
 								});
 							});
-						setRecentItem(profileID, "animes", animeID).catch((error) => {
+						setRecentItem("animes", profileID, animeID).catch((error) => {
 							triggerAlert("Error", { severity: "error", error });
 						});
 					}

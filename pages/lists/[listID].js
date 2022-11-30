@@ -132,7 +132,7 @@ const List = () => {
 				setLoading(false);
 			});
 		if (profileID !== null) {
-			setRecentItem(profileID, "lists", listID);
+			setRecentItem("lists", profileID, listID);
 		}
 	}, [listID, profileID]);
 

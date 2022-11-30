@@ -353,23 +353,28 @@ export async function getReviewList(animeID, userProfileID = null) {
 	return list;
 }
 
-export async function setRecentItem(profileID, type, item) {
-	// GET THE ITEMS, UNSHIFT NEW ITEM, IF LENGTH > 3: TRIM TO 3
-	const { data: recentItems } = await supabase
+export async function getRecentItems(type, profileID) {
+	const { data } = await supabase
 		.from("recent_items")
 		.select(type)
 		.eq("profile_id", profileID)
 		.throwOnError();
+	return data;
+}
+
+export async function setRecentItem(type, profileID, item) {
+	// GET THE ITEMS, UNSHIFT NEW ITEM, IF LENGTH > 3: TRIM TO 3
+	const recentItems = await getRecentItems(type, profileID);
 	if (!recentItems.includes(item)) {
-		recentItems.unshift(item);
-		if (recentItems.length > 3) {
-			recentItems = recentItems.slice(0, 3);
+		let updatedRecentItems = [item, ...recentItems];
+		if (updatedRecentItems.length > 3) {
+			updatedRecentItems = updatedRecentItems.slice(0, 3);
 		}
 		try {
 			await supabase
 				.from("recent_items")
 				.update({
-					[type]: recentItems,
+					[type]: updatedRecentItems,
 				})
 				.eq("profile_id", profileID)
 				.throwOnError();

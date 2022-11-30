@@ -57,7 +57,7 @@ const Discussion = () => {
 				});
 
 			if (profileID !== null) {
-				setRecentItem(profileID, "discussions", discussionID);
+				setRecentItem("discussions", profileID, discussionID);
 			}
 		}
 	}, [router, profileID]);

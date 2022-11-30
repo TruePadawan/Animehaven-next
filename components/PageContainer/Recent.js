@@ -1,19 +1,11 @@
 import useSWRImmutable from "swr/immutable";
-import { supabase } from "../../supabase/config";
 import Loading from "../Loading/Loading";
 import TurnedInNotIcon from "@mui/icons-material/TurnedInNot";
 import styles from "./pagecontainer.module.css";
+import { getRecentItems } from "../../utilities/app-utilities";
 
-async function recentsFetcher(type, profileID) {
-	const { data } = await supabase
-		.from("recent_items")
-		.select(type)
-		.eq("id", profileID)
-		.throwOnError();
-	return data;
-}
 export default function Recent({ profileID, type }) {
-	const { data, error } = useSWRImmutable([type, profileID], recentsFetcher);
+	const { data, error } = useSWRImmutable([type, profileID], getRecentItems);
 
 	const loading = !data && !error;
 	let content = (
