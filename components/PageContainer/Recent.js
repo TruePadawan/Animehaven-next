@@ -3,6 +3,7 @@ import Loading from "../Loading/Loading";
 import TurnedInNotIcon from "@mui/icons-material/TurnedInNot";
 import styles from "./pagecontainer.module.css";
 import { getRecentItems } from "../../utilities/app-utilities";
+import Anime from "../RecentItems/Anime";
 
 export default function Recent({ profileID, type }) {
 	const { data, error } = useSWRImmutable([type, profileID], getRecentItems);
@@ -23,7 +24,24 @@ export default function Recent({ profileID, type }) {
 			</li>
 		);
 	} else if (data.length > 0) {
-		// transform
+		switch (type) {
+			case "animes":
+				content = data.map((item) => (
+					<Anime
+						id={item.id}
+						label={item.title}
+						imgSrc={item.photoURL}
+						synopsis={item.synopsis}
+					/>
+				));
+				break;
+			case "discussions":
+				break;
+			case "lists":
+				break;
+			default:
+				break;
+		}
 	}
 	return <ul className={styles["recent-items"]}>{content}</ul>;
 }

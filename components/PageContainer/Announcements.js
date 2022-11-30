@@ -20,10 +20,10 @@ export default function Announcements() {
 
 	const loading = !data && !error;
 	let content = (
-		<div className="h-100 d-flex flex-column align-items-center justify-content-center">
+		<li className="h-100 p-3 d-flex flex-column align-items-center justify-content-center">
 			<AnnouncementOutlinedIcon sx={{ fontSize: "3rem" }} />
 			<span style={{ fontFamily: "'Roboto'" }}>No announcements!</span>
-		</div>
+		</li>
 	);
 	if (loading) {
 		content = <Loading />;

@@ -93,19 +93,8 @@ const AnimeDetails = () => {
 	const [loading, setLoading] = useState(true);
 	const [snackbarData, setSnackbarData] = useState(defaultSnackbarState);
 	const [watchStatus, setWatchStatus] = useState("NOT_WATCHED");
-	const [info, setInfo] = useState({
-		title: "",
-		type: "",
-		overview: "",
-		score: "",
-		photoURL: "",
-	});
-	const [extraInfo, setExtraInfo] = useState({
-		episodes: "",
-		studios: "",
-		rank: "",
-		status: "",
-	});
+	const [info, setInfo] = useState(null);
+	const [extraInfo, setExtraInfo] = useState(null);
 	const [recommendationStatus, setRecommendationStatus] =
 		useState("not_recommended");
 	const [recommendBtnDisabled, setRecommendBtnDisabled] = useState(false);
@@ -113,7 +102,6 @@ const AnimeDetails = () => {
 	const [categoryVal, setCategoryVal] = useState("COMMENTS");
 	const [loadingFailed, setLoadingFailed] = useState(false);
 	const router = useRouter();
-	const animeID = router.query?.animeID;
 
 	// ALLOW SNACKBAR STATE TO BE CUSTOMIZED
 	const triggerAlert = useCallback((text, options) => {
@@ -146,55 +134,6 @@ const AnimeDetails = () => {
 					const { main, extra } = transformAnimeData(animeData);
 					setInfo(main);
 					setExtraInfo(extra);
-
-					if (profileID !== null) {
-						setWatchStatusElDisabled(true);
-						setRecommendBtnDisabled(true);
-						// LOAD ANIME WATCH STATUS FOR SIGNED IN USER
-						getProfileData("items_watch_status", profileID)
-							.then(({ items_watch_status }) => {
-								const itemIDs = Object.keys(items_watch_status);
-								if (itemIDs.includes(animeID) === false) {
-									items_watch_status[animeID] = "NOT_WATCHED";
-									supabase
-										.from("profiles")
-										.update({ items_watch_status: items_watch_status })
-										.eq("id", profileID);
-								} else {
-									setWatchStatus(items_watch_status[animeID]);
-								}
-								setWatchStatusElDisabled(false);
-							})
-							.catch((error) => {
-								triggerAlert("Failed to load anime watch status", {
-									severity: "error",
-									error,
-								});
-							});
-
-						// CHECK IF ANIME IS RECOMMENDED BY SIGNED IN USER
-						getUserItemRecommendations(profileID)
-							.then(({ data: rows }) => {
-								const isRecommended = rows.some(
-									(row) => row.item_id === animeID
-								);
-								if (isRecommended) {
-									setRecommendationStatus("recommended");
-								} else {
-									setRecommendationStatus("not_recommended");
-								}
-								setRecommendBtnDisabled(false);
-							})
-							.catch((error) => {
-								triggerAlert("Failed to load anime recommendation status", {
-									severity: "error",
-									error,
-								});
-							});
-						setRecentItem("animes", profileID, animeID).catch((error) => {
-							triggerAlert("Error", { severity: "error", error });
-						});
-					}
 				})
 				.catch((error) => {
 					triggerAlert("Failed to load anime info", {
@@ -207,8 +146,65 @@ const AnimeDetails = () => {
 					setLoading(false);
 				});
 		}
+	}, [router, triggerAlert]);
+
+	// IF THERE IS A SIGNED IN USER, CHECK IF ANIME IS RECOMMENDED OR HAS A WATCH STATUS SET
+	useEffect(() => {
+		if (router.isReady && profileID !== null) {
+			const { animeID } = router.query;
+			setWatchStatusElDisabled(true);
+			setRecommendBtnDisabled(true);
+			// LOAD ANIME WATCH STATUS FOR SIGNED IN USER
+			getProfileData("items_watch_status", profileID)
+				.then(({ items_watch_status }) => {
+					const animeIDs = Object.keys(items_watch_status);
+					if (animeIDs.includes(animeID)) {
+						setWatchStatus(items_watch_status[animeID]);
+					}
+					setWatchStatusElDisabled(false);
+				})
+				.catch((error) => {
+					triggerAlert("Failed to load anime watch status", {
+						severity: "error",
+						error,
+					});
+				});
+
+			// CHECK IF ANIME IS RECOMMENDED BY SIGNED IN USER
+			getUserItemRecommendations(profileID)
+				.then(({ data: rows }) => {
+					const isRecommended = rows.some((row) => row.item_id === animeID);
+					if (isRecommended) {
+						setRecommendationStatus("recommended");
+					} else {
+						setRecommendationStatus("not_recommended");
+					}
+					setRecommendBtnDisabled(false);
+				})
+				.catch((error) => {
+					triggerAlert("Failed to load anime recommendation status", {
+						severity: "error",
+						error,
+					});
+				});
+		}
 	}, [profileID, router, triggerAlert]);
-	
+
+	// IF THERE IS A SIGNED IN USER - UPDATE THEIR RECENT ANIMES VIEWED
+	useEffect(() => {
+		if (router.isReady && profileID !== null && info !== null) {
+			const { animeID } = router.query;
+			setRecentItem("animes", profileID, {
+				id: animeID,
+				title: info.title,
+				photoURL: info.photoURL,
+				synopsis: info.overview,
+			}).catch((error) => {
+				triggerAlert("Error", { severity: "error", error });
+			});
+		}
+	}, [profileID, router, triggerAlert, info]);
+
 	// RECOMMEND ITEM OR REMOVE RECOMMENDATION
 	const recommendItem = async () => {
 		if (profileID === null) return;
@@ -277,12 +273,7 @@ const AnimeDetails = () => {
 		vertical: "bottom",
 		horizontal: "left",
 	};
-
-	const itemData = {
-		id: animeID,
-		title: info.title,
-	};
-
+	const animeID = router.query?.animeID;
 	return (
 		<Fragment>
 			{loading && <Loading />}
@@ -327,7 +318,7 @@ const AnimeDetails = () => {
 									<AddToList
 										animeID={animeID}
 										profileID={profileID}
-										itemData={itemData}
+										itemData={{ id: animeID, title: info.title }}
 										triggerAlert={triggerAlert}
 									/>
 								)}

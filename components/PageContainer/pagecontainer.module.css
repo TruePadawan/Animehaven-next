@@ -18,7 +18,7 @@
     border-radius: 8px 8px 0px 0px !important;
     background-color: #828282;
     color: black;
-    height: 370px;
+    height: max-content;
     display: flex;
     flex-direction: column;
 }

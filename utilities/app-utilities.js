@@ -359,13 +359,18 @@ export async function getRecentItems(type, profileID) {
 		.select(type)
 		.eq("profile_id", profileID)
 		.throwOnError();
-	return data;
+	return data[0][type];
 }
 
 export async function setRecentItem(type, profileID, item) {
-	// GET THE ITEMS, UNSHIFT NEW ITEM, IF LENGTH > 3: TRIM TO 3
 	const recentItems = await getRecentItems(type, profileID);
-	if (!recentItems.includes(item)) {
+	let itemAlreadyExists = false;
+	if (type === "animes") {
+		itemAlreadyExists = recentItems.some((r_item) => r_item.id === item.id);
+	} else {
+		itemAlreadyExists = recentItems.includes(item);
+	}
+	if (!itemAlreadyExists) {
 		let updatedRecentItems = [item, ...recentItems];
 		if (updatedRecentItems.length > 3) {
 			updatedRecentItems = updatedRecentItems.slice(0, 3);
