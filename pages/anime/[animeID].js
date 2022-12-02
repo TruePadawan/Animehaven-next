@@ -24,39 +24,37 @@ import { useRouter } from "next/router";
 
 const ExtraInfo = (props) => {
 	return (
-		<ul className={styles.extrainfo}>
-			<li className="d-flex flex-column">
-				<span className={`align-start ${styles.category}`}>Episodes</span>
-				<span className="font-bold align-self-center">{props.episodes}</span>
+		<ul className={styles["extra-info"]}>
+			<li>
+				<span className={styles.category}>Episodes</span>
+				<span className={styles["category-data"]}>{props.episodes}</span>
 			</li>
-			<li className="d-flex flex-column">
-				<span className={`align-start ${styles.category}`}>Studios</span>
-				<span className="font-bold align-self-center">{props.studios}</span>
+			<li>
+				<span className={styles.category}>Studios</span>
+				<ul className={styles["category-data"]}>{props.studios}</ul>
 			</li>
-			<li className="d-flex flex-column">
-				<span
-					className={`align-start ${styles.category}`}
-					title="MyAnimeList Ranking">
+			<li>
+				<span className={styles.category} title="MyAnimeList Ranking">
 					MAL Ranking
 				</span>
-				<span className="font-bold align-self-center">{props.rank}</span>
+				<span className={styles["category-data"]}>{props.rank}</span>
 			</li>
-			<li className="d-flex flex-column">
-				<span className={`align-start ${styles.category}`}>Status</span>
-				<span className="font-bold align-self-center">{props.status}</span>
+			<li>
+				<span className={styles.category}>Status</span>
+				<span className={styles["category-data"]}>{props.status}</span>
 			</li>
 		</ul>
 	);
 };
 
 const getItemStudio = (itemData) => {
-	let studios = itemData["studios"].length > 0 ? "" : "N/A";
+	const studios = [];
+	if (itemData["studios"].length === 0) {
+		studios.push(<li key={0}>N/A</li>);
+		return studios;
+	}
 	itemData["studios"].forEach((studio, index) => {
-		if (index === itemData["studios"].length - 1) {
-			studios = studios.concat(`${studio.name}`);
-		} else {
-			studios = studios.concat(`${studio.name}, `);
-		}
+		studios.push(<li key={index}>{studio.name}</li>);
 	});
 	return studios;
 };
