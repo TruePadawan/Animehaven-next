@@ -1,4 +1,6 @@
-html, body, body > div {
+html,
+body,
+body>div {
   height: 100vh;
 }
 
@@ -29,20 +31,21 @@ body {
   background-color: #2B2B2B;
 }
 
-body > div::-webkit-scrollbar {
-  width: 5px;
+body>div::-webkit-scrollbar {
+  width: 8px;
 }
 
-body > div::-webkit-scrollbar-track {
+body>div::-webkit-scrollbar-track {
   background-color: rgb(79, 79, 79);
-  border-radius: 10px;
 }
 
-body > div::-webkit-scrollbar-thumb {
+body>div::-webkit-scrollbar-thumb {
   background-color: #252525;
+  border-bottom: 4px solid rgb(161, 161, 161);
+  border-top: 4px solid rgb(161, 161, 161);
 }
 
-body > div {
+body>div {
   overflow-y: scroll;
   display: flex;
   flex-direction: column;
@@ -82,7 +85,8 @@ button:disabled {
   padding: 1rem;
 }
 
-.signupForm, .verify-otp-form {
+.signupForm,
+.verify-otp-form {
   font-family: 'Rubik', sans-serif;
   padding: 1rem;
   display: flex;
@@ -91,15 +95,18 @@ button:disabled {
 }
 
 
-.signupForm input, .verify-otp-form input {
+.signupForm input,
+.verify-otp-form input {
   color: antiquewhite;
 }
 
-.signupForm label, .verify-otp-form label {
+.signupForm label,
+.verify-otp-form label {
   color: gray;
 }
 
-.signupForm button, .verify-otp-form button {
+.signupForm button,
+.verify-otp-form button {
   font-family: inherit;
 }
 
