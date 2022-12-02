@@ -117,6 +117,10 @@
     color: #B9B9B9;
 }
 
+.category-data {
+    font-size: 0.9rem;
+}
+
 .not_recommended {
     background-color: transparent;
 }

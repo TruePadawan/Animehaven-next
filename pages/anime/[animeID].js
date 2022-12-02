@@ -27,21 +27,21 @@ const ExtraInfo = (props) => {
 		<ul className={styles["extra-info"]}>
 			<li>
 				<span className={styles.category}>Episodes</span>
-				<span className="font-bold align-self-center">{props.episodes}</span>
+				<span className={styles["category-data"]}>{props.episodes}</span>
 			</li>
 			<li>
 				<span className={styles.category}>Studios</span>
-				<li className="font-bold align-self-center text-center">{props.studios}</li>
+				<ul className={styles["category-data"]}>{props.studios}</ul>
 			</li>
 			<li>
 				<span className={styles.category} title="MyAnimeList Ranking">
 					MAL Ranking
 				</span>
-				<span className="font-bold align-self-center">{props.rank}</span>
+				<span className={styles["category-data"]}>{props.rank}</span>
 			</li>
 			<li>
 				<span className={styles.category}>Status</span>
-				<span className="font-bold align-self-center">{props.status}</span>
+				<span className={styles["category-data"]}>{props.status}</span>
 			</li>
 		</ul>
 	);
