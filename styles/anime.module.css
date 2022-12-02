@@ -35,7 +35,8 @@
     height: auto;
 }
 
-.name, .overview {
+.name,
+.overview {
     font-family: 'Ubuntu', sans-serif;
 }
 
@@ -57,7 +58,8 @@
     cursor: pointer;
 }
 
-.watchStatus, .btn {
+.watchStatus,
+.btn {
     border: 2px solid #748CBC;
     background-color: transparent;
     margin-top: 1%;
@@ -68,12 +70,14 @@
     text-align: center;
 }
 
-.btn:hover, .recommended {
+.btn:hover,
+.recommended {
     background-color: #F8E378;
     color: black;
 }
 
-.btn:disabled, .watchStatus:disabled {
+.btn:disabled,
+.watchStatus:disabled {
     color: rgb(80, 80, 80);
 }
 
@@ -86,18 +90,30 @@
     color: black;
 }
 
-.extrainfo {
+.extra-info {
     min-width: 270px;
     margin-top: 0.8rem;
     padding: 0.1rem 0.4rem;
-    background-color: #444444;
+    background-color: #49494980;
     align-self: stretch;
     border-radius: 8px 8px 0px 0px;
     box-shadow: 2px 2px 2px #202020b4;
 }
 
+.extra-info>li {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 2% 0;
+}
+
+.extra-info>li:nth-child(n):not(:nth-last-child(1)) {
+    border-bottom: 2px solid rgba(0, 0, 0, 0.274);
+}
+
 .category {
-    font-family: 'Lato', sans-serif;
+    font-family: "Roboto", sans-serif;
+    font-size: large;
     color: #B9B9B9;
 }
 
