@@ -76,6 +76,7 @@ const Item = ({ itemID, itemTitle, index }) => {
 	);
 };
 
+const initialErrorState = { occurred: false, text: "" };
 const List = () => {
 	const { listID } = useRouter().query;
 	const { profileID } = useContext(UserAuthContext);
@@ -83,7 +84,7 @@ const List = () => {
 	const [showCreateListDialog, setShowCreateListDialog] = useState(false);
 	const [listData, setListData] = useState({});
 	const [editAllowed, setEditAllowed] = useState(false);
-	const [error, setError] = useState({ occurred: false, text: "" });
+	const [error, setError] = useState(initialErrorState);
 
 	// REQUEST FOR AND LOAD LIST DATA TO UI
 	useEffect(() => {
@@ -119,7 +120,13 @@ const List = () => {
 							comment_instance_id,
 						});
 						setEditAllowed(profileID === creator_id);
+						setError(initialErrorState);
 						setLoading(false);
+
+						// SINCE LIST EXISTS, ADD TO RECENTLY VIEWED LISTS
+						if (profileID !== null) {
+							setRecentItem("lists", profileID, listID);
+						}
 					});
 			})
 			.catch((error) => {
@@ -129,9 +136,6 @@ const List = () => {
 				});
 				setLoading(false);
 			});
-		if (profileID !== null) {
-			setRecentItem("lists", profileID, listID);
-		}
 	}, [listID, profileID]);
 
 	const openCreateListDialog = () => setShowCreateListDialog(true);

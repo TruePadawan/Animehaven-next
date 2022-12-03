@@ -1,8 +1,7 @@
-import { IconButton } from "@mui/material";
+import { Button } from "@mui/material";
 import { Fragment, useContext, useEffect, useState } from "react";
 import Link from "next/link";
 import Head from "next/head";
-import EditIcon from "@mui/icons-material/Edit";
 import styles from "../../styles/discussion.module.css";
 import Loading from "../../components/Loading/Loading";
 import Error from "../../components/Error/Error";
@@ -16,11 +15,12 @@ import {
 import { UserAuthContext } from "../../context/UserAuthContext";
 import { useRouter } from "next/router";
 
+const initialErrorState = { occurred: false, text: "" };
 const Discussion = () => {
 	const router = useRouter();
 	const { profileID } = useContext(UserAuthContext);
 	const [loading, setLoading] = useState(false);
-	const [error, setError] = useState({ occurred: false, text: "" });
+	const [error, setError] = useState(initialErrorState);
 	const [data, setData] = useState({
 		title: null,
 		creator: null,
@@ -28,11 +28,12 @@ const Discussion = () => {
 		commentInstanceID: null,
 	});
 	const [editAllowed, setEditAllowed] = useState(false);
+	const discussionID = router.query?.discussionID;
 
 	useEffect(() => {
-		if (router.isReady) {
-			const { discussionID } = router.query;
+		if (discussionID) {
 			setLoading(true);
+
 			getDiscussionByID(discussionID)
 				.then((data) => {
 					getProfileData("account_name", data.creator_id).then(
@@ -43,8 +44,14 @@ const Discussion = () => {
 								body: data.body,
 								commentInstanceID: data.comment_instance_id,
 							});
-							setLoading(false);
 							setEditAllowed(profileID === data.creator_id);
+							setError(initialErrorState);
+							setLoading(false);
+
+							// SINCE DISCUSSION HAS BEEN CONFIRMED TO EXIST, ADD IT TO RECENTLY VIEWED DISCUSISONS
+							if (profileID !== null) {
+								setRecentItem("discussions", profileID, discussionID);
+							}
 						}
 					);
 				})
@@ -55,12 +62,8 @@ const Discussion = () => {
 					});
 					setLoading(false);
 				});
-
-			if (profileID !== null) {
-				setRecentItem("discussions", profileID, discussionID);
-			}
 		}
-	}, [router, profileID]);
+	}, [discussionID, profileID]);
 
 	if (router.isReady === false || loading) {
 		return (
@@ -87,8 +90,11 @@ const Discussion = () => {
 		);
 	}
 
+	function editButtonClickHandler() {
+		router.push(`/discussions/edit?id=${discussionID}`);
+	}
+
 	const { title, body, creator, commentInstanceID } = data;
-	const { discussionID } = router.query;
 	return (
 		<Fragment>
 			<Head>
@@ -110,17 +116,21 @@ const Discussion = () => {
 				<meta name="twitter:description" content={body} />
 			</Head>
 			<div id="discussion-body" className="d-flex flex-column">
-				<span className="d-flex gap-1">
-					<h2 className={styles.title}>{title}</h2>
+				<div className="d-flex justify-content-between align-items-center">
+					<span className={styles.creator}>
+						Created by <Link href={`/users/${creator}`}>{creator}</Link>
+					</span>
 					{editAllowed && (
-						<IconButton title="Edit" sx={{ color: "whitesmoke" }}>
-							<EditIcon />
-						</IconButton>
+						<Button
+							type="button"
+							variant="text"
+							sx={{ fontWeight: "bold", color: "antiquewhite" }}
+							onClick={editButtonClickHandler}>
+							Edit
+						</Button>
 					)}
-				</span>
-				<div className={styles.creator}>
-					Created by <Link href={`/users/${creator}`}>{creator}</Link>
 				</div>
+				<h2 className={styles.title}>{title}</h2>
 				<p className={styles.body}>{body}</p>
 			</div>
 			<CommentsList
@@ -135,7 +145,9 @@ const Discussion = () => {
 export default Discussion;
 
 Discussion.getLayout = (page) => (
-	<PageContainer className="d-flex flex-column gap-2" recentItems="discussions">
+	<PageContainer
+		className={`d-flex flex-column gap-2 ${styles.container}`}
+		recentItems="discussions">
 		{page}
 	</PageContainer>
 );
