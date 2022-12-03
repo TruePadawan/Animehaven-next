@@ -28,6 +28,7 @@ const Discussion = () => {
 		commentInstanceID: null,
 	});
 	const [editAllowed, setEditAllowed] = useState(false);
+	const { discussionID } = router.query;
 
 	useEffect(() => {
 		if (router.isReady) {
@@ -45,6 +46,10 @@ const Discussion = () => {
 							});
 							setLoading(false);
 							setEditAllowed(profileID === data.creator_id);
+							// SINCE DISCUSSION HAS BEEN CONFIRMED TO EXIST, ADD IT TO RECENTLY VIEWED DISCUSISONS
+							if (profileID !== null) {
+								setRecentItem("discussions", profileID, discussionID);
+							}
 						}
 					);
 				})
@@ -56,9 +61,6 @@ const Discussion = () => {
 					setLoading(false);
 				});
 
-			if (profileID !== null) {
-				setRecentItem("discussions", profileID, discussionID);
-			}
 		}
 	}, [router, profileID]);
 
@@ -87,8 +89,11 @@ const Discussion = () => {
 		);
 	}
 
+	function editButtonClickHandler() {
+		router.push(`/discussions/edit?id=${discussionID}`);
+	}
+
 	const { title, body, creator, commentInstanceID } = data;
-	const { discussionID } = router.query;
 	return (
 		<Fragment>
 			<Head>
@@ -110,17 +115,20 @@ const Discussion = () => {
 				<meta name="twitter:description" content={body} />
 			</Head>
 			<div id="discussion-body" className="d-flex flex-column">
+				<div className={styles.creator}>
+					Created by <Link href={`/users/${creator}`}>{creator}</Link>
+				</div>
 				<span className="d-flex gap-1">
 					<h2 className={styles.title}>{title}</h2>
 					{editAllowed && (
-						<IconButton title="Edit" sx={{ color: "whitesmoke" }}>
+						<IconButton
+							title="Edit"
+							sx={{ color: "grey" }}
+							onClick={editButtonClickHandler}>
 							<EditIcon />
 						</IconButton>
 					)}
 				</span>
-				<div className={styles.creator}>
-					Created by <Link href={`/users/${creator}`}>{creator}</Link>
-				</div>
 				<p className={styles.body}>{body}</p>
 			</div>
 			<CommentsList
@@ -135,7 +143,9 @@ const Discussion = () => {
 export default Discussion;
 
 Discussion.getLayout = (page) => (
-	<PageContainer className="d-flex flex-column gap-2" recentItems="discussions">
+	<PageContainer
+		className={`d-flex flex-column gap-2 ${styles.container}`}
+		recentItems="discussions">
 		{page}
 	</PageContainer>
 );

@@ -188,7 +188,7 @@ const AnimeDetails = () => {
 		}
 	}, [profileID, router, triggerAlert]);
 
-	// IF THERE IS A SIGNED IN USER - UPDATE THEIR RECENT ANIMES VIEWED
+	// IF THERE IS A SIGNED IN USER AND ANIME HAS BEEN CONFIRMED TO EXIST - UPDATE THEIR RECENTLY VIEWED ANIMES
 	useEffect(() => {
 		if (router.isReady && profileID !== null && info !== null) {
 			const { animeID } = router.query;

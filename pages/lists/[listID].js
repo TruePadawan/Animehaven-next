@@ -120,6 +120,10 @@ const List = () => {
 						});
 						setEditAllowed(profileID === creator_id);
 						setLoading(false);
+						// SINCE LIST EXISTS, ADD TO RECENTLY VIEWED LISTS
+						if (profileID !== null) {
+							setRecentItem("lists", profileID, listID);
+						}
 					});
 			})
 			.catch((error) => {
@@ -129,9 +133,6 @@ const List = () => {
 				});
 				setLoading(false);
 			});
-		if (profileID !== null) {
-			setRecentItem("lists", profileID, listID);
-		}
 	}, [listID, profileID]);
 
 	const openCreateListDialog = () => setShowCreateListDialog(true);
