@@ -88,7 +88,6 @@ const defaultSnackbarState = { open: false, severity: "info", text: "" };
 
 const AnimeDetails = () => {
 	const { profileID } = useContext(UserAuthContext);
-	const [loading, setLoading] = useState(true);
 	const [snackbarData, setSnackbarData] = useState(defaultSnackbarState);
 	const [watchStatus, setWatchStatus] = useState("NOT_WATCHED");
 	const [info, setInfo] = useState(null);
@@ -98,8 +97,9 @@ const AnimeDetails = () => {
 	const [recommendBtnDisabled, setRecommendBtnDisabled] = useState(false);
 	const [watchStatusElDisabled, setWatchStatusElDisabled] = useState(false);
 	const [categoryVal, setCategoryVal] = useState("COMMENTS");
-	const [loadingFailed, setLoadingFailed] = useState(false);
+	const [errorText, setErrorText] = useState("");
 	const router = useRouter();
+	const animeID = router.query?.animeID;
 
 	// ALLOW SNACKBAR STATE TO BE CUSTOMIZED
 	const triggerAlert = useCallback((text, options) => {
@@ -125,8 +125,8 @@ const AnimeDetails = () => {
 
 	// LOAD DATA FOR ITEM AND RENDER IT IN UI
 	useEffect(() => {
-		if (router.isReady) {
-			const { animeID } = router.query;
+		if (animeID) {
+			setInfo(null);
 			getAnimeByID(animeID)
 				.then((animeData) => {
 					const { main, extra } = transformAnimeData(animeData);
@@ -134,17 +134,10 @@ const AnimeDetails = () => {
 					setExtraInfo(extra);
 				})
 				.catch((error) => {
-					triggerAlert("Failed to load anime info", {
-						severity: "error",
-						error,
-					});
-					setLoadingFailed(true);
-				})
-				.finally(() => {
-					setLoading(false);
+					setErrorText(error.message);
 				});
 		}
-	}, [router, triggerAlert]);
+	}, [animeID]);
 
 	// IF THERE IS A SIGNED IN USER, CHECK IF ANIME IS RECOMMENDED OR HAS A WATCH STATUS SET
 	useEffect(() => {
@@ -264,131 +257,144 @@ const AnimeDetails = () => {
 		setWatchStatusElDisabled(false);
 	};
 
-	const errorWhileLoading = loadingFailed === true;
-	const loadingSuccessful = loading === false && loadingFailed === false;
+	const loading = info === null && errorText === "";
+
+	if (errorText.length > 0) {
+		return (
+			<Fragment>
+				<Head>
+					<title>Animehaven | Anime</title>
+				</Head>
+				<Error
+					title="Error occurred while loading anime"
+					extraText={errorText}
+					sx={{ width: "100%" }}
+				/>
+			</Fragment>
+		);
+	}
+
+	if (router.isReady === false || loading) {
+		return (
+			<Fragment>
+				<Head>
+					<title>Animehaven | Anime</title>
+				</Head>
+				<Loading />
+			</Fragment>
+		);
+	}
 
 	const alertAnchorOrigin = {
 		vertical: "bottom",
 		horizontal: "left",
 	};
-	const animeID = router.query?.animeID;
 	return (
 		<Fragment>
-			{loading && <Loading />}
-			{errorWhileLoading && (
-				<Error
-					title="Error occurred while loading anime"
-					extraText="Consider reloading the page!"
+			<Head>
+				<title>{`Animehaven | ${info.title}`}</title>
+				<meta name="description" content={info.overview} />
+				<meta property="og:title" content={`Animehaven | ${info.title}`} />
+				<meta property="og:description" content={info.overview} />
+				<meta
+					property="og:url"
+					content={`https://animehaven.vercel.app/item/${animeID}`}
 				/>
-			)}
-			{loadingSuccessful && (
-				<Fragment>
-					<Head>
-						<title>{`Animehaven | ${info.title}`}</title>
-						<meta name="description" content={info.overview} />
-						<meta property="og:title" content={`Animehaven | ${info.title}`} />
-						<meta property="og:description" content={info.overview} />
-						<meta
-							property="og:url"
-							content={`https://animehaven.vercel.app/item/${animeID}`}
+				<meta name="twitter:title" content={`Animehaven | ${info.title}`} />
+				<meta name="twitter:description" content={info.overview} />
+			</Head>
+			<Box
+				className={`d-flex flex-column mt-5 gap-3 ${styles["main-section-container"]}`}>
+				<section className={styles.mainSection}>
+					<h2 className={styles.name}>{info.title}</h2>
+					<span className="d-flex gap-3">
+						<Chip
+							label={info.type}
+							sx={{
+								color: "white",
+								backgroundColor: "#616161",
+								width: "max-content",
+							}}
 						/>
-						<meta name="twitter:title" content={`Animehaven | ${info.title}`} />
-						<meta name="twitter:description" content={info.overview} />
-					</Head>
-					<Box
-						className={`d-flex flex-column mt-5 gap-3 ${styles["main-section-container"]}`}>
-						<section className={styles.mainSection}>
-							<h2 className={styles.name}>{info.title}</h2>
-							<span className="d-flex gap-3">
-								<Chip
-									label={info.type}
-									sx={{
-										color: "white",
-										backgroundColor: "#616161",
-										width: "max-content",
-									}}
-								/>
-								<span className="d-flex align-items-center gap-2">
-									<StarIcon sx={{ color: "goldenrod", marginBottom: "2px" }} />
-									<small>{info.score}</small>
-								</span>
-								{profileID && (
-									<AddToList
-										animeID={animeID}
-										profileID={profileID}
-										itemData={{ id: animeID, title: info.title }}
-										triggerAlert={triggerAlert}
-									/>
-								)}
-							</span>
-							<p className={styles.overview}>{info.overview}</p>
-						</section>
-						<Select
-							aria-label="category"
-							value={categoryVal}
-							onChange={(e) => setCategoryVal(e.target.value)}>
-							<option value="COMMENTS" defaultValue>
-								Comments
-							</option>
-							<option value="REVIEWS">Reviews</option>
-						</Select>
-						{categoryVal === "COMMENTS" && <CommentsList id={animeID} />}
-						{categoryVal === "REVIEWS" && (
-							<ReviewsList
-								profileID={profileID}
+						<span className="d-flex align-items-center gap-2">
+							<StarIcon sx={{ color: "goldenrod", marginBottom: "2px" }} />
+							<small>{info.score}</small>
+						</span>
+						{profileID && (
+							<AddToList
 								animeID={animeID}
+								profileID={profileID}
+								itemData={{ id: animeID, title: info.title }}
 								triggerAlert={triggerAlert}
 							/>
 						)}
-					</Box>
-					<div className="d-flex flex-column gap-1 align-items-center">
-						<span className={styles.photo}>
-							<Image
-								src={info.photoURL}
-								alt={info.title}
-								width={200}
-								height={300}
-							/>
-						</span>
-						{profileID && (
-							<span className="d-flex gap-2">
-								<select
-									className={styles.watchStatus}
-									onChange={updateWatchStatus}
-									value={watchStatus}
-									disabled={watchStatusElDisabled}>
-									<option value="NOT_WATCHED">Not watched</option>
-									<option value="WATCHING">Watching</option>
-									<option value="WATCHED">Watched</option>
-								</select>
-								<button
-									type="button"
-									className={`${styles.btn} ${styles[recommendationStatus]}`}
-									onClick={recommendItem}
-									style={{ borderColor: "#F8E378" }}
-									disabled={recommendBtnDisabled}>
-									{recommendationStatus === "recommended"
-										? "Recommended"
-										: "Recommend"}
-								</button>
-							</span>
-						)}
-						<ExtraInfo {...extraInfo} />
-					</div>
-					<Snackbar
-						open={snackbarData.open}
-						autoHideDuration={6000}
-						onClose={resetSnackbar}
-						anchorOrigin={alertAnchorOrigin}>
-						<Alert
-							severity={snackbarData.severity}
-							sx={{ width: "100%" }}
-							onClose={resetSnackbar}>
-							{snackbarData.text}
-						</Alert>
-					</Snackbar>
-				</Fragment>
-			)}
+					</span>
+					<p className={styles.overview}>{info.overview}</p>
+				</section>
+				<Select
+					aria-label="category"
+					value={categoryVal}
+					onChange={(e) => setCategoryVal(e.target.value)}>
+					<option value="COMMENTS" defaultValue>
+						Comments
+					</option>
+					<option value="REVIEWS">Reviews</option>
+				</Select>
+				{categoryVal === "COMMENTS" && <CommentsList id={animeID} />}
+				{categoryVal === "REVIEWS" && (
+					<ReviewsList
+						profileID={profileID}
+						animeID={animeID}
+						triggerAlert={triggerAlert}
+					/>
+				)}
+			</Box>
+			<div className="d-flex flex-column gap-1 align-items-center">
+				<span className={styles.photo}>
+					<Image
+						src={info.photoURL}
+						alt={info.title}
+						width={200}
+						height={300}
+					/>
+				</span>
+				{profileID && (
+					<span className="d-flex gap-2">
+						<select
+							className={styles.watchStatus}
+							onChange={updateWatchStatus}
+							value={watchStatus}
+							disabled={watchStatusElDisabled}>
+							<option value="NOT_WATCHED">Not watched</option>
+							<option value="WATCHING">Watching</option>
+							<option value="WATCHED">Watched</option>
+						</select>
+						<button
+							type="button"
+							className={`${styles.btn} ${styles[recommendationStatus]}`}
+							onClick={recommendItem}
+							style={{ borderColor: "#F8E378" }}
+							disabled={recommendBtnDisabled}>
+							{recommendationStatus === "recommended"
+								? "Recommended"
+								: "Recommend"}
+						</button>
+					</span>
+				)}
+				<ExtraInfo {...extraInfo} />
+			</div>
+			<Snackbar
+				open={snackbarData.open}
+				autoHideDuration={6000}
+				onClose={resetSnackbar}
+				anchorOrigin={alertAnchorOrigin}>
+				<Alert
+					severity={snackbarData.severity}
+					sx={{ width: "100%" }}
+					onClose={resetSnackbar}>
+					{snackbarData.text}
+				</Alert>
+			</Snackbar>
 		</Fragment>
 	);
 };
