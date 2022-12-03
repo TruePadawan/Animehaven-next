@@ -9,77 +9,103 @@ import { UserAuthContext } from "../../context/UserAuthContext";
 import { DISCUSSION_TAGS } from "../../utilities/app-utilities";
 import styles from "../../styles/create-discussion.module.css";
 import { supabase } from "../../supabase/config";
+import Loading from "../../components/Loading/Loading";
 
-export default function Create() {
+export default function Edit() {
 	const { profileID } = useContext(UserAuthContext);
+	const [loading, setLoading] = useState(true);
 	const [errorText, setErrorText] = useState("");
-	const [createBtnDisabled, setCreateBtnDisabled] = useState(false);
+	const [updateBtnDisabled, setUpdateBtnDisabled] = useState(true);
 	const [discussionData, setDiscussionData] = useState({
 		title: "",
 		body: "",
 		tag: "",
 	});
 	const router = useRouter();
+	const discussionID = router.query?.id;
 
 	useEffect(() => {
-		const cachedTitle = window.localStorage.getItem("discussion_title");
-		const cachedBody = window.localStorage.getItem("discussion_body");
-		setDiscussionData({
-			title: cachedTitle || "",
-			body: cachedBody || "",
-			tag: DISCUSSION_TAGS[0].toLowerCase(),
-		});
-	}, []);
-
-	useEffect(() => {
-		if (profileID === null) {
-			setCreateBtnDisabled(true);
-			setErrorText("You need to be signed in to create a discussion!");
-		} else {
-			setCreateBtnDisabled(false);
-			setErrorText("");
+		if (router.isReady && profileID) {
+			const discussionID = router.query?.id;
+			if (discussionID === undefined) {
+				router.replace("/discussions");
+			} else {
+				supabase
+					.from("discussions")
+					.select()
+					.eq("id", discussionID)
+					.throwOnError()
+					.then((response) => {
+						const { data } = response;
+						if (data.length === 0) {
+							throw new Error("Failed to get data for discussion!");
+						}
+						const { title, body, tag, creator_id } = data[0];
+						if (creator_id !== profileID) {
+							router.replace("/discussions");
+						}
+						setDiscussionData({ title, body, tag });
+						setUpdateBtnDisabled(false);
+						setLoading(false);
+					});
+			}
 		}
-	}, [profileID]);
+	}, [router, profileID]);
 
-	function onDiscussionCreated() {
-		window.localStorage.removeItem("discussion_title");
-		window.localStorage.removeItem("discussion_body");
-		router.push("/discussions");
+	if (router.isReady === false || loading) {
+		return (
+			<Fragment>
+				<Head>
+					<title>Animehaven | Edit Discussion</title>
+				</Head>
+				<Loading />
+			</Fragment>
+		);
+	}
+
+	function onDiscussionEdited() {
+		router.push(`/discussions/${discussionID}`);
 	}
 
 	async function formSubmitHandler(event) {
 		event.preventDefault();
 
 		if (profileID !== null) {
-			setCreateBtnDisabled(true);
-			const data = discussionData;
-			data.creator_id = profileID;
+			setUpdateBtnDisabled(true);
 			try {
-				await supabase.from("discussions").insert(data).throwOnError();
-				onDiscussionCreated();
+				await supabase
+					.from("discussions")
+					.update(discussionData)
+					.eq("id", discussionID)
+					.throwOnError();
+				onDiscussionEdited();
 			} catch (error) {
 				setErrorText(
-					`Failed to create discussion - ${
+					`Failed to complete action - ${
 						error.message || error.error_description
 					}`
 				);
+                setUpdateBtnDisabled(false);
 			}
-			setCreateBtnDisabled(false);
 		}
 	}
 
-	function onCancelBtnClicked() {
-		const { title, body } = discussionData;
-		const titleTrimmed = title.trim();
-		const bodyTrimmed = body.trim();
-
-		if (titleTrimmed.length > 0) {
-			window.localStorage.setItem("discussion_title", titleTrimmed);
+	async function onDeleteButtonClicked() {
+		if (profileID !== null) {
+			try {
+				await supabase
+					.from("discussions")
+					.delete()
+					.eq("id", discussionID)
+					.throwOnError();
+				router.replace("/discussions");
+			} catch (error) {
+				setErrorText("Failed to delete discussion!");
+			}
 		}
-		if (bodyTrimmed.length > 0) {
-			window.localStorage.setItem("discussion_body", bodyTrimmed);
-		}
+	}
 
+	function onCancelButtonClicked() {
 		router.push("/discussions");
 	}
 
@@ -104,11 +130,11 @@ export default function Create() {
 	return (
 		<Fragment>
 			<Head>
-				<title>Animehaven | Create a Discussion</title>
+				<title>Animehaven | Edit Discussion</title>
 			</Head>
 			<div className={styles["create-discussion-container"]}>
 				{errorText.length > 0 && <Alert severity="warning">{errorText}</Alert>}
-				<h2 className="fs-3 mt-3">Create a Discussion</h2>
+				<h2 className="fs-3 mt-3">Edit Discussion</h2>
 				<form onSubmit={formSubmitHandler} className="d-flex flex-column gap-2">
 					<div className="d-flex flex-column">
 						<label htmlFor="title-field" className={styles.label}>
@@ -151,12 +177,18 @@ export default function Create() {
 					<div className="mt-2 d-flex flex-column gap-2">
 						<Button
 							variant="contained"
-							className={styles["create-btn"]}
 							type="submit"
-							disabled={createBtnDisabled}>
-							Create
+							className={styles["create-btn"]}
+							disabled={updateBtnDisabled}>
+							Update
 						</Button>
-						<Button type="button" color="warning" onClick={onCancelBtnClicked}>
+						<Button type="button" color="error" onClick={onDeleteButtonClicked}>
+							Delete
+						</Button>
+						<Button
+							type="button"
+							color="warning"
+							onClick={onCancelButtonClicked}>
 							Cancel
 						</Button>
 					</div>
