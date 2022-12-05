@@ -4,12 +4,13 @@ import {
 	useContext,
 	useEffect,
 	useMemo,
+	useRef,
 	useState,
 } from "react";
 import CommentItem from "./CommentItem";
 import CommentBox from "./CommentBox";
 import styles from "../Comments-Reviews.module.css";
-import { Alert, Snackbar } from "@mui/material";
+import { Alert, Button, Snackbar } from "@mui/material";
 import { supabase } from "../../../supabase/config";
 import {
 	getCommentsData,
@@ -20,15 +21,17 @@ import CommentIcon from "@mui/icons-material/Comment";
 import ShareButton from "../../ShareButton/ShareButton";
 
 const defaultSnackbarState = { open: false, severity: "info", text: "" };
-
+const COMMENTS_PER_REQUEST = 10;
 const CommentsList = ({ id, className = "" }) => {
 	const { profileID } = useContext(UserAuthContext);
 	const [commentsData, setCommentsData] = useState([]);
+	const [loadingComments, setLoadingComments] = useState(false);
 	const [snackbarData, setSnackbarData] = useState(defaultSnackbarState);
 	const [replyData, setReplyData] = useState({
 		parentCommentID: "",
 		accountName: "",
 	});
+	const totalCommentsCount = useRef(0);
 
 	const triggerAlert = useCallback((text, options) => {
 		const alertSeverity = options?.severity;
@@ -44,17 +47,18 @@ const CommentsList = ({ id, className = "" }) => {
 		});
 	}, []);
 
-	const resetSnackbar = (event, reason) => {
+	function resetSnackbar(event, reason) {
 		if (reason === "clickaway") {
 			return;
 		}
 		setSnackbarData(defaultSnackbarState);
-	};
+	}
 
 	// LOAD COMMENTS ASSOCIATED WITH INSTANCE ID
 	useEffect(() => {
-		getCommentsData(id)
-			.then((data) => {
+		getCommentsData(id, COMMENTS_PER_REQUEST)
+			.then(({ data, count }) => {
+				totalCommentsCount.current = count;
 				setCommentsData(data);
 			})
 			.catch((error) => {
@@ -134,9 +138,9 @@ const CommentsList = ({ id, className = "" }) => {
 		return () => supabase.removeChannel(channel);
 	}, [id]);
 
-	const resetReplyData = () => {
+	function resetReplyData() {
 		setReplyData({ parentCommentID: "", accountName: "" });
-	};
+	}
 
 	function onShareSuccess() {
 		triggerAlert("Link Copied!", { severity: "success" });
@@ -145,8 +149,30 @@ const CommentsList = ({ id, className = "" }) => {
 		triggerAlert("Failed to Copy Link!", { severity: "warning" });
 	}
 
+	async function loadMoreCommentsClickHandler() {
+		setLoadingComments(true);
+		const lastCommentIndex = commentsData.at(-1).index;
+		try {
+			const { data } = await getCommentsData(
+				id,
+				COMMENTS_PER_REQUEST,
+				lastCommentIndex
+			);
+			setCommentsData((snapshot) => {
+				return [...snapshot, ...data];
+			});
+		} catch (error) {
+			triggerAlert("Failed to load more comments", {
+				severity: "error",
+				error,
+			});
+		}
+		setLoadingComments(false);
+	}
+
 	const replying = replyData.parentCommentID !== "";
 	const noComments = commentsData.length === 0;
+	const moreComments = commentsData.length < totalCommentsCount.current;
 	const commentsCountText = numberToString(commentsData.length, "Comment");
 
 	const comments = useMemo(() => {
@@ -197,7 +223,22 @@ const CommentsList = ({ id, className = "" }) => {
 				{noComments && (
 					<div className="d-flex justify-content-center mt-4">No Comments</div>
 				)}
-				{!noComments && <ul className={styles.items}>{comments}</ul>}
+				{!noComments && (
+					<Fragment>
+						<ul className={styles.items}>{comments}</ul>
+						{moreComments && (
+							<Button
+								type="button"
+								aria-label="load more comments"
+								variant="contained"
+								sx={{ backgroundColor: "dimgray" }}
+								disabled={loadingComments}
+								onClick={loadMoreCommentsClickHandler}>
+								Load More Comments
+							</Button>
+						)}
+					</Fragment>
+				)}
 			</div>
 			<Snackbar
 				open={snackbarData.open}
