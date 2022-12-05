@@ -10,6 +10,7 @@ import { DISCUSSION_TAGS } from "../../utilities/app-utilities";
 import styles from "../../styles/create-discussion.module.css";
 import { supabase } from "../../supabase/config";
 
+const allowed_tags = DISCUSSION_TAGS.map((tag) => tag.toLowerCase());
 export default function Create() {
 	const { profileID } = useContext(UserAuthContext);
 	const [errorText, setErrorText] = useState("");
@@ -55,6 +56,9 @@ export default function Create() {
 			const data = discussionData;
 			data.creator_id = profileID;
 			try {
+				if (allowed_tags.includes(data.tag) === false) {
+					throw new Error("Invalid tag specified!");
+				}
 				await supabase.from("discussions").insert(data).throwOnError();
 				onDiscussionCreated();
 			} catch (error) {
