@@ -49,9 +49,13 @@ export const LIST_GENRES = [
 
 export const DISCUSSION_TAGS = ["Chat", "Support"];
 
-export async function getCommentsData(instanceID, limit, index = null) {
+export async function getCommentsData(
+	instanceID,
+	limit,
+	startAfterIndex = null
+) {
 	let response;
-	if (index === null) {
+	if (startAfterIndex === null) {
 		response = await supabase
 			.from("comments")
 			.select("*", { count: "exact" })
@@ -64,7 +68,7 @@ export async function getCommentsData(instanceID, limit, index = null) {
 			.from("comments")
 			.select("*", { count: "exact" })
 			.eq("instance_id", instanceID)
-			.lt("index", index)
+			.lt("index", startAfterIndex)
 			.limit(limit)
 			.order("created_at", { ascending: false })
 			.throwOnError();
@@ -353,40 +357,84 @@ export function numberToString(count, appendString) {
 	}
 }
 
-export async function getReviewByUser(animeID, userProfileID) {
+export async function getReviewByUser(animeID, profileID) {
 	const { data } = await supabase
 		.from("item_reviews")
 		.select()
 		.eq("item_id", animeID)
-		.eq("creator_id", userProfileID)
+		.eq("creator_id", profileID)
 		.throwOnError();
 	return data;
 }
 
-export async function getReviewList(animeID, userProfileID = null) {
+export async function getReviewsData(
+	animeID,
+	limit,
+	startAfterIndex = null,
+	profileID = null
+) {
 	let list = [];
-	if (userProfileID !== null) {
-		const userReview = await getReviewByUser(animeID, userProfileID);
+	let totalReviewsCount = 0;
+	const response = { data: [], count: 0 };
+	// GET USER REVIEW FIRST BEFORE OTHER REVIEWS IF PROFILE ID SPECIFIED
+	if (profileID !== null) {
+		const userReview = await getReviewByUser(animeID, profileID);
 		if (userReview.length > 0) {
 			list.push(userReview[0]);
+			totalReviewsCount += 1;
 		}
 
-		const { data } = await supabase
-			.from("item_reviews")
-			.select()
-			.eq("item_id", animeID)
-			.neq("creator_id", userProfileID)
-			.throwOnError();
-		list = list.concat(data);
+		if (startAfterIndex !== null) {
+			const { data, count } = await supabase
+				.from("item_reviews")
+				.select("*", { count: "exact" })
+				.eq("item_id", animeID)
+				.neq("creator_id", profileID)
+				.limit(limit)
+				.lt("index", startAfterIndex)
+				.order("created_at", { ascending: false })
+				.throwOnError();
+			totalReviewsCount += count;
+			list = list.concat(data);
+		} else {
+			const { data, count } = await supabase
+				.from("item_reviews")
+				.select("*", { count: "exact" })
+				.eq("item_id", animeID)
+				.neq("creator_id", profileID)
+				.limit(limit)
+				.order("created_at", { ascending: false })
+				.throwOnError();
+			totalReviewsCount += count;
+			list = list.concat(data);
+		}
 	} else {
-		const { data } = await supabase
-			.from("item_reviews")
-			.select()
-			.eq("item_id", animeID)
-			.throwOnError();
-		list = list.concat(data);
+		if (startAfterIndex !== null) {
+			const { data, count } = await supabase
+				.from("item_reviews")
+				.select("*", { count: "exact" })
+				.eq("item_id", animeID)
+				.limit(limit)
+				.lt("index", startAfterIndex)
+				.order("created_at", { ascending: false })
+				.throwOnError();
+			totalReviewsCount += count;
+			list = list.concat(data);
+		} else {
+			const { data, count } = await supabase
+				.from("item_reviews")
+				.select("*", { count: "exact" })
+				.eq("item_id", animeID)
+				.limit(limit)
+				.order("created_at", { ascending: false })
+				.throwOnError();
+			totalReviewsCount += count;
+			list = list.concat(data);
+		}
 	}
-	return list;
+	response.data = list;
+	response.count = totalReviewsCount;
+	return response;
 }
 
 export async function getRecentItems(type, profileID) {

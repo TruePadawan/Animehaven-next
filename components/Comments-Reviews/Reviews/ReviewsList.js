@@ -1,5 +1,12 @@
-import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
-import { Alert, Rating, TextareaAutosize } from "@mui/material";
+import {
+	Fragment,
+	useCallback,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+} from "react";
+import { Alert, Button, Rating, TextareaAutosize } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
 import ReviewItem from "./ReviewItem";
 import styles from "../Comments-Reviews.module.css";
@@ -7,7 +14,7 @@ import { supabase } from "../../../supabase/config";
 import ShareButton from "../../ShareButton/ShareButton";
 import {
 	getReviewByUser,
-	getReviewList,
+	getReviewsData,
 	numberToString,
 } from "../../../utilities/app-utilities";
 import ReviewsIcon from "@mui/icons-material/Reviews";
@@ -18,12 +25,14 @@ import ReviewsIcon from "@mui/icons-material/Reviews";
 // 		.throwOnError();
 // 	return reviews;
 // };
-
+const REVIEWS_PER_REQUESTS = 10;
 const ReviewsList = ({ profileID, animeID, triggerAlert }) => {
 	const [reviewText, setReviewText] = useState("");
 	const [reviewListData, setReviewListData] = useState([]);
 	const [rating, setRating] = useState(1);
 	const [disableAddReviewBtn, setDisableAddReviewBtn] = useState(false);
+	const [loadingReviews, setLoadingReviews] = useState(false);
+	const totalReviewsCount = useRef(0);
 
 	const handleError = useCallback(
 		(errorText, error) => {
@@ -34,9 +43,10 @@ const ReviewsList = ({ profileID, animeID, triggerAlert }) => {
 
 	useEffect(() => {
 		// IF USER IS SIGNED IN, CHECK IF USER HAS REVIEW THE ANIME AND SHOW THEIRS AT THE TOP
-		getReviewList(animeID, profileID)
-			.then((list) => {
-				setReviewListData(list);
+		getReviewsData(animeID, profileID)
+			.then(({ data, count }) => {
+				totalReviewsCount.current = count;
+				setReviewListData(data);
 			})
 			.catch((error) => {
 				handleError("Failed to retrieve reviews", error);
@@ -60,7 +70,7 @@ const ReviewsList = ({ profileID, animeID, triggerAlert }) => {
 				})
 				.throwOnError();
 
-			const list = await getReviewList(animeID, profileID);
+			const list = await getReviewsData(animeID, profileID);
 			setReviewListData(list);
 			onReviewAdded();
 		} catch (error) {
@@ -125,7 +135,29 @@ const ReviewsList = ({ profileID, animeID, triggerAlert }) => {
 		triggerAlert("Failed to Copy Link!", { severity: "warning" });
 	}
 
+	async function loadMoreReviewsClickHandler() {
+		setLoadingReviews(true);
+		const lastReviewIndex = reviewListData.at(-1).index;
+		try {
+			const { data } = await getReviewsData(
+				animeID,
+				REVIEWS_PER_REQUESTS,
+				lastReviewIndex
+			);
+			setReviewListData((snapshot) => {
+				return [...snapshot, ...data];
+			});
+		} catch (error) {
+			triggerAlert("Failed to load more reviews", {
+				severity: "error",
+				error,
+			});
+		}
+		setLoadingReviews(false);
+	}
+
 	const noReviews = reviewListData.length === 0;
+	const moreReviews = reviewListData.length < totalReviewsCount.current;
 	const reviewsCountText = numberToString(reviewListData.length, "Review");
 
 	const reviewList = useMemo(() => {
@@ -191,7 +223,22 @@ const ReviewsList = ({ profileID, animeID, triggerAlert }) => {
 				{noReviews && (
 					<div className="d-flex justify-content-center mt-4">No Reviews</div>
 				)}
-				{!noReviews && <ul className={styles.items}>{reviewList}</ul>}
+				{!noReviews && (
+					<Fragment>
+						<ul className={styles.items}>{reviewList}</ul>
+						{moreReviews && (
+							<Button
+								type="button"
+								aria-label="load more reviews"
+								variant="contained"
+								sx={{ backgroundColor: "dimgray" }}
+								disabled={loadingReviews}
+								onClick={loadMoreReviewsClickHandler}>
+								Load More Reviews
+							</Button>
+						)}
+					</Fragment>
+				)}
 			</div>
 		</div>
 	);
