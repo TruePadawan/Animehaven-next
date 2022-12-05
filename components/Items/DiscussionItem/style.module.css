@@ -18,8 +18,12 @@
     color: bisque;
 }
 
-.creator a:hover {
+.creator a {
     color: darkgray;
+}
+
+.creator a:hover {
+    text-decoration: underline;
 }
 
 .tag {
