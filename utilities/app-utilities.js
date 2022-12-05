@@ -49,15 +49,27 @@ export const LIST_GENRES = [
 
 export const DISCUSSION_TAGS = ["Chat", "Support"];
 
-export async function getCommentsData(instanceID) {
-	const { data } = await supabase
-		.from("comments")
-		.select()
-		.eq("instance_id", instanceID)
-		.limit(4)
-		.order("created_at", { ascending: false })
-		.throwOnError();
-	return data;
+export async function getCommentsData(instanceID, limit, index = null) {
+	let response;
+	if (index === null) {
+		response = await supabase
+			.from("comments")
+			.select("*", { count: "exact" })
+			.eq("instance_id", instanceID)
+			.limit(limit)
+			.order("created_at", { ascending: false })
+			.throwOnError();
+	} else {
+		response = await supabase
+			.from("comments")
+			.select("*", { count: "exact" })
+			.eq("instance_id", instanceID)
+			.lt("index", index)
+			.limit(limit)
+			.order("created_at", { ascending: false })
+			.throwOnError();
+	}
+	return response;
 }
 
 export async function getCommentData(commentID, fields = "*") {
