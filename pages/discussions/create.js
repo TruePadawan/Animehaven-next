@@ -105,6 +105,12 @@ export default function Create() {
 		});
 	}
 
+	const createBtnStyles = {
+		backgroundColor: "#1E1E1E",
+		"&:hover": {
+			backgroundColor: "#313131",
+		},
+	};
 	return (
 		<Fragment>
 			<Head>
@@ -155,7 +161,7 @@ export default function Create() {
 					<div className="mt-2 d-flex flex-column gap-2">
 						<Button
 							variant="contained"
-							className={styles["create-btn"]}
+							sx={createBtnStyles}
 							type="submit"
 							disabled={createBtnDisabled}>
 							Create

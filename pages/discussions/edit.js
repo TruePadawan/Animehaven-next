@@ -127,6 +127,13 @@ export default function Edit() {
 		});
 	}
 
+	const updateBtnStyles = {
+		backgroundColor: "#1E1E1E",
+		"&:hover": {
+			backgroundColor: "#313131",
+		},
+	};
+
 	return (
 		<Fragment>
 			<Head>
@@ -178,7 +185,7 @@ export default function Edit() {
 						<Button
 							variant="contained"
 							type="submit"
-							className={styles["create-btn"]}
+							sx={{updateBtnStyles}}
 							disabled={updateBtnDisabled}>
 							Update
 						</Button>

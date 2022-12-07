@@ -15,11 +15,3 @@
 .label {
     font-family: "Ubuntu", sans-serif;
 }
-
-.create-btn {
-    background-color: #1E1E1E;
-}
-
-.create-btn:hover {
-    background-color: #313131;
-}
