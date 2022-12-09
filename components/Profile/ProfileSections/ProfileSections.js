@@ -1,8 +1,8 @@
 import { PhotoCamera } from "@mui/icons-material";
 import { Masonry } from "@mui/lab";
-import { Box, IconButton, Modal } from "@mui/material";
+import { Alert, Box, IconButton, Modal, Snackbar } from "@mui/material";
 import Grid from "@mui/material/Grid";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import DiscussionItem from "../../../components/Items/DiscussionItem/DiscussionItem";
 import ListItem from "../../../components/Items/ListItem/ListItem";
 import RecommendedItem from "../../../components/Items/RecommendedItem/RecommendedItem";
@@ -11,15 +11,19 @@ import Loading from "../../../components/Loading/Loading";
 import { UserAuthContext } from "../../../context/UserAuthContext";
 import styles from "./ProfileSections.module.css";
 import {
+	defaultSnackbarState,
 	DEFAULT_AVATAR_URL,
 	getDiscussionByAccountName,
 	getUserItemRecommendations,
 	getUserItemReviews,
+	PROFILE_IMG_MAX_SIZE,
+	verifyProfileImage,
 } from "../../../utilities/app-utilities";
 import { getProfileID, getProfileData } from "../../../utilities/app-utilities";
 import { supabase } from "../../../supabase/config";
 import { useRouter } from "next/router";
 import Image from "next/image";
+import { Fragment } from "react";
 
 const ProfileSectionContainer = ({ title, children }) => {
 	return (
@@ -285,6 +289,28 @@ export function EditProfile({ open, closeDialog }) {
 	const currentAccountNameRef = useRef();
 	const shouldAvatarChange = useRef(false);
 	const avatarFile = useRef(null);
+	const [snackbarData, setSnackbarData] = useState(defaultSnackbarState);
+
+	const triggerAlert = useCallback((text, options) => {
+		const alertSeverity = options?.severity;
+		setSnackbarData({
+			open: true,
+			severity: alertSeverity || "info",
+			text:
+				alertSeverity === "error"
+					? `${text} - ${
+							options.error.message || options.error.error_description
+					  }`
+					: text,
+		});
+	}, []);
+
+	function resetSnackbar(event, reason) {
+		if (reason === "clickaway") {
+			return;
+		}
+		setSnackbarData(defaultSnackbarState);
+	}
 
 	useEffect(() => {
 		const loadAccountData = async () => {
@@ -325,7 +351,9 @@ export function EditProfile({ open, closeDialog }) {
 					.eq("account_name", accountName)
 					.then((db_result) => {
 						if (db_result.data.length !== 0) {
-							setFormInfo(`Account name '${accountName}' is already taken`);
+							triggerAlert(`Account name '${accountName}' is already taken`, {
+								severity: "warning",
+							});
 						} else {
 							setFormIsValid(true);
 						}
@@ -338,7 +366,6 @@ export function EditProfile({ open, closeDialog }) {
 	}, [profileData, open]);
 
 	const accountNameChangeHandler = (event) => {
-		setFormInfo("");
 		const value = event.target.value.replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
 		setProfileData((snapshot) => {
 			return { ...snapshot, accountName: value };
@@ -357,10 +384,6 @@ export function EditProfile({ open, closeDialog }) {
 		setProfileData((snapshot) => {
 			return { ...snapshot, bio: value };
 		});
-	};
-
-	const clearTempFile = () => {
-		supabase.storage.from("avatars").remove(`temp/${profileID}`);
 	};
 
 	// UPDATE ACCOUNT DATA
@@ -382,42 +405,53 @@ export function EditProfile({ open, closeDialog }) {
 					.from("avatars")
 					.getPublicUrl(`final/${profileID}`).data.publicUrl;
 				newData["avatar_url"] = avatarFileURL;
-				clearTempFile();
 			}
 			await supabase.from("profiles").update(newData).eq("id", profileID);
 			closeDialog();
 			router.replace(`/users/${accountName}`);
 			window.location.reload();
 		} else {
-			setFormInfo("Update process failed. No user signed in.");
+			triggerAlert("Update process failed. No user signed in", {
+				severity: "warning",
+			});
 		}
 	};
 
 	const updateUserPhoto = (e) => {
 		if (e.target.files.length > 0) {
 			setBtnDisabled({ save: true, cancel: false });
-			const imageFile = e.target.files[0];
-			supabase.storage
-				.from("avatars")
-				.upload(`temp/${profileID}`, imageFile, { upsert: true })
-				.then((data) => {
-					const tempImageURL = supabase.storage
-						.from("avatars")
-						.getPublicUrl(`temp/${profileID}`).data.publicUrl;
-					shouldAvatarChange.current = true;
-					avatarFile.current = imageFile;
-					setProfileData((snapshot) => {
-						return { ...snapshot, avatarURL: tempImageURL };
-					});
-					setBtnDisabled({ save: false, cancel: false });
-				});
-		}
-	};
 
-	const cancelUpdate = () => {
-		closeDialog();
-		if (shouldAvatarChange.current === true) {
-			clearTempFile();
+			// MAKE SURE FILE IS IMAGE AND HAS VALID DIMENSIONS
+			const selectedFile = e.target.files[0];
+			verifyProfileImage(selectedFile, (isValid) => {
+				if (isValid) {
+					const img = document.createElement("img");
+					img.addEventListener("load", () => {
+						const { width, height, src } = img;
+						if (width < 150 || height < 150) {
+							triggerAlert(
+								`Image must be at least 150x150 - Selected image dimensions are ${width}x${height}`,
+								{
+									severity: "warning",
+								}
+							);
+						} else {
+							setProfileData((snapshot) => {
+								return { ...snapshot, avatarURL: src };
+							});
+							shouldAvatarChange.current = true;
+							avatarFile.current = selectedFile;
+							setBtnDisabled({ save: false, cancel: false });
+						}
+					});
+
+					img.src = URL.createObjectURL(selectedFile);
+				} else {
+					triggerAlert("Invalid file! File must be an image of size <= 1MB", {
+						severity: "warning",
+					});
+				}
+			});
 		}
 	};
 
@@ -438,100 +472,121 @@ export function EditProfile({ open, closeDialog }) {
 		transform: "translate(-50%, -50%)",
 	};
 
+	const alertAnchorOrigin = {
+		vertical: "top",
+		horizontal: "center",
+	};
+
 	const { accountName, avatarURL, displayName, bio } = profileData;
 	return (
-		<Modal open={open}>
-			<Box sx={style}>
-				{!loading && (
-					<form className={styles.editProfileForm} onSubmit={formSubmitHandler}>
-						<div className="d-flex gap-3 align-items-center">
-							<label className={styles.formLabel} htmlFor="acct_name">
-								<span>Update profile picture</span>
-								<span
-									className="d-block text-center"
-									style={{ fontSize: "small" }}>
-									{"<2MB"}
-								</span>
-							</label>
-							<span className={styles.updateProfilePic}>
-								<Image
-									src={avatarURL}
-									alt={accountName}
-									width={100}
-									height={100}
-									quality={100}
-								/>
-								<IconButton
-									aria-label="upload picture"
-									sx={uploadBtnStyle}
-									component="label">
-									<input
-										hidden
-										accept="image/*"
-										type="file"
-										onChange={updateUserPhoto}
+		<Fragment>
+			<Modal open={open}>
+				<Box sx={style}>
+					{!loading && (
+						<form
+							className={styles.editProfileForm}
+							onSubmit={formSubmitHandler}>
+							<div className="d-flex gap-3 align-items-center">
+								<label className={styles.formLabel} htmlFor="acct_name">
+									<span>Update profile picture</span>
+									<span
+										className="d-block text-center"
+										style={{ fontSize: "small" }}>
+										{"<=1MB"}
+									</span>
+								</label>
+								<span className={styles.updateProfilePic}>
+									<Image
+										src={avatarURL}
+										alt={accountName}
+										width={100}
+										height={100}
+										quality={100}
 									/>
-									<PhotoCamera />
-								</IconButton>
+									<IconButton
+										aria-label="upload picture"
+										sx={uploadBtnStyle}
+										component="label">
+										<input
+											hidden
+											accept="image/*"
+											type="file"
+											onChange={updateUserPhoto}
+										/>
+										<PhotoCamera />
+									</IconButton>
+								</span>
+							</div>
+							<div className="d-flex gap-3 justify-content-between align-items-center">
+								<label className={styles.formLabel} htmlFor="acct_name">
+									Account name
+								</label>
+								<input
+									id="acct_name"
+									value={accountName}
+									onChange={accountNameChangeHandler}
+									spellCheck={false}
+									minLength={3}
+									required
+								/>
+							</div>
+							<div className="d-flex gap-3 justify-content-between align-items-center">
+								<label className={styles.formLabel} htmlFor="d_name">
+									Display name
+								</label>
+								<input
+									id="d_name"
+									value={displayName}
+									onChange={displayNameChangeHandler}
+									spellCheck={false}
+									minLength={3}
+									required
+								/>
+							</div>
+							<div className="d-flex gap-3 justify-content-between align-items-center">
+								<label className={styles.formLabel} htmlFor="bio">
+									Bio
+								</label>
+								<textarea
+									id="bio"
+									value={bio}
+									onChange={bioChangeHandler}
+									spellCheck={false}
+								/>
+							</div>
+							<small className="text-info">{formInfo}</small>
+							<span className="align-self-end d-flex gap-2">
+								<button
+									type="submit"
+									className={styles.editFormBtn}
+									disabled={!formIsValid || btnDisabled.save}>
+									Save
+								</button>
+								<button
+									type="button"
+									onClick={closeDialog}
+									className={styles.editFormBtn}
+									disabled={btnDisabled.cancel}>
+									Cancel
+								</button>
 							</span>
-						</div>
-						<div className="d-flex gap-3 justify-content-between align-items-center">
-							<label className={styles.formLabel} htmlFor="acct_name">
-								Account name
-							</label>
-							<input
-								id="acct_name"
-								value={accountName}
-								onChange={accountNameChangeHandler}
-								spellCheck={false}
-								minLength={3}
-								required
-							/>
-						</div>
-						<div className="d-flex gap-3 justify-content-between align-items-center">
-							<label className={styles.formLabel} htmlFor="d_name">
-								Display name
-							</label>
-							<input
-								id="d_name"
-								value={displayName}
-								onChange={displayNameChangeHandler}
-								spellCheck={false}
-								minLength={3}
-								required
-							/>
-						</div>
-						<div className="d-flex gap-3 justify-content-between align-items-center">
-							<label className={styles.formLabel} htmlFor="bio">
-								Bio
-							</label>
-							<textarea
-								id="bio"
-								value={bio}
-								onChange={bioChangeHandler}
-								spellCheck={false}
-							/>
-						</div>
-						<small className="text-info">{formInfo}</small>
-						<span className="align-self-end d-flex gap-2">
-							<button
-								type="submit"
-								className={styles.editFormBtn}
-								disabled={!formIsValid || btnDisabled.save}>
-								Save
-							</button>
-							<button
-								type="button"
-								onClick={cancelUpdate}
-								className={styles.editFormBtn}
-								disabled={btnDisabled.cancel}>
-								Cancel
-							</button>
-						</span>
-					</form>
-				)}
-				{loading && <Loading />}
-			</Box>
-		</Modal>
+						</form>
+					)}
+					{loading && <Loading />}
+				</Box>
+			</Modal>
+			<Snackbar
+				open={snackbarData.open}
+				autoHideDuration={6000}
+				onClose={resetSnackbar}
+				anchorOrigin={alertAnchorOrigin}>
+				<Alert
+					severity={snackbarData.severity}
+					sx={{ width: "100%" }}
+					onClose={resetSnackbar}>
+					{snackbarData.text}
+				</Alert>
+			</Snackbar>
+		</Fragment>
 	);
 }
