@@ -3,13 +3,13 @@ import { useEffect, useState } from "react";
 const useInput = (validate, customTransformation = null) => {
 	const [inputValue, setInputValue] = useState("");
 	const [inputIsValid, setInputIsValid] = useState(false);
-    const [inputHasError, setInputHasError] = useState(false);
+	const [inputHasError, setInputHasError] = useState(false);
 	const [checkingValidity, setCheckingValidity] = useState(false);
-    const [inputWasTouched, setInputWasTouched] = useState(false);
+	const [inputWasTouched, setInputWasTouched] = useState(false);
 
 	useEffect(() => {
-        setInputIsValid(false);
-        setCheckingValidity(true);
+		setInputIsValid(false);
+		setCheckingValidity(true);
 		const timeoutID = setTimeout(() => {
 			validate(inputValue)
 				.then((isValid) => {
@@ -19,21 +19,20 @@ const useInput = (validate, customTransformation = null) => {
 					setInputIsValid(isValid);
 					setCheckingValidity(false);
 				})
-				.catch((reason) => {
-					console.log(reason);
+				.catch(() => {
 					setCheckingValidity(false);
 				});
 		}, 600);
 		return () => clearTimeout(timeoutID);
 	}, [inputValue, validate]);
 
-    useEffect(() => {
-        if (!inputIsValid && inputWasTouched && !checkingValidity) {
-            setInputHasError(true);
-        } else if (inputIsValid && inputWasTouched && !checkingValidity) {
-            setInputHasError(false);
-        }
-    }, [inputIsValid, inputWasTouched, checkingValidity]);
+	useEffect(() => {
+		if (!inputIsValid && inputWasTouched && !checkingValidity) {
+			setInputHasError(true);
+		} else if (inputIsValid && inputWasTouched && !checkingValidity) {
+			setInputHasError(false);
+		}
+	}, [inputIsValid, inputWasTouched, checkingValidity]);
 
 	const inputChangeHandler = (event) => {
 		if (customTransformation === null) {
@@ -43,24 +42,24 @@ const useInput = (validate, customTransformation = null) => {
 		}
 	};
 
-    const inputOnBlurHandler = (event) => {
-        setInputWasTouched(true);
-    }
+	const inputOnBlurHandler = (event) => {
+		setInputWasTouched(true);
+	};
 
-    const resetInput = () => {
-        setInputValue("");
-        setInputHasError(false);
-        setInputWasTouched(false);
-    };
+	const resetInput = () => {
+		setInputValue("");
+		setInputHasError(false);
+		setInputWasTouched(false);
+	};
 
 	return {
 		value: inputValue,
 		isValid: inputIsValid,
-        hasError: inputHasError,
+		hasError: inputHasError,
 		changeHandler: inputChangeHandler,
-        blurHandler: inputOnBlurHandler,
+		blurHandler: inputOnBlurHandler,
 		checkingValidity,
-        resetInput
+		resetInput,
 	};
 };
 

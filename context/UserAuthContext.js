@@ -60,9 +60,7 @@ export const UserAuthContextProvider = ({ children }) => {
 				}
 			}
 		} catch (error) {
-			console.error(error);
-			console.log("auth", error.error_description || error.message);
-			return;
+			alert(`Authentication failed! - ${error.message}`);
 		}
 	};
 
