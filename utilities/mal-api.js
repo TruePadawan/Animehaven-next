@@ -24,21 +24,6 @@ const isFlagged = (item, type) => {
 	return hasNoImage || hasWrongType || hasNoDescription || notSFW;
 };
 
-// RETURN A RANDOM MANGA FROM MYANIMELIST THAT ISN'T HENTAI
-export const getRandomManga = async () => {
-	try {
-		let response = await fetch("https://api.jikan.moe/v4/random/manga");
-		let manga = await (await response.json()).data;
-		while (isFlagged(manga, "manga")) {
-			response = await fetch("https://api.jikan.moe/v4/random/manga");
-			manga = await (await response.json()).data;
-		}
-		return manga;
-	} catch (err) {
-		console.log(`Error : ${err} - getRandomManga`);
-	}
-};
-
 export const getRandomAnime = async () => {
 	const URL = "https://api.jikan.moe/v4/random/anime";
 	let response = await fetch(URL);
