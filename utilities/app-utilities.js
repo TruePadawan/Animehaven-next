@@ -1,6 +1,26 @@
 import { supabase } from "../supabase/config";
+import { filetypemime } from "magic-bytes.js";
 
 export const APP_LOGO_URL = "https://i.imgur.com/joo9Qy4.jpg";
+export const PROFILE_IMG_MAX_SIZE = Math.pow(10, 6);
+export const defaultSnackbarState = { open: false, severity: "info", text: "" };
+export const LIST_GENRES = [
+	"Action",
+	"Adventure",
+	"Comedy",
+	"Drama",
+	"Ecchi",
+	"Horror",
+	"Sports",
+	"Supernatural",
+	"Romance",
+	"Suspense",
+	"Fantasy",
+	"Slice of Life",
+	"Sci-Fi",
+	"Boys Love",
+];
+export const DISCUSSION_TAGS = ["Chat", "Support"];
 
 export function getUsefulData(rawAnimeData) {
 	const id = rawAnimeData["mal_id"];
@@ -31,25 +51,6 @@ export function createProfile(accountData) {
 
 export const DEFAULT_AVATAR_URL =
 	"https://bkpyhkkjvgzfjojacrka.supabase.co/storage/v1/object/public/avatars/noprofilepic.jpg";
-
-export const LIST_GENRES = [
-	"Action",
-	"Adventure",
-	"Comedy",
-	"Drama",
-	"Ecchi",
-	"Horror",
-	"Sports",
-	"Supernatural",
-	"Romance",
-	"Suspense",
-	"Fantasy",
-	"Slice of Life",
-	"Sci-Fi",
-	"Boys Love",
-];
-
-export const DISCUSSION_TAGS = ["Chat", "Support"];
 
 export async function getCommentsData(
 	instanceID,
@@ -472,5 +473,25 @@ export async function setRecentItem(type, profileID, item) {
 		} catch (error) {
 			throw new Error(`Failed to update recent items - ${type}`);
 		}
+	}
+}
+
+export function verifyProfileImage(file, onVerificationComplete) {
+	let isValidSize = file.size <= PROFILE_IMG_MAX_SIZE;
+	if (isValidSize) {
+		// CONFIRM FILE IS AN IMAGE
+		const fileReader = new FileReader();
+		fileReader.addEventListener("loadend", (event) => {
+			const bytes = new Uint8Array(event.target.result);
+			const fileType = filetypemime(bytes);
+			let isValid = false;
+			if (fileType.length > 0) {
+				isValid = fileType.at(0).split("/").at(0) === "image";
+			}
+			onVerificationComplete(isValid);
+		});
+		fileReader.readAsArrayBuffer(file);
+	} else {
+		onVerificationComplete(false);
 	}
 }
