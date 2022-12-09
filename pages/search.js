@@ -11,9 +11,8 @@ import { Alert, Box, Snackbar } from "@mui/material";
 import { supabase } from "../supabase/config";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import { getUsefulData } from "../utilities/app-utilities";
+import { defaultSnackbarState, getUsefulData } from "../utilities/app-utilities";
 
-const defaultSnackbarState = { open: false, severity: "info", text: "" };
 export default function Search() {
 	const [searchResult, setSearchResult] = useState([]);
 	const [loading, setLoading] = useState(false);

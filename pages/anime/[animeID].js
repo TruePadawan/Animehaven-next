@@ -6,6 +6,7 @@ import { getAnimeByID } from "../../utilities/mal-api";
 import { UserAuthContext } from "../../context/UserAuthContext";
 import Select from "../../components/Select/Select";
 import {
+	defaultSnackbarState,
 	getUsefulData,
 	getUserItemRecommendations,
 	setRecentItem,
@@ -82,8 +83,6 @@ const transformAnimeData = (data) => {
 		},
 	};
 };
-
-const defaultSnackbarState = { open: false, severity: "info", text: "" };
 
 const AnimeDetails = () => {
 	const { profileID } = useContext(UserAuthContext);

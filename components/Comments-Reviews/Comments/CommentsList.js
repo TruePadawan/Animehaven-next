@@ -13,6 +13,7 @@ import styles from "../Comments-Reviews.module.css";
 import { Alert, Button, Snackbar } from "@mui/material";
 import { supabase } from "../../../supabase/config";
 import {
+	defaultSnackbarState,
 	getCommentsData,
 	numberToString,
 } from "../../../utilities/app-utilities";
@@ -20,7 +21,6 @@ import { UserAuthContext } from "../../../context/UserAuthContext";
 import CommentIcon from "@mui/icons-material/Comment";
 import ShareButton from "../../ShareButton/ShareButton";
 
-const defaultSnackbarState = { open: false, severity: "info", text: "" };
 const COMMENTS_PER_REQUEST = 10;
 const CommentsList = ({ id, className = "" }) => {
 	const { profileID } = useContext(UserAuthContext);

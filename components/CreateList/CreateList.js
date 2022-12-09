@@ -24,10 +24,9 @@ import SearchInput from "../Input/SearchInput/SearchInput";
 import Loading from "../Loading/Loading";
 import styles from "./style.module.css";
 import { supabase } from "../../supabase/config";
-import { getUsefulData, LIST_GENRES } from "../../utilities/app-utilities";
+import { defaultSnackbarState, getUsefulData, LIST_GENRES } from "../../utilities/app-utilities";
 import { useRouter } from "next/router";
 
-const defaultSnackbarState = { open: false, severity: "info", text: "" };
 const CreateList = (props) => {
 	const [visibility, setVisibility] = useState(() => {
 		if (props.update === true) {
