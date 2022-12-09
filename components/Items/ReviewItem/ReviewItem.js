@@ -7,7 +7,7 @@ import {
 	Skeleton,
 	Typography,
 } from "@mui/material";
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { getAnimeByID } from "../../../utilities/mal-api";
 import { getUsefulData } from "../../../utilities/app-utilities";
 import Link from "next/link";
@@ -56,7 +56,7 @@ export default function ReviewItem({ itemID, creatorID, index }) {
 		<Grid item xs={12} sm={6} md={6} lg={4} xl={3}>
 			<div className={styles.item}>
 				{loading && (
-					<>
+					<Fragment>
 						<Skeleton variant="rounded" width={90} height={100} />
 						<div
 							className={`d-flex flex-column justify-content-between flex-grow-1`}>
@@ -69,11 +69,17 @@ export default function ReviewItem({ itemID, creatorID, index }) {
 								size="small"
 							/>
 						</div>
-					</>
+					</Fragment>
 				)}
 				{!loading && (
-					<>
-						<Image src={itemData.photoSrc} alt={itemData.title} width={120} height={120} quality={100} />
+					<Fragment>
+						<img
+							src={itemData.photoSrc}
+							alt={itemData.title}
+							width={90}
+							height={100}
+							loading="lazy"
+						/>
 						<div className={`d-flex flex-column flex-grow-1`}>
 							<div className="d-flex justify-content-between flex-wrap">
 								<Link
@@ -99,11 +105,15 @@ export default function ReviewItem({ itemID, creatorID, index }) {
 							onClose={closeModal}
 							aria-labelledby="modal-title">
 							<Box className={styles.review}>
-								<Typography id="modal-title" variant="h6" component="h2">Review</Typography>
-								<Typography sx={{ mt: 2, whiteSpace: "pre-line" }}>{itemData.review}</Typography>
+								<Typography id="modal-title" variant="h6" component="h2">
+									Review
+								</Typography>
+								<Typography sx={{ mt: 2, whiteSpace: "pre-line" }}>
+									{itemData.review}
+								</Typography>
 							</Box>
 						</Modal>
-					</>
+					</Fragment>
 				)}
 			</div>
 		</Grid>

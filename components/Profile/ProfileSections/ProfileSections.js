@@ -62,11 +62,7 @@ export function UserDiscussions({ accountName }) {
 	return (
 		<ProfileSectionContainer title="Discussions">
 			{loading && <Loading />}
-			{!loading && (
-				<ul className={styles.discussions}>
-					{items}
-				</ul>
-			)}
+			{!loading && <ul className={styles.discussions}>{items}</ul>}
 		</ProfileSectionContainer>
 	);
 }
@@ -450,7 +446,12 @@ export function EditProfile({ open, closeDialog }) {
 					<form className={styles.editProfileForm} onSubmit={formSubmitHandler}>
 						<div className="d-flex gap-3 align-items-center">
 							<label className={styles.formLabel} htmlFor="acct_name">
-								Update profile picture
+								<span>Update profile picture</span>
+								<span
+									className="d-block text-center"
+									style={{ fontSize: "small" }}>
+									{"<2MB"}
+								</span>
 							</label>
 							<span className={styles.updateProfilePic}>
 								<Image

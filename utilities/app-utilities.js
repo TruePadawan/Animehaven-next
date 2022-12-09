@@ -1,5 +1,7 @@
 import { supabase } from "../supabase/config";
 
+export const APP_LOGO_URL = "https://i.imgur.com/joo9Qy4.jpg";
+
 export function getUsefulData(rawAnimeData) {
 	const id = rawAnimeData["mal_id"];
 	let title = rawAnimeData.title;
@@ -8,7 +10,7 @@ export function getUsefulData(rawAnimeData) {
 			title = lang["title"];
 		}
 	});
-	const imageURL = rawAnimeData.images.jpg["large_image_url"];
+	let imageURL = rawAnimeData.images.webp["image_url"];
 	const type = rawAnimeData.type;
 	const score = rawAnimeData.score;
 	const genres = rawAnimeData.genres;

@@ -19,7 +19,6 @@ import Error from "../../components/Error/Error";
 import { getProfileData } from "../../utilities/app-utilities";
 import Head from "next/head";
 import { supabase } from "../../supabase/config";
-import Image from "next/image";
 import { useRouter } from "next/router";
 
 const ExtraInfo = (props) => {
@@ -351,12 +350,7 @@ const AnimeDetails = () => {
 			</Box>
 			<div className="d-flex flex-column gap-1 align-items-center">
 				<span className={styles.photo}>
-					<Image
-						src={info.photoURL}
-						alt={info.title}
-						width={200}
-						height={300}
-					/>
+					<img src={info.photoURL} alt={info.title} />
 				</span>
 				{profileID && (
 					<span className="d-flex gap-2">

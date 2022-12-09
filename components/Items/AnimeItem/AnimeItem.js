@@ -45,12 +45,16 @@ const AnimeItem = (props) => {
 				<Fragment>
 					<li onMouseEnter={openPopper} onMouseLeave={handleMouseLeave}>
 						<Link href={`/anime/${props.id}`} className={styles["anime-item"]}>
-							<Image
-								src={props.image}
-								alt={props.title}
-								width={204}
-								height={300}
-							/>
+							{props.optimize ? (
+								<Image
+									src={props.image}
+									alt={props.title}
+									width={204}
+									height={300}
+								/>
+							) : (
+								<img src={props.image} alt={props.title} loading="lazy" />
+							)}
 							<span className={styles.title}>{props.title}</span>
 						</Link>
 					</li>
@@ -65,6 +69,7 @@ const AnimeItem = (props) => {
 							genres={props.genres}
 							anchorEl={anchorEl}
 							onClose={closePopper}
+							optimize={props.optimize}
 						/>
 					)}
 				</Fragment>

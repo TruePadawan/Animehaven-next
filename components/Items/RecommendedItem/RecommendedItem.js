@@ -4,7 +4,6 @@ import { getAnimeByID } from "../../../utilities/mal-api";
 import { getUsefulData } from "../../../utilities/app-utilities";
 import Link from "next/link";
 import styles from "./style.module.css";
-import Image from "next/image";
 
 const RecommendedItem = ({ itemID, index }) => {
   const [loading, setLoading] = useState(true);
@@ -37,7 +36,7 @@ const RecommendedItem = ({ itemID, index }) => {
         )}
         {!loading && (
           <div className={styles.item}>
-            <Image src={itemData.photoSrc} alt={itemData.title} width={120} height={170} quality={100} />
+            <img src={itemData.photoSrc} alt={itemData.title} width={120} height={170} loading="lazy" />
             <span className={styles.title} title={itemData.title}>
               <Link href={`/anime/${itemID}`}>{itemData.title}</Link>
             </span>

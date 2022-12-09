@@ -156,8 +156,8 @@ export default function ProfileLayout(props) {
 									src={avatar_url}
 									alt="profile pic"
 									className={styles.photo}
-									width={200}
-									height={200}
+									width={150}
+									height={150}
 									quality={100}
 								/>
 								<div className="d-flex flex-column align-items-center">

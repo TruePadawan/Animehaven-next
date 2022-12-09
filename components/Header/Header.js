@@ -2,10 +2,9 @@ import { Box, Tab, Tabs, useMediaQuery } from "@mui/material";
 import styles from "./header.module.css";
 import { useRouter } from "next/router";
 import Authentication from "./components/Authentication/Authentication";
-import HeaderLogo from "../../assets/logo.png";
-import Image from "next/image";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { APP_LOGO_URL } from "../../utilities/app-utilities";
 
 const NavTab = ({ children, ...props }) => {
 	const tabStyles = {
@@ -47,8 +46,8 @@ const Header = () => {
 	};
 
 	const headerContent = matchesSmallDevice ? (
-		<Image
-			src={HeaderLogo}
+		<img
+			src={APP_LOGO_URL}
 			alt="animehaven"
 			width={50}
 			height={50}
@@ -107,12 +106,8 @@ const Header = () => {
 					{isAtAnimeDetailsPage && (
 						<NavTab href={router.query.animeID || ""}>Anime</NavTab>
 					)}
-					{isAtSignupPage && (
-						<NavTab href={"/signup"}>Sign Up</NavTab>
-					)}
-					{isAtSigninPage && (
-						<NavTab href={"/signin"}>Sign In</NavTab>
-					)}
+					{isAtSignupPage && <NavTab href={"/signup"}>Sign Up</NavTab>}
+					{isAtSigninPage && <NavTab href={"/signin"}>Sign In</NavTab>}
 				</Tabs>
 			</Box>
 		</header>

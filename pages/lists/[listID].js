@@ -18,7 +18,6 @@ import {
 import { getAnimeByID } from "../../utilities/mal-api";
 import { UserAuthContext } from "../../context/UserAuthContext";
 import { useRouter } from "next/router";
-import Image from "next/image";
 
 const Item = ({ itemID, itemTitle, index }) => {
 	const [loading, setLoading] = useState(true);
@@ -61,7 +60,7 @@ const Item = ({ itemID, itemTitle, index }) => {
 			)}
 			{!loading && (
 				<Fragment>
-					<Image src={imageURL} alt={title} width={90} height={112} />
+					<img src={imageURL} alt={title} loading="lazy" />
 					<div className="d-flex flex-column h-100" style={{ minWidth: "0" }}>
 						<Link href={`/anime/${itemID}`} className={styles["item-title"]}>
 							{title}

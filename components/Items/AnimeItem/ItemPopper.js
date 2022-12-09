@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Fragment } from "react";
 import { v4 as uuid } from "uuid";
-import StarIcon from '@mui/icons-material/Star';
+import StarIcon from "@mui/icons-material/Star";
 import styles from "./style.module.css";
 
 const ItemPopper = (props) => {
@@ -41,13 +41,23 @@ const ItemPopper = (props) => {
 				className={styles.popover}
 				onMouseLeave={props.onClose}
 				href={`/anime/${props.id}`}>
-				<Image
-					src={props.image}
-					alt={props.title}
-					className={styles.popoverItemImg}
-					width={200}
-					height={300}
-				/>
+				{props.optimize ? (
+					<Image
+						src={props.image}
+						alt={props.title}
+						className={styles.popoverItemImg}
+						width={200}
+						height={300}
+					/>
+				) : (
+					<img
+						className={styles.popoverItemImg}
+						src={props.image}
+						alt={props.title}
+						loading="lazy"
+					/>
+				)}
+
 				<div className="d-flex flex-column align-self-stretch gap-1">
 					<span className={styles.title}>{props.title}</span>
 					<div className="d-flex justify-content-between">

@@ -11,6 +11,7 @@ import { Alert, Box, Snackbar } from "@mui/material";
 import { supabase } from "../supabase/config";
 import Head from "next/head";
 import { useRouter } from "next/router";
+import { getUsefulData } from "../utilities/app-utilities";
 
 const defaultSnackbarState = { open: false, severity: "info", text: "" };
 export default function Search() {
@@ -29,16 +30,13 @@ export default function Search() {
 			searchAnime(searchText)
 				.then((data) => {
 					const list = data.map((anime) => {
-						const ID = anime["mal_id"];
-						let title = anime.title;
-						if (anime["title_english"] !== null) title = anime["title_english"];
-						const photoURL = anime.images.jpg["large_image_url"];
+						const { id, title, imageURL } = getUsefulData(anime);
 						return (
 							<SearchResultItem
-								key={ID}
-								itemID={ID}
+								key={id}
+								itemID={id}
 								title={title}
-								photoURL={photoURL}
+								photoURL={imageURL}
 								type="item"
 							/>
 						);
