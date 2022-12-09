@@ -7,7 +7,6 @@ import { EditProfile } from "./ProfileSections/ProfileSections";
 import { getProfileData, getProfileID } from "../../utilities/app-utilities";
 import { UserAuthContext } from "../../context/UserAuthContext";
 import styles from "./profile-layout.module.css";
-import Image from "next/image";
 import Loading from "../Loading/Loading";
 import NoAccount from "../NoAccount/NoAccount";
 
@@ -152,13 +151,12 @@ export default function ProfileLayout(props) {
 						{!matchesSmallDevice && sidebar}
 						<main className="d-flex flex-column flex-grow-1 p-2 mw-100">
 							<div className="d-flex flex-column align-items-center gap-1 p-4 text-white">
-								<Image
+								<img
 									src={avatar_url}
 									alt="profile pic"
 									className={styles.photo}
 									width={150}
 									height={150}
-									quality={100}
 								/>
 								<div className="d-flex flex-column align-items-center">
 									<span className="fs-4">{display_name}</span>
