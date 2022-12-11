@@ -62,8 +62,8 @@ const UserAccountBtn = ({ profileID, errorHandler }) => {
 								style={{ objectFit: "contain" }}
 								src={photoSrc}
 								alt={accountName}
-								width={100}
-								height={100}
+								width={40}
+								height={40}
 								quality={100}
 								title="Account"
 							/>

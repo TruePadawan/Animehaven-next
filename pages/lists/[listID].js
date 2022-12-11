@@ -185,8 +185,9 @@ const List = () => {
 					<h2 className={styles.title}>{title}</h2>
 					{editAllowed && (
 						<IconButton
-							title="Edit"
-							sx={{ color: "whitesmoke" }}
+							aria-label="Edit list"
+							title="Edit list"
+							sx={{ color: "lightblue" }}
 							onClick={openCreateListDialog}>
 							<EditIcon />
 						</IconButton>

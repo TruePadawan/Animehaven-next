@@ -1,4 +1,4 @@
-import { Button } from "@mui/material";
+import { Button, IconButton } from "@mui/material";
 import { Fragment, useContext, useEffect, useState } from "react";
 import Link from "next/link";
 import Head from "next/head";
@@ -14,6 +14,7 @@ import {
 } from "../../utilities/app-utilities";
 import { UserAuthContext } from "../../context/UserAuthContext";
 import { useRouter } from "next/router";
+import EditIcon from "@mui/icons-material/Edit";
 
 const initialErrorState = { occurred: false, text: "" };
 const Discussion = () => {
@@ -116,21 +117,22 @@ const Discussion = () => {
 				<meta name="twitter:description" content={body} />
 			</Head>
 			<div id="discussion-body" className="d-flex flex-column">
-				<div className="d-flex justify-content-between align-items-center">
-					<span className={styles.creator}>
-						Created by <Link href={`/users/${creator}`}>{creator}</Link>
-					</span>
+				<span className={styles.creator}>
+					Created by <Link href={`/users/${creator}`}>{creator}</Link>
+				</span>
+				<div className="d-flex gap-2 align-items-center">
+					<h2 className={styles.title}>{title}</h2>
 					{editAllowed && (
-						<Button
+						<IconButton
+							aria-label="Edit discussion"
+							title="Edit discussion"
 							type="button"
-							variant="text"
-							sx={{ fontWeight: "bold", color: "antiquewhite" }}
+							sx={{ color: "lightblue" }}
 							onClick={editButtonClickHandler}>
-							Edit
-						</Button>
+							<EditIcon />
+						</IconButton>
 					)}
 				</div>
-				<h2 className={styles.title}>{title}</h2>
 				<p className={styles.body}>{body}</p>
 			</div>
 			<CommentsList

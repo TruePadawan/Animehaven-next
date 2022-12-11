@@ -3,21 +3,24 @@
 }
 
 .title {
+    margin: 0;
     font-family: 'Ubuntu', sans-serif;
 }
 
 .creator {
-    color: antiquewhite;
     width: max-content;
-    font-family: 'Roboto', sans-serif;
+    font-family: 'Baloo Tamma 2', cursive;
+    font-size: 14px;
+    color: #B5B5B5;
 }
 
 .creator a {
-    color: #a37e5c;
+    font-weight: 500;
+    color: #80884E;
 }
 
 .creator a:hover {
-    text-decoration: underline;
+    color: #9da75f;
 }
 
 .body {
