@@ -36,6 +36,7 @@ const EditCommentItem = (props) => {
 		<form onSubmit={formSubmitHandler} className="d-flex flex-column">
 			<TextareaAutosize
 				aria-label="Edit Comment"
+				title="Edit Comment"
 				className={styles.inputfield}
 				defaultValue={commentText}
 				onChange={changeHandler}

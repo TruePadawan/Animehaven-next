@@ -19,7 +19,3 @@
     align-self: stretch;
     border: none;
 }
-
-.searchCategory:focus {
-    outline: none;
-}

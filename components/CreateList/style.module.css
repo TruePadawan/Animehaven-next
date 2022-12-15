@@ -5,7 +5,8 @@
     gap: 1rem;
 }
 
-.createListForm, .addItems {
+.createListForm,
+.addItems {
     flex: 1;
     min-width: 300px;
     display: flex;
@@ -33,6 +34,7 @@
 
 .descfield:focus {
     outline: none;
+    border-color: black;
 }
 
 .divider {

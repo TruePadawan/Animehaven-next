@@ -32,7 +32,8 @@ export default function MoreOptions(props) {
 	return (
 		<Fragment>
 			<IconButton
-				aria-label="more"
+				aria-label="More"
+				title="More"
 				id="more-options-btn"
 				aria-controls={menuOpen ? "more-options-menu" : undefined}
 				aria-expanded={menuOpen ? "true" : undefined}

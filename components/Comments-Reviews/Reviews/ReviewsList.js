@@ -192,8 +192,9 @@ const ReviewsList = ({ profileID, animeID, triggerAlert }) => {
 					/>
 					<form className={styles.interface} onSubmit={formSubmitHandler}>
 						<TextareaAutosize
-							className={styles.inputfield}
+							aria-label="Review"
 							title="Review"
+							className={styles.inputfield}
 							value={reviewText}
 							onChange={textAreaChangeHandler}
 							spellCheck={false}
@@ -201,6 +202,7 @@ const ReviewsList = ({ profileID, animeID, triggerAlert }) => {
 						/>
 						<button
 							type="submit"
+							aria-label="Send"
 							title="Send"
 							className={styles.sendBtn}
 							disabled={disableAddReviewBtn}>
@@ -229,7 +231,6 @@ const ReviewsList = ({ profileID, animeID, triggerAlert }) => {
 						{moreReviews && (
 							<Button
 								type="button"
-								aria-label="load more reviews"
 								variant="contained"
 								sx={{ backgroundColor: "dimgray" }}
 								disabled={loadingReviews}

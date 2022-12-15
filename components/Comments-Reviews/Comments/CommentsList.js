@@ -229,7 +229,6 @@ const CommentsList = ({ id, className = "" }) => {
 						{moreComments && (
 							<Button
 								type="button"
-								aria-label="load more comments"
 								variant="contained"
 								sx={{ backgroundColor: "dimgray" }}
 								disabled={loadingComments}

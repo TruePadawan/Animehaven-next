@@ -288,8 +288,8 @@ const CommentItem = (props) => {
 								<div className="d-flex justify-content-end gap-2">
 									<span className={styles.upvote}>
 										<IconButton
-											aria-label="upvote"
-											title="upvote"
+											aria-label="Upvote"
+											title="Upvote"
 											size="small"
 											type="button"
 											onClick={handleUpvote}

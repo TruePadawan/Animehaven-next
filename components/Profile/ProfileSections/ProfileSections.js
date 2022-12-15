@@ -505,6 +505,7 @@ export function EditProfile({ open, closeDialog }) {
 									/>
 									<IconButton
 										aria-label="upload picture"
+										title="upload picture"
 										sx={uploadBtnStyle}
 										component="label">
 										<input

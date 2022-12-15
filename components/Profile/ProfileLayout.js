@@ -131,6 +131,7 @@ export default function ProfileLayout(props) {
 							<Fragment>
 								<IconButton
 									aria-label="Toggle Sidebar"
+									title="Toggle Sidebar"
 									sx={{ position: "absolute" }}
 									className={styles["toggle-sidebar-btn"]}
 									type="button"

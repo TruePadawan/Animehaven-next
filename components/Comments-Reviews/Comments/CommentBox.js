@@ -51,7 +51,9 @@ const CommentBox = (props) => {
 	const formSubmitHandler = async (event) => {
 		event.preventDefault();
 		if (commentText.trim().length === 0) {
-			props.triggerAlert("Comment must have 1 or more characters", { severity: "warning" });
+			props.triggerAlert("Comment must have 1 or more characters", {
+				severity: "warning",
+			});
 			setCommentText("");
 			return;
 		}
@@ -98,21 +100,30 @@ const CommentBox = (props) => {
 								@{referencedCommentAccountName}
 							</Link>
 						</Typography>
-						<IconButton size="small" type="button" sx={{ padding: "0" }} onClick={props.cancelReply}>
+						<IconButton
+							size="small"
+							type="button"
+							sx={{ padding: "0" }}
+							onClick={props.cancelReply}>
 							<CancelIcon sx={{ color: "darkgrey" }} />
 						</IconButton>
 					</div>
 				)}
 				<TextareaAutosize
-					className={textareaClassName}
+					aria-label="Comment"
 					title="Comment"
+					className={textareaClassName}
 					spellCheck={false}
 					value={commentText}
 					onChange={commentTextChangeHandler}
 					required
 				/>
 			</div>
-			<button type="submit" title="Send" className={styles.sendBtn} disabled={sendBtnDisabled}>
+			<button
+				type="submit"
+				title="Send"
+				className={styles.sendBtn}
+				disabled={sendBtnDisabled}>
 				<SendIcon />
 			</button>
 		</form>

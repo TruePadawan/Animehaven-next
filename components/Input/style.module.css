@@ -7,4 +7,5 @@
 
 .input:focus {
     outline: none;
+    border-color: black;
 }

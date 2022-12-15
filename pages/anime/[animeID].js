@@ -330,7 +330,8 @@ const AnimeDetails = () => {
 					<p className={styles.overview}>{info.overview}</p>
 				</section>
 				<Select
-					aria-label="category"
+					aria-label="Show comments or reviews"
+					title="Show comments or reviews"
 					value={categoryVal}
 					onChange={(e) => setCategoryVal(e.target.value)}>
 					<option value="COMMENTS" defaultValue>

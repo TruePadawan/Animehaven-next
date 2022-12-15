@@ -47,13 +47,8 @@
     background-color: rgba(254, 254, 254, 0.12);
     color: #FEFEFE;
     border-radius: 14px;
-    border: none;
+    border: 2px solid transparent;
     padding: 8px 10px;
-}
-
-.editProfileForm input:focus,
-.editProfileForm textarea:focus {
-    outline: none;
 }
 
 .editFormBtn {
@@ -63,6 +58,11 @@
     padding: 3px 1.2rem;
 }
 
+.editProfileForm input:focus,
+.editProfileForm textarea:focus {
+    outline: none;
+    border-color: black;
+}
 
 .editFormBtn[type="button"] {
     border: 1px solid white;
@@ -96,7 +96,7 @@
     gap: 10px;
 }
 
-@media screen and (max-width: 1024px){
+@media screen and (max-width: 1024px) {
     .discussions {
         grid-template-columns: 1fr;
     }

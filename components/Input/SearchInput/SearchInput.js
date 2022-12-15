@@ -4,13 +4,14 @@ import styles from "./style.module.css";
 
 const SearchInput = ({ searchFunc, className, ...inputAttr }) => {
 	const inputClassName = `flex-grow-1 ${className || ""}`;
-  
+
 	return (
 		<form className="input-group flex-nowrap" onSubmit={searchFunc}>
 			<Input
 				{...inputAttr}
 				className={inputClassName}
 				aria-label="Search"
+				title="Search"
 				required
 			/>
 			<span className="input-group-text">

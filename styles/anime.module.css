@@ -81,10 +81,6 @@
     color: rgb(80, 80, 80);
 }
 
-.watchStatus:focus {
-    outline: none;
-}
-
 .watchStatus option {
     background-color: lightblue;
     color: black;

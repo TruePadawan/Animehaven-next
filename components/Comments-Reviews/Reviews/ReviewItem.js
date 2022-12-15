@@ -163,9 +163,9 @@ const ReviewItem = ({ reviewData, profileID, editReview, handleError }) => {
 						<div className="d-flex justify-content-end gap-2">
 							<span className={styles.upvote}>
 								<IconButton
-									aria-label="upvote"
+									aria-label="Upvote"
+									title="Upvote"
 									size="small"
-									title="upvote"
 									disabled={upvoteBtnDisabled}
 									onClick={onUpvoteButtonClicked}>
 									{upvoteIcon}
@@ -174,8 +174,8 @@ const ReviewItem = ({ reviewData, profileID, editReview, handleError }) => {
 							</span>
 							<IconButton
 								aria-label="delete"
-								size="small"
 								title="delete"
+								size="small"
 								disabled={deleteBtnDisabled}
 								onClick={onDeleteButtonClicked}>
 								<DeleteIcon />

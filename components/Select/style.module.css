@@ -11,7 +11,3 @@
 .select option {
     background-color: rgb(47, 47, 47);
 }
-
-.select:focus {
-    outline: none;
-}

@@ -20,6 +20,7 @@ export default function ShareButton(props) {
 	return (
 		<IconButton
 			aria-label="share"
+			title="share"
 			sx={{ color: "white", fontSize: "1rem" }}
 			onClick={onShareBtnClicked}>
 			<IosShareIcon />
