@@ -14,7 +14,6 @@ import Link from "next/link";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import styles from "./style.module.css";
 import { supabase } from "../../../supabase/config";
-import Image from "next/image";
 
 export default function ReviewItem({ itemID, creatorID, index }) {
 	const [loading, setLoading] = useState(true);
