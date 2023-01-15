@@ -5,11 +5,6 @@ const isNSFW = (item) => {
 	});
 };
 
-const afterYear = (year, item, type) => {
-	if (type === "manga") return item.published.prop.from.year >= year;
-	else if (type === "anime") return item.aired.prop.from.year >= year;
-};
-
 const isFlagged = (item) => {
 	const acceptedTypes = ["TV", "OVA"];
 	const hasNoImage =
