@@ -42,13 +42,6 @@ export const getListOfAnimes = async (subcategory, limit = 20) => {
 	return list;
 };
 
-/**
- * Either return a list of unique random anime item data or perform some operation on each of them as they're consumed from the API.
- * @param {Number} number
- * @param {Function} callback
- * @returns Promise | Array
- */
-
 export const requestNRandomAnime = async (number = 1, callback = null) => {
 	const itemsData = [];
 	// IF THE ITEM GOTTEN FROM API HAS BEEN GOTTEN BEFORE, REQUEST ANOTHER ONE
