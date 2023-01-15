@@ -10,7 +10,7 @@ const afterYear = (year, item, type) => {
 	else if (type === "anime") return item.aired.prop.from.year >= year;
 };
 
-const isFlagged = (item, type) => {
+const isFlagged = (item) => {
 	const acceptedTypes = ["TV", "OVA"];
 	const hasNoImage =
 		item.images.jpg["image_url"] ===
@@ -28,7 +28,7 @@ export const getRandomAnime = async () => {
 	const URL = "https://api.jikan.moe/v4/random/anime";
 	let response = await fetch(URL);
 	let anime = await (await response.json()).data;
-	while (isFlagged(anime, "anime")) {
+	while (isFlagged(anime)) {
 		response = await fetch(URL);
 		anime = await (await response.json()).data;
 	}
