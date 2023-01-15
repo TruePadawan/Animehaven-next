@@ -7,9 +7,9 @@ import {
 	CircularProgress,
 } from "@mui/material";
 import Link from "next/link";
-import { DEFAULT_AVATAR_URL } from "../../../../utilities/app-utilities";
-import { supabase } from "../../../../supabase/config";
-import { getProfileData } from "../../../../utilities/app-utilities";
+import { DEFAULT_AVATAR_URL } from "../../utilities/app-utilities";
+import { supabase } from "../../supabase/config";
+import { getProfileData } from "../../utilities/app-utilities";
 import Image from "next/image";
 
 const UserAccountBtn = ({ profileID, errorHandler }) => {

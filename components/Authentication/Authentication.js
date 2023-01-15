@@ -1,7 +1,7 @@
 import { Alert, Button, ButtonGroup, Snackbar, styled } from "@mui/material";
 import { useContext, useState } from "react";
-import { UserAuthContext } from "../../../../context/UserAuthContext";
-import UserAccountBtn from "../UserAccountBtn/UserAccountBtn";
+import { UserAuthContext } from "../../context/UserAuthContext";
+import UserAccountBtn from "./UserAccountBtn";
 import { Fragment } from "react";
 import { useRouter } from "next/router";
 

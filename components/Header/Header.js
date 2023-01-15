@@ -1,7 +1,7 @@
 import { Box, Tab, Tabs, useMediaQuery } from "@mui/material";
 import styles from "./header.module.css";
 import { useRouter } from "next/router";
-import Authentication from "./components/Authentication/Authentication";
+import Authentication from "../Authentication/Authentication";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { APP_LOGO_URL } from "../../utilities/app-utilities";

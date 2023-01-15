@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 
-const useInput = (validate, customTransformation = null) => {
-	const [inputValue, setInputValue] = useState("");
+const useInput = (validate, options = {}) => {
+	const [inputValue, setInputValue] = useState(options?.defaultValue ?? "");
 	const [inputIsValid, setInputIsValid] = useState(false);
 	const [inputHasError, setInputHasError] = useState(false);
 	const [checkingValidity, setCheckingValidity] = useState(false);
 	const [inputWasTouched, setInputWasTouched] = useState(false);
+	const { customTransformation = null } = options;
 
 	useEffect(() => {
 		setInputIsValid(false);

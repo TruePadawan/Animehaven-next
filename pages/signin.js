@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useContext, Fragment } from "react";
 import { Button, TextField, Snackbar, Alert } from "@mui/material";
-import VerifyOTP from "../components/Header/components/Authentication/components/VerifyOTP";
+import VerifyOTP from "../components/Authentication/VerifyOTP";
 import GoogleIcon from "@mui/icons-material/Google";
 import Loading from "../components/Loading/Loading";
 import useInput from "../hooks/use-input";
@@ -9,9 +9,10 @@ import { useRouter } from "next/router";
 import Head from "next/head";
 import styles from "../styles/auth.module.css";
 import Link from "next/link";
-import { supabase } from "../supabase/config";
+import { useSupabaseClient } from "@supabase/auth-helpers-react";
 
 export default function SignIn() {
+	const supabase = useSupabaseClient();
 	const { handleGoogleAuth, profileID } = useContext(UserAuthContext);
 	const [error, setError] = useState({ occurred: false, text: "" });
 	const [OTPVerificationPending, setOTPVerificationPending] = useState(false);

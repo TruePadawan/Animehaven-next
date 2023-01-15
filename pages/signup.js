@@ -1,9 +1,8 @@
 import { Button, TextField, Snackbar, Alert } from "@mui/material";
 import GoogleIcon from "@mui/icons-material/Google";
 import { useState, useEffect, useCallback, Fragment, useContext } from "react";
-import { supabase } from "../supabase/config";
 import { createProfile } from "../utilities/app-utilities";
-import VerifyOTP from "../components/Header/components/Authentication/components/VerifyOTP";
+import VerifyOTP from "../components/Authentication/VerifyOTP";
 import Loading from "../components/Loading/Loading";
 import useInput from "../hooks/use-input";
 import { UserAuthContext } from "../context/UserAuthContext";
@@ -11,8 +10,10 @@ import Head from "next/head";
 import Link from "next/link";
 import styles from "../styles/auth.module.css";
 import { useRouter } from "next/router";
+import { useSupabaseClient } from "@supabase/auth-helpers-react";
 
 export default function SignUp() {
+	const supabase = useSupabaseClient();
 	const { handleGoogleAuth, profileID } = useContext(UserAuthContext);
 	const [displayName, setDisplayName] = useState("");
 	const [formText, setFormText] = useState({ acctName: "", email: "" });
@@ -20,11 +21,11 @@ export default function SignUp() {
 	const [OTPVerificationPending, setOTPVerificationPending] = useState(false);
 	const router = useRouter();
 
-    useEffect(() => {
-        if (profileID !== null) {
-            router.replace("/");
-        }
-    }, [profileID]);
+	useEffect(() => {
+		if (profileID !== null) {
+			router.replace("/");
+		}
+	}, [profileID]);
 
 	const handleError = (text, error) => {
 		setError({
@@ -73,7 +74,9 @@ export default function SignUp() {
 		changeHandler: accountNameChangeHandler,
 		checkingValidity: checkingAcctNameValidity,
 		blurHandler: accountNameBlurHandler,
-	} = useInput(processAccountNameValidation, accountNameTransformation);
+	} = useInput(processAccountNameValidation, {
+		customTransformation: accountNameTransformation,
+	});
 
 	const {
 		value: email,
@@ -171,6 +174,7 @@ export default function SignUp() {
 				email: email,
 			});
 			if (error) throw error;
+			window.location.reload();
 		} catch (error) {
 			handleError("Failed to complete signup and create profile", error);
 		}

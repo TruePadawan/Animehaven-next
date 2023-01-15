@@ -49,6 +49,15 @@ export function createProfile(accountData) {
 	return supabase.from("profiles").insert(accountData);
 }
 
+export async function hasProfile(supabaseClient, profileID) {
+	const { count } = await supabaseClient
+		.from("profiles")
+		.select("*", { count: "exact", head: true })
+		.eq("id", profileID)
+		.throwOnError();
+	return count === 1;
+}
+
 export const DEFAULT_AVATAR_URL =
 	"https://bkpyhkkjvgzfjojacrka.supabase.co/storage/v1/object/public/avatars/noprofilepic.jpg";
 

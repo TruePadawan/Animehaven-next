@@ -1,7 +1,7 @@
 import { Typography, Button, TextField } from "@mui/material";
 import { useState } from "react";
-import useInterval from "../../../../../hooks/use-interval";
-import { supabase } from "../../../../../supabase/config";
+import useInterval from "../../hooks/use-interval";
+import { supabase } from "../../supabase/config";
 
 const VerifyOTP = ({ email, options, onVerify = null, errorHandler }) => {
 	const [OTPValue, setOTPValue] = useState("");
