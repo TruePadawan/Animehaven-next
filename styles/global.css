@@ -73,46 +73,19 @@ button:disabled {
   cursor: not-allowed;
 }
 
-.authDialog {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  max-width: 500px;
-  width: 100%;
-  background-color: rgb(30, 30, 30);
-  border-radius: 8px;
-  padding: 1rem;
-}
-
-.signupForm,
-.verify-otp-form {
-  font-family: 'Rubik', sans-serif;
-  padding: 1rem;
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-
-
-.signupForm input,
-.verify-otp-form input {
-  color: antiquewhite;
-}
-
-.signupForm label,
-.verify-otp-form label {
-  color: gray;
-}
-
-.signupForm button,
-.verify-otp-form button {
-  font-family: inherit;
-}
-
 .form-helper-text {
   color: indianred;
   font-family: 'Lato', sans-serif;
   font-weight: 600;
   font-size: 14px;
+}
+
+.verify-otp-form {
+  width: 100%;
+  max-width: 500px;
+  font-family: 'Rubik', sans-serif;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
 }

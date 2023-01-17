@@ -75,6 +75,7 @@ const VerifyOTP = ({ email, options, onVerify = null, errorHandler }) => {
 				Verify OTP
 			</Button>
 			<Button
+				sx={{ "&:disabled": { color: "gray"} }}
 				type="button"
 				disabled={disableRequestOTPBtn}
 				onClick={requestOTP}>
