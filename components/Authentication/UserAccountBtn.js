@@ -8,11 +8,12 @@ import {
 } from "@mui/material";
 import Link from "next/link";
 import { DEFAULT_AVATAR_URL } from "../../utilities/app-utilities";
-import { supabase } from "../../supabase/config";
 import { getProfileData } from "../../utilities/app-utilities";
 import Image from "next/image";
+import { useSupabaseClient } from "@supabase/auth-helpers-react";
 
 const UserAccountBtn = ({ profileID, errorHandler }) => {
+	const supabase = useSupabaseClient();
 	const [accountName, setAccountName] = useState("");
 	const [menuAnchorEl, setMenuAnchorEl] = useState(null);
 	const [photoSrc, setPhotoSrc] = useState(DEFAULT_AVATAR_URL);
