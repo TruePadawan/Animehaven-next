@@ -5,7 +5,6 @@ import { UserAuthContext } from "../../context/UserAuthContext";
 import { Box, useMediaQuery } from "@mui/material";
 import Announcements from "./Announcements";
 import Recent from "./Recent";
-// const ALLOWED_RECENT_ITEMS = ["animes", "lists", "discussions"];
 
 const PageContainer = ({ children, className, recentItems = "animes" }) => {
 	const { profileID } = useContext(UserAuthContext);
