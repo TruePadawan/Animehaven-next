@@ -1,4 +1,3 @@
-import Header from "../components/Header/Header";
 import { UserAuthContextProvider } from "../context/UserAuthContext";
 import { Analytics } from "@vercel/analytics/react";
 import "../styles/global.css";
@@ -21,7 +20,6 @@ function MyApp({ Component, pageProps }) {
 				supabaseClient={supabaseClient}
 				initialSession={pageProps.initialSession}>
 				<UserAuthContextProvider>
-					<Header />
 					{getLayout(<Component {...pageProps} />)}
 					<Analytics />
 				</UserAuthContextProvider>

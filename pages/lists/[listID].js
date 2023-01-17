@@ -8,7 +8,7 @@ import Loading from "../../components/Loading/Loading";
 import CreateList from "../../components/CreateList/CreateList";
 import Error from "../../components/Error/Error";
 import CommentsList from "../../components/Comments-Reviews/Comments/CommentsList";
-import PageContainer from "../../components/PageContainer/PageContainer";
+import BodyLayout from "../../components/BodyLayout/BodyLayout";
 import { supabase } from "../../supabase/config";
 import {
 	getListByID,
@@ -18,6 +18,7 @@ import {
 import { getAnimeByID } from "../../utilities/mal-api";
 import { UserAuthContext } from "../../context/UserAuthContext";
 import { useRouter } from "next/router";
+import HeaderLayout from "../../components/HeaderLayout/HeaderLayout";
 
 const Item = ({ itemID, itemTitle, index }) => {
 	const [loading, setLoading] = useState(true);
@@ -214,8 +215,10 @@ List.getLayout = (page) => (
 		<Head>
 			<title>Animehaven | List</title>
 		</Head>
-		<PageContainer className="d-flex flex-column gap-2" recentItems="lists">
-			{page}
-		</PageContainer>
+		<HeaderLayout>
+			<BodyLayout className="d-flex flex-column gap-2" recentItems="lists">
+				{page}
+			</BodyLayout>
+		</HeaderLayout>
 	</Fragment>
 );

@@ -1,12 +1,12 @@
 import Section from "../Section/Section";
-import styles from "./pagecontainer.module.css";
+import styles from "./styles.module.css";
 import { useContext } from "react";
 import { UserAuthContext } from "../../context/UserAuthContext";
 import { Box, useMediaQuery } from "@mui/material";
 import Announcements from "./Announcements";
 import Recent from "./Recent";
 
-const PageContainer = ({ children, className, recentItems = "animes" }) => {
+const BodyLayout = ({ children, className, recentItems = "animes" }) => {
 	const { profileID } = useContext(UserAuthContext);
 	const showSideSection = useMediaQuery("(min-width:1200px)");
 	return (
@@ -32,4 +32,4 @@ const PageContainer = ({ children, className, recentItems = "animes" }) => {
 	);
 };
 
-export default PageContainer;
+export default BodyLayout;

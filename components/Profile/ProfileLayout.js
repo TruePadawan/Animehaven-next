@@ -9,6 +9,7 @@ import { UserAuthContext } from "../../context/UserAuthContext";
 import styles from "./profile-layout.module.css";
 import Loading from "../Loading/Loading";
 import NoAccount from "../NoAccount/NoAccount";
+import HeaderLayout from "../HeaderLayout/HeaderLayout";
 
 export default function ProfileLayout(props) {
 	const { profileID } = useContext(UserAuthContext);
@@ -98,10 +99,8 @@ export default function ProfileLayout(props) {
 		</aside>
 	);
 	return (
-		<Fragment>
-			{!profileExists && (
-				<NoAccount accountName={accountName} />
-			)}
+		<HeaderLayout>
+			{!profileExists && <NoAccount accountName={accountName} />}
 			{profileExists && (
 				<Fragment>
 					<Head>
@@ -171,6 +170,6 @@ export default function ProfileLayout(props) {
 					</div>
 				</Fragment>
 			)}
-		</Fragment>
+		</HeaderLayout>
 	);
 }

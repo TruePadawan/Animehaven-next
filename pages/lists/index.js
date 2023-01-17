@@ -8,7 +8,7 @@ import {
 	useMediaQuery,
 	Button as MUIButton,
 } from "@mui/material";
-import PageContainer from "../../components/PageContainer/PageContainer";
+import BodyLayout from "../../components/BodyLayout/BodyLayout";
 import Button from "../../components/Button/Button";
 import Select from "../../components/Select/Select";
 import Checkbox from "../../components/Checkbox/Checkbox";
@@ -21,6 +21,7 @@ import { supabase } from "../../supabase/config";
 import Loading from "../../components/Loading/Loading";
 import Head from "next/head";
 import CheckboxList from "../../components/CheckboxList/CheckboxList";
+import HeaderLayout from "../../components/HeaderLayout/HeaderLayout";
 
 const applyGenreFilter = (lists, acceptedGenres) => {
 	const filtered = lists.filter((list) => {
@@ -296,6 +297,12 @@ const Lists = () => {
 
 export default Lists;
 
-Lists.getLayout = (page) => (
-	<PageContainer className="d-flex gap-2" recentItems="lists">{page}</PageContainer>
-);
+Lists.getLayout = (page) => {
+	return (
+		<HeaderLayout>
+			<BodyLayout className="d-flex gap-2" recentItems="lists">
+				{page}
+			</BodyLayout>
+		</HeaderLayout>
+	);
+};

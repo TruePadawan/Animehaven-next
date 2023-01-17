@@ -1,11 +1,12 @@
 import { Fragment } from "react";
 import AnimeItem from "../components/Items/AnimeItem/AnimeItem";
-import PageContainer from "../components/PageContainer/PageContainer";
+import BodyLayout from "../components/BodyLayout/BodyLayout";
 import { getUsefulData } from "../utilities/app-utilities";
 import Section from "../components/Section/Section";
 import { getListOfAnimes, requestNRandomAnime } from "../utilities/mal-api";
 import styles from "../styles/home.module.css";
 import Head from "next/head";
+import HeaderLayout from "../components/HeaderLayout/HeaderLayout";
 
 const DEFAULT_N_LOADED_ITEMS = 10;
 const Home = (props) => {
@@ -137,6 +138,10 @@ export async function getStaticProps() {
 
 export default Home;
 
-Home.getLayout = (page) => (
-	<PageContainer className={styles["home-main"]}>{page}</PageContainer>
-);
+Home.getLayout = (page) => {
+	return (
+		<HeaderLayout>
+			<BodyLayout className={styles["home-main"]}>{page}</BodyLayout>
+		</HeaderLayout>
+	);
+};

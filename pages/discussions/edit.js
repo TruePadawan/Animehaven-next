@@ -10,6 +10,7 @@ import { DISCUSSION_TAGS } from "../../utilities/app-utilities";
 import styles from "../../styles/create-discussion.module.css";
 import { supabase } from "../../supabase/config";
 import Loading from "../../components/Loading/Loading";
+import HeaderLayout from "../../components/HeaderLayout/HeaderLayout";
 
 export default function Edit() {
 	const { profileID } = useContext(UserAuthContext);
@@ -85,7 +86,7 @@ export default function Edit() {
 						error.message || error.error_description
 					}`
 				);
-                setUpdateBtnDisabled(false);
+				setUpdateBtnDisabled(false);
 			}
 		}
 	}
@@ -185,7 +186,7 @@ export default function Edit() {
 						<Button
 							variant="contained"
 							type="submit"
-							sx={{updateBtnStyles}}
+							sx={{ updateBtnStyles }}
 							disabled={updateBtnDisabled}>
 							Update
 						</Button>
@@ -204,3 +205,5 @@ export default function Edit() {
 		</Fragment>
 	);
 }
+
+Edit.getLayout = (page) => <HeaderLayout>{page}</HeaderLayout>;

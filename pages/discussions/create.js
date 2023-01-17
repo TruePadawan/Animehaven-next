@@ -9,6 +9,7 @@ import { UserAuthContext } from "../../context/UserAuthContext";
 import { DISCUSSION_TAGS } from "../../utilities/app-utilities";
 import styles from "../../styles/create-discussion.module.css";
 import { supabase } from "../../supabase/config";
+import HeaderLayout from "../../components/HeaderLayout/HeaderLayout";
 
 const allowed_tags = DISCUSSION_TAGS.map((tag) => tag.toLowerCase());
 export default function Create() {
@@ -175,3 +176,5 @@ export default function Create() {
 		</Fragment>
 	);
 }
+
+Create.getLayout = (page) => <HeaderLayout>{page}</HeaderLayout>;

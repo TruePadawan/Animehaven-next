@@ -1,7 +1,7 @@
 import useSWRImmutable from "swr/immutable";
 import Loading from "../Loading/Loading";
 import TurnedInNotIcon from "@mui/icons-material/TurnedInNot";
-import styles from "./pagecontainer.module.css";
+import styles from "./styles.module.css";
 import { getRecentItems } from "../../utilities/app-utilities";
 import Anime from "../RecentItems/Anime";
 import List from "../RecentItems/List";

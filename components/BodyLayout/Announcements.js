@@ -3,7 +3,7 @@ import useSWRImmutable from "swr/immutable";
 import AnnouncementItem from "../Items/AnnouncementItem/AnnouncementItem";
 import { supabase } from "../../supabase/config";
 import AnnouncementOutlinedIcon from '@mui/icons-material/AnnouncementOutlined';
-import styles from "./pagecontainer.module.css";
+import styles from "./styles.module.css";
 
 async function announcementsFetcher(tag) {
 	const { data } = await supabase

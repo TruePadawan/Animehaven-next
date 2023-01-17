@@ -1,4 +1,4 @@
-import PageContainer from "../components/PageContainer/PageContainer";
+import BodyLayout from "../components/BodyLayout/BodyLayout";
 import { Fragment, useEffect, useState } from "react";
 import { useMemo } from "react";
 import { useCallback } from "react";
@@ -12,6 +12,7 @@ import { supabase } from "../supabase/config";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { defaultSnackbarState, getUsefulData } from "../utilities/app-utilities";
+import HeaderLayout from "../components/HeaderLayout/HeaderLayout";
 
 export default function Search() {
 	const [searchResult, setSearchResult] = useState([]);
@@ -156,4 +157,10 @@ export default function Search() {
 	);
 }
 
-Search.getLayout = (page) => <PageContainer>{page}</PageContainer>;
+Search.getLayout = (page) => {
+	return (
+		<HeaderLayout>
+			<BodyLayout>{page}</BodyLayout>
+		</HeaderLayout>
+	)
+}

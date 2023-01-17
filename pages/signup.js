@@ -11,6 +11,7 @@ import Link from "next/link";
 import styles from "../styles/auth.module.css";
 import { useRouter } from "next/router";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
+import HeaderLayout from "../components/HeaderLayout/HeaderLayout";
 
 export default function SignUp() {
 	const supabase = useSupabaseClient();
@@ -281,4 +282,12 @@ export default function SignUp() {
 			</Snackbar>
 		</Fragment>
 	);
+}
+
+SignUp.getLayout = (page) => {
+	return (
+		<HeaderLayout>
+			{page}
+		</HeaderLayout>
+	)
 }

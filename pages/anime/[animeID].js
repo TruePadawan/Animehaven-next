@@ -1,4 +1,4 @@
-import PageContainer from "../../components/PageContainer/PageContainer";
+import BodyLayout from "../../components/BodyLayout/BodyLayout";
 import StarIcon from "@mui/icons-material/Star";
 import { Box, Chip, Snackbar, Alert } from "@mui/material";
 import { Fragment, useCallback, useContext, useEffect, useState } from "react";
@@ -21,6 +21,7 @@ import { getProfileData } from "../../utilities/app-utilities";
 import Head from "next/head";
 import { supabase } from "../../supabase/config";
 import { useRouter } from "next/router";
+import HeaderLayout from "../../components/HeaderLayout/HeaderLayout";
 
 const ExtraInfo = (props) => {
 	return (
@@ -396,5 +397,7 @@ const AnimeDetails = () => {
 export default AnimeDetails;
 
 AnimeDetails.getLayout = (page) => (
-	<PageContainer className={styles.page}>{page}</PageContainer>
+	<HeaderLayout>
+		<BodyLayout className={styles.page}>{page}</BodyLayout>
+	</HeaderLayout>
 );

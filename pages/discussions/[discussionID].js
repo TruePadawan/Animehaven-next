@@ -6,7 +6,7 @@ import styles from "../../styles/discussion.module.css";
 import Loading from "../../components/Loading/Loading";
 import Error from "../../components/Error/Error";
 import CommentsList from "../../components/Comments-Reviews/Comments/CommentsList";
-import PageContainer from "../../components/PageContainer/PageContainer";
+import BodyLayout from "../../components/BodyLayout/BodyLayout";
 import {
 	getDiscussionByID,
 	getProfileData,
@@ -15,6 +15,7 @@ import {
 import { UserAuthContext } from "../../context/UserAuthContext";
 import { useRouter } from "next/router";
 import EditIcon from "@mui/icons-material/Edit";
+import HeaderLayout from "../../components/HeaderLayout/HeaderLayout";
 
 const initialErrorState = { occurred: false, text: "" };
 const Discussion = () => {
@@ -147,9 +148,11 @@ const Discussion = () => {
 export default Discussion;
 
 Discussion.getLayout = (page) => (
-	<PageContainer
-		className={`d-flex flex-column gap-2 ${styles.container}`}
-		recentItems="discussions">
-		{page}
-	</PageContainer>
+	<HeaderLayout>
+		<BodyLayout
+			className={`d-flex flex-column gap-2 ${styles.container}`}
+			recentItems="discussions">
+			{page}
+		</BodyLayout>
+	</HeaderLayout>
 );

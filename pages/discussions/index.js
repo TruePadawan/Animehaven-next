@@ -12,13 +12,14 @@ import { useEffect } from "react";
 import Checkbox from "../../components/Checkbox/Checkbox";
 import CheckboxList from "../../components/CheckboxList/CheckboxList";
 import SearchInput from "../../components/Input/SearchInput/SearchInput";
-import PageContainer from "../../components/PageContainer/PageContainer";
+import BodyLayout from "../../components/BodyLayout/BodyLayout";
 import Select from "../../components/Select/Select";
 import { UserAuthContext } from "../../context/UserAuthContext";
 import { DISCUSSION_TAGS } from "../../utilities/app-utilities";
 import { getDiscussionsByTags } from "../../utilities/app-utilities";
 import DiscussionItem from "../../components/Items/DiscussionItem/DiscussionItem";
 import Loading from "../../components/Loading/Loading";
+import HeaderLayout from "../../components/HeaderLayout/HeaderLayout";
 
 export default function Discussions() {
 	const { profileID } = useContext(UserAuthContext);
@@ -194,7 +195,9 @@ export default function Discussions() {
 }
 
 Discussions.getLayout = (page) => (
-	<PageContainer className="d-flex gap-2" recentItems="discussions">
-		{page}
-	</PageContainer>
+	<HeaderLayout>
+		<BodyLayout className="d-flex gap-2" recentItems="discussions">
+			{page}
+		</BodyLayout>
+	</HeaderLayout>
 );
