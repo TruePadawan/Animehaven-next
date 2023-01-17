@@ -3,7 +3,13 @@ import { useState } from "react";
 import useInterval from "../../hooks/use-interval";
 import { supabase } from "../../supabase/config";
 
-const VerifyOTP = ({ email, options, onVerify = null, errorHandler }) => {
+const VerifyOTP = ({
+	email,
+	options,
+	onVerify = undefined,
+	onCancel = undefined,
+	errorHandler,
+}) => {
 	const [OTPValue, setOTPValue] = useState("");
 	const [countdown, setCountdown] = useState(60);
 	const [countdownIsRunning, setCountdownIsRunning] = useState(true);
@@ -47,7 +53,7 @@ const VerifyOTP = ({ email, options, onVerify = null, errorHandler }) => {
 			});
 			if (error) throw error;
 			else {
-				if (onVerify !== null) {
+				if (onVerify) {
 					onVerify(data);
 				}
 			}
@@ -75,11 +81,14 @@ const VerifyOTP = ({ email, options, onVerify = null, errorHandler }) => {
 				Verify OTP
 			</Button>
 			<Button
-				sx={{ "&:disabled": { color: "gray"} }}
+				sx={{ "&:disabled": { color: "gray" } }}
 				type="button"
 				disabled={disableRequestOTPBtn}
 				onClick={requestOTP}>
 				Request new OTP
+			</Button>
+			<Button variant="contained" type="button" color="error" onClick={onCancel}>
+				Cancel
 			</Button>
 		</form>
 	);

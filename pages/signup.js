@@ -265,6 +265,7 @@ export default function SignUp() {
 						email={email}
 						options={{ verificationType: "signup" }}
 						onVerify={completeSignup}
+						onCancel={() => router.reload()}
 						handleError={handleError}
 					/>
 				)}

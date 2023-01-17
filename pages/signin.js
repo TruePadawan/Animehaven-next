@@ -138,6 +138,7 @@ export default function SignIn() {
 					<VerifyOTP
 						email={email}
 						options={{ verificationType: "magiclink" }}
+						onCancel={() => router.reload()}
 						handleError={handleError}
 					/>
 				)}
