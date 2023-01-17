@@ -174,7 +174,7 @@ export default function SignUp() {
 				email: email,
 			});
 			if (error) throw error;
-			window.location.reload();
+			router.reload();
 		} catch (error) {
 			handleError("Failed to complete signup and create profile", error);
 		}
