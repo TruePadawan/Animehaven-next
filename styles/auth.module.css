@@ -6,8 +6,7 @@
     margin-top: 2rem;
 }
 
-.auth-form,
-.verify-otp-form {
+.auth-form {
     width: 100%;
     max-width: 500px;
     font-family: 'Rubik', sans-serif;
