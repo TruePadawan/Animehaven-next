@@ -4,7 +4,6 @@ import { useRouter } from "next/router";
 import Authentication from "../Authentication/Authentication";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { APP_LOGO_URL } from "../../utilities/app-utilities";
 
 const NavTab = ({ children, ...props }) => {
 	const tabStyles = {
@@ -47,7 +46,7 @@ const Header = () => {
 
 	const headerContent = matchesSmallDevice ? (
 		<img
-			src={APP_LOGO_URL}
+			src="/logo.png"
 			alt="animehaven"
 			width={50}
 			height={50}

@@ -1,7 +1,6 @@
 import { supabase } from "../supabase/config";
 import { filetypemime } from "magic-bytes.js";
 
-export const APP_LOGO_URL = "https://i.imgur.com/joo9Qy4.jpg";
 export const PROFILE_IMG_MAX_SIZE = Math.pow(10, 6);
 export const defaultSnackbarState = { open: false, severity: "info", text: "" };
 export const LIST_GENRES = [
