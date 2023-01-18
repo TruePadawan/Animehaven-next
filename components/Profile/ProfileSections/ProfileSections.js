@@ -287,7 +287,6 @@ export function EditProfile({ open, closeDialog }) {
 		displayName: "",
 		bio: "",
 	});
-	const [formInfo, setFormInfo] = useState("");
 	const [formIsValid, setFormIsValid] = useState(true);
 	const [btnDisabled, setBtnDisabled] = useState({
 		save: false,
@@ -562,7 +561,6 @@ export function EditProfile({ open, closeDialog }) {
 									spellCheck={false}
 								/>
 							</div>
-							<small className="text-info">{formInfo}</small>
 							<span className="align-self-end d-flex gap-2">
 								<button
 									type="submit"
