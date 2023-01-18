@@ -60,6 +60,7 @@ const AuthComplete = ({ userData }) => {
 		}
 		try {
 			setCreateProfileBtnDisabled(true);
+			setCancelAuthBtnDisabled(true);
 			const profileExists = await hasProfile(supabase, userData.profile_id);
 			if (profileExists) throw new Error("Profile already exists");
 			await createProfile({
@@ -74,13 +75,23 @@ const AuthComplete = ({ userData }) => {
 				`Failed to create profile - ${error.message || error.error_description}`
 			);
 			setCreateProfileBtnDisabled(false);
+			setCancelAuthBtnDisabled(false);
 		}
 	}
 
 	async function cancelAuthentication() {
 		setCreateProfileBtnDisabled(true);
-		await supabase.auth.signOut();
-		router.reload();
+		setCancelAuthBtnDisabled(true);
+		try {
+			await supabase.auth.signOut();
+			router.reload();
+		} catch (error) {
+			alert(
+				`Error occurred while signing out - ${error.message || error.error_description}`
+			);
+			setCreateProfileBtnDisabled(false);
+			setCancelAuthBtnDisabled(false);
+		}
 	}
 
 	return (
