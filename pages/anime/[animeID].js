@@ -10,6 +10,7 @@ import {
 	getUsefulData,
 	getUserItemRecommendations,
 	setRecentItem,
+	getProfileData,
 } from "../../utilities/app-utilities";
 import styles from "../../styles/anime.module.css";
 import CommentsList from "../../components/Comments-Reviews/Comments/CommentsList";
@@ -17,11 +18,10 @@ import ReviewsList from "../../components/Comments-Reviews/Reviews/ReviewsList";
 import Loading from "../../components/Loading/Loading";
 import AddToList from "../../components/AddToList/AddToList";
 import Error from "../../components/Error/Error";
-import { getProfileData } from "../../utilities/app-utilities";
 import Head from "next/head";
-import { supabase } from "../../supabase/config";
 import { useRouter } from "next/router";
 import HeaderLayout from "../../components/HeaderLayout/HeaderLayout";
+import { useSupabaseClient } from "@supabase/auth-helpers-react";
 
 const ExtraInfo = (props) => {
 	return (
@@ -86,6 +86,7 @@ const transformAnimeData = (data) => {
 };
 
 const AnimeDetails = () => {
+	const supabase = useSupabaseClient();
 	const { profileID } = useContext(UserAuthContext);
 	const [snackbarData, setSnackbarData] = useState(defaultSnackbarState);
 	const [watchStatus, setWatchStatus] = useState("NOT_WATCHED");
@@ -145,7 +146,7 @@ const AnimeDetails = () => {
 			setWatchStatusElDisabled(true);
 			setRecommendBtnDisabled(true);
 			// LOAD ANIME WATCH STATUS FOR SIGNED IN USER
-			getProfileData("items_watch_status", profileID)
+			getProfileData(supabase, "items_watch_status", profileID)
 				.then(({ items_watch_status }) => {
 					const animeIDs = Object.keys(items_watch_status);
 					if (animeIDs.includes(animeID)) {
@@ -161,7 +162,7 @@ const AnimeDetails = () => {
 				});
 
 			// CHECK IF ANIME IS RECOMMENDED BY SIGNED IN USER
-			getUserItemRecommendations(profileID)
+			getUserItemRecommendations(supabase, profileID)
 				.then(({ data: rows }) => {
 					const isRecommended = rows.some((row) => row.item_id === animeID);
 					if (isRecommended) {
@@ -178,13 +179,13 @@ const AnimeDetails = () => {
 					});
 				});
 		}
-	}, [profileID, router, triggerAlert]);
+	}, [profileID, router, triggerAlert, supabase]);
 
 	// IF THERE IS A SIGNED IN USER AND ANIME HAS BEEN CONFIRMED TO EXIST - UPDATE THEIR RECENTLY VIEWED ANIMES
 	useEffect(() => {
 		if (router.isReady && profileID !== null && info !== null) {
 			const { animeID } = router.query;
-			setRecentItem("animes", profileID, {
+			setRecentItem(supabase, "animes", profileID, {
 				id: animeID,
 				title: info.title,
 				photoURL: info.photoURL,
@@ -193,14 +194,17 @@ const AnimeDetails = () => {
 				triggerAlert("Error", { severity: "error", error });
 			});
 		}
-	}, [profileID, router, triggerAlert, info]);
+	}, [profileID, router, triggerAlert, info, supabase]);
 
 	// RECOMMEND ITEM OR REMOVE RECOMMENDATION
 	const recommendItem = async () => {
 		if (profileID === null) return;
 
 		setRecommendBtnDisabled(true);
-		const { data: rows } = await getUserItemRecommendations(profileID);
+		const { data: rows } = await getUserItemRecommendations(
+			supabase,
+			profileID
+		);
 		const isRecommended = rows.some((row) => row.item_id === animeID);
 		if (!isRecommended) {
 			try {
@@ -237,6 +241,7 @@ const AnimeDetails = () => {
 		setWatchStatusElDisabled(true);
 		try {
 			const { items_watch_status } = await getProfileData(
+				supabase,
 				"items_watch_status",
 				profileID
 			);

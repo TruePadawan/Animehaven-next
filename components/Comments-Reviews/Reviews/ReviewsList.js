@@ -10,7 +10,6 @@ import { Alert, Button, Rating, TextareaAutosize } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
 import ReviewItem from "./ReviewItem";
 import styles from "../Comments-Reviews.module.css";
-import { supabase } from "../../../supabase/config";
 import ShareButton from "../../ShareButton/ShareButton";
 import {
 	getReviewByUser,
@@ -18,15 +17,11 @@ import {
 	numberToString,
 } from "../../../utilities/app-utilities";
 import ReviewsIcon from "@mui/icons-material/Reviews";
+import { useSupabaseClient } from "@supabase/auth-helpers-react";
 
-// const getItemReviews = async (animeID, count = 4) => {
-// 	const { data: reviews } = await supabase
-// 		.rpc("get_item_reviews", { itemid: animeID, n_reviews: count + 1 })
-// 		.throwOnError();
-// 	return reviews;
-// };
 const REVIEWS_PER_REQUESTS = 10;
 const ReviewsList = ({ profileID, animeID, triggerAlert }) => {
+	const supabase = useSupabaseClient();
 	const [reviewText, setReviewText] = useState("");
 	const [reviewListData, setReviewListData] = useState([]);
 	const [rating, setRating] = useState(1);
@@ -43,7 +38,7 @@ const ReviewsList = ({ profileID, animeID, triggerAlert }) => {
 
 	useEffect(() => {
 		// IF USER IS SIGNED IN, CHECK IF USER HAS REVIEW THE ANIME AND SHOW THEIRS AT THE TOP
-		getReviewsData(animeID, profileID)
+		getReviewsData(supabase, animeID, profileID)
 			.then(({ data, count }) => {
 				totalReviewsCount.current = count;
 				setReviewListData(data);
@@ -52,7 +47,7 @@ const ReviewsList = ({ profileID, animeID, triggerAlert }) => {
 				handleError("Failed to retrieve reviews", error);
 				setReviewListData([]);
 			});
-	}, [animeID, profileID, handleError]);
+	}, [animeID, profileID, handleError, supabase]);
 
 	const updateRating = (e, newVal) => setRating(newVal < 1 ? 1 : newVal);
 	const textAreaChangeHandler = (e) => setReviewText(e.target.value);
@@ -70,7 +65,7 @@ const ReviewsList = ({ profileID, animeID, triggerAlert }) => {
 				})
 				.throwOnError();
 
-			const list = await getReviewsData(animeID, profileID);
+			const list = await getReviewsData(supabase, animeID, profileID);
 			setReviewListData(list);
 			onReviewAdded();
 		} catch (error) {
@@ -112,7 +107,7 @@ const ReviewsList = ({ profileID, animeID, triggerAlert }) => {
 		if (profileID === null) return;
 		setDisableAddReviewBtn(true);
 		// CHECK TO SEE IF THERE IS ALREADY A REVIEW BY THE USER AND UPDATE IT BECAUSE ONLY ONE REVIEW PER ITEM ELSE CREATE ONE
-		const reviewData = await getReviewByUser(animeID, profileID);
+		const reviewData = await getReviewByUser(supabase, animeID, profileID);
 		const userHasReviewedItem = reviewData.length === 1;
 		if (userHasReviewedItem) {
 			await updateReview(() => {
@@ -140,6 +135,7 @@ const ReviewsList = ({ profileID, animeID, triggerAlert }) => {
 		const lastReviewIndex = reviewListData.at(-1).index;
 		try {
 			const { data } = await getReviewsData(
+				supabase,
 				animeID,
 				REVIEWS_PER_REQUESTS,
 				lastReviewIndex

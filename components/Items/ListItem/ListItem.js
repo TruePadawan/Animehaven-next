@@ -2,12 +2,13 @@ import { Fragment, useContext, useEffect, useState } from "react";
 import styles from "./style.module.css";
 import Link from "next/link";
 import { UserAuthContext } from "../../../context/UserAuthContext";
-import { supabase } from "../../../supabase/config";
 import { Alert, Button, Skeleton, Snackbar } from "@mui/material";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import { getProfileData } from "../../../utilities/app-utilities";
+import { useSupabaseClient } from "@supabase/auth-helpers-react";
 
 export default function ListItem({ listID, skeleton = false }) {
+	const supabase = useSupabaseClient();
 	const { profileID } = useContext(UserAuthContext);
 	const [loading, setLoading] = useState(true);
 	const [listTitle, setListTitle] = useState("");
@@ -39,38 +40,46 @@ export default function ListItem({ listID, skeleton = false }) {
 				setListTitle(title);
 				setListDesc(description);
 				setCreatorID(creator_id);
-				getProfileData("account_name", creator_id).then(({ account_name }) => {
-					setCreator(account_name);
-					setLoading(false);
-				});
+				getProfileData(supabase, "account_name", creator_id).then(
+					({ account_name }) => {
+						setCreator(account_name);
+						setLoading(false);
+					}
+				);
 				// ENABLE SAVE BTN IF LIST WAS NOT CREATED BY SIGNED IN USER AND IT ISN'T ALREADY SAVED
 				if (profileID === null) {
 					setSaveDisabled(true);
 				} else {
-					getProfileData("saved_lists", profileID).then(({ saved_lists }) => {
-						if (
-							creator_id !== profileID &&
-							saved_lists.includes(listID) === false
-						) {
-							setIsSaved(false);
-							setSaveDisabled(false);
-						} else if (
-							creator_id !== profileID &&
-							saved_lists.includes(listID) === true
-						) {
-							setIsSaved(true);
-							setUndoSaveDisabled(false);
+					getProfileData(supabase, "saved_lists", profileID).then(
+						({ saved_lists }) => {
+							if (
+								creator_id !== profileID &&
+								saved_lists.includes(listID) === false
+							) {
+								setIsSaved(false);
+								setSaveDisabled(false);
+							} else if (
+								creator_id !== profileID &&
+								saved_lists.includes(listID) === true
+							) {
+								setIsSaved(true);
+								setUndoSaveDisabled(false);
+							}
 						}
-					});
+					);
 				}
 			});
-	}, [listID, profileID]);
+	}, [listID, profileID, supabase]);
 
 	const saveList = async () => {
 		if (profileID !== null && creatorID !== profileID) {
 			setSaveDisabled(true);
 			try {
-				const { saved_lists } = await getProfileData("saved_lists", profileID);
+				const { saved_lists } = await getProfileData(
+					supabase,
+					"saved_lists",
+					profileID
+				);
 				if (saved_lists.includes(listID) === false) {
 					saved_lists.push(listID);
 					await supabase
@@ -111,7 +120,11 @@ export default function ListItem({ listID, skeleton = false }) {
 		if (profileID !== null && creatorID !== profileID) {
 			setUndoSaveDisabled(true);
 			try {
-				let { saved_lists } = await getProfileData("saved_lists", profileID);
+				let { saved_lists } = await getProfileData(
+					supabase,
+					"saved_lists",
+					profileID
+				);
 				if (saved_lists.includes(listID)) {
 					saved_lists = saved_lists.filter((id) => id !== listID);
 					await supabase

@@ -1,4 +1,3 @@
-import { supabase } from "../supabase/config";
 import { filetypemime } from "magic-bytes.js";
 
 export const PROFILE_IMG_MAX_SIZE = Math.pow(10, 6);
@@ -44,12 +43,12 @@ export function getRandomInt(min, max) {
 	return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-export function createProfile(accountData) {
+export function createProfile(supabase, accountData) {
 	return supabase.from("profiles").insert(accountData);
 }
 
-export async function hasProfile(supabaseClient, profileID) {
-	const { count } = await supabaseClient
+export async function hasProfile(supabase, profileID) {
+	const { count } = await supabase
 		.from("profiles")
 		.select("*", { count: "exact", head: true })
 		.eq("id", profileID)
@@ -61,6 +60,7 @@ export const DEFAULT_AVATAR_URL =
 	"https://bkpyhkkjvgzfjojacrka.supabase.co/storage/v1/object/public/avatars/noprofilepic.jpg";
 
 export async function getCommentsData(
+	supabase,
 	instanceID,
 	limit,
 	startAfterIndex = null
@@ -87,7 +87,7 @@ export async function getCommentsData(
 	return response;
 }
 
-export async function getCommentData(commentID, fields = "*") {
+export async function getCommentData(supabase, commentID, fields = "*") {
 	const { data } = await supabase
 		.from("comments")
 		.select(fields)
@@ -98,7 +98,7 @@ export async function getCommentData(commentID, fields = "*") {
 	return data;
 }
 
-export async function getProfileData(fields, profileID) {
+export async function getProfileData(supabase, fields, profileID) {
 	const { data } = await supabase
 		.from("profiles")
 		.select(fields)
@@ -109,12 +109,7 @@ export async function getProfileData(fields, profileID) {
 	return data;
 }
 
-export async function getProfiles() {
-	const { data } = await supabase.from("profiles").select().throwOnError();
-	return data;
-}
-
-export async function getProfileID(accountName) {
+export async function getProfileID(supabase, accountName) {
 	const { data } = await supabase
 		.from("profiles")
 		.select("id")
@@ -126,7 +121,7 @@ export async function getProfileID(accountName) {
 	return null;
 }
 
-export async function getReviewUpvoteList(reviewID) {
+export async function getReviewUpvoteList(supabase, reviewID) {
 	const { data } = await supabase
 		.from("item_reviews")
 		.select("upvoted_by")
@@ -136,7 +131,7 @@ export async function getReviewUpvoteList(reviewID) {
 	return data.upvoted_by;
 }
 
-export async function reviewExist(reviewID) {
+export async function reviewExist(supabase, reviewID) {
 	const { count } = await supabase
 		.from("item_reviews")
 		.select("*", { count: "exact", head: true })
@@ -144,14 +139,14 @@ export async function reviewExist(reviewID) {
 	return count === 1;
 }
 
-export async function toggleUpvoteForReview(reviewID, profileID) {
+export async function toggleUpvoteForReview(supabase, reviewID, profileID) {
 	if (!profileID) {
 		throw new Error("NO_PROFILE_ID_SPECIFIED");
 	}
 
 	// CONFIRM THAT REVIEW EXISTS
 	try {
-		const exist = await reviewExist(reviewID);
+		const exist = await reviewExist(supabase, reviewID);
 		if (!exist) {
 			return {
 				status: "FAILED",
@@ -198,14 +193,14 @@ export async function toggleUpvoteForReview(reviewID, profileID) {
 	}
 }
 
-export async function deleteReview(reviewID, profileID) {
+export async function deleteReview(supabase, reviewID, profileID) {
 	if (!profileID) {
 		throw new Error("NO_PROFILE_ID_SPECIFIED");
 	}
 
 	// CONFIRM THAT REVIEW EXISTS
 	try {
-		const exist = await reviewExist(reviewID);
+		const exist = await reviewExist(supabase, reviewID);
 		if (!exist) {
 			return {
 				status: "FAILED",
@@ -228,14 +223,18 @@ export async function deleteReview(reviewID, profileID) {
 	};
 }
 
-export async function toggleUpvoteForComment(commentID, profileID) {
+export async function toggleUpvoteForComment(supabase, commentID, profileID) {
 	if (!profileID) {
 		throw new Error("NO_PROFILE_ID_SPECIFIED");
 	}
 
 	let upvoteList = [];
 	try {
-		const { upvoted_by } = await getCommentData(commentID, "upvoted_by");
+		const { upvoted_by } = await getCommentData(
+			supabase,
+			commentID,
+			"upvoted_by"
+		);
 		upvoteList = upvoted_by;
 	} catch (error) {
 		throw error;
@@ -267,7 +266,7 @@ export async function toggleUpvoteForComment(commentID, profileID) {
 	}
 }
 
-export async function getUserItemRecommendations(profileID) {
+export async function getUserItemRecommendations(supabase, profileID) {
 	const response = await supabase
 		.from("item_recommendations")
 		.select()
@@ -276,7 +275,7 @@ export async function getUserItemRecommendations(profileID) {
 	return response;
 }
 
-export async function getUserItemReviews(profileID) {
+export async function getUserItemReviews(supabase, profileID) {
 	const response = await supabase
 		.from("item_reviews")
 		.select()
@@ -285,7 +284,7 @@ export async function getUserItemReviews(profileID) {
 	return response;
 }
 
-export async function getDiscussionsByTags(tags, profileID = null) {
+export async function getDiscussionsByTags(supabase, tags, profileID = null) {
 	if (!(tags instanceof Array)) {
 		throw new Error("Invalid params - tags must be an array");
 	}
@@ -307,7 +306,7 @@ export async function getDiscussionsByTags(tags, profileID = null) {
 	}
 }
 
-export async function getDiscussionByID(discussionID) {
+export async function getDiscussionByID(supabase, discussionID) {
 	if (!discussionID) {
 		throw new Error(`Invalid argument passed - ${discussionID}`);
 	}
@@ -322,7 +321,7 @@ export async function getDiscussionByID(discussionID) {
 	return data[0];
 }
 
-export async function getDiscussionByAccountName(accountName) {
+export async function getDiscussionByAccountName(supabase, accountName) {
 	if (!accountName) {
 		throw new Error(`Invalid argument passed - ${accountName}`);
 	}
@@ -335,7 +334,7 @@ export async function getDiscussionByAccountName(accountName) {
 	return data;
 }
 
-export async function getListByID(listID) {
+export async function getListByID(supabase, listID) {
 	if (!listID) {
 		throw new Error(`Invalid argument passed - ${listID}`);
 	}
@@ -368,7 +367,7 @@ export function numberToString(count, appendString) {
 	}
 }
 
-export async function getReviewByUser(animeID, profileID) {
+export async function getReviewByUser(supabase, animeID, profileID) {
 	const { data } = await supabase
 		.from("item_reviews")
 		.select()
@@ -379,6 +378,7 @@ export async function getReviewByUser(animeID, profileID) {
 }
 
 export async function getReviewsData(
+	supabase,
 	animeID,
 	limit,
 	startAfterIndex = null,
@@ -389,7 +389,7 @@ export async function getReviewsData(
 	const response = { data: [], count: 0 };
 	// GET USER REVIEW FIRST BEFORE OTHER REVIEWS IF PROFILE ID SPECIFIED
 	if (profileID !== null) {
-		const userReview = await getReviewByUser(animeID, profileID);
+		const userReview = await getReviewByUser(supabase, animeID, profileID);
 		if (userReview.length > 0) {
 			list.push(userReview[0]);
 			totalReviewsCount += 1;
@@ -448,7 +448,7 @@ export async function getReviewsData(
 	return response;
 }
 
-export async function getRecentItems(type, profileID) {
+export async function getRecentItems(supabase, type, profileID) {
 	const { data } = await supabase
 		.from("recent_items")
 		.select(type)
@@ -457,7 +457,7 @@ export async function getRecentItems(type, profileID) {
 	return data[0][type];
 }
 
-export async function setRecentItem(type, profileID, item) {
+export async function setRecentItem(supabase, type, profileID, item) {
 	const recentItems = await getRecentItems(type, profileID);
 	let itemAlreadyExists = false;
 	if (type === "animes") {

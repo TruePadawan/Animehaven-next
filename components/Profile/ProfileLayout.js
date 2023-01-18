@@ -10,8 +10,10 @@ import styles from "./profile-layout.module.css";
 import Loading from "../Loading/Loading";
 import NoAccount from "../NoAccount/NoAccount";
 import HeaderLayout from "../HeaderLayout/HeaderLayout";
+import { useSupabaseClient } from "@supabase/auth-helpers-react";
 
 export default function ProfileLayout(props) {
+	const supabase = useSupabaseClient();
 	const { profileID } = useContext(UserAuthContext);
 	const [profileData, setProfileData] = useState({
 		profileExists: null,
@@ -28,7 +30,7 @@ export default function ProfileLayout(props) {
 	useEffect(() => {
 		if (router.isReady) {
 			const { accountName } = router.query;
-			getProfileID(accountName).then((id) => {
+			getProfileID(supabase, accountName).then((id) => {
 				if (id === null) {
 					setProfileData({
 						profileExists: false,
@@ -36,21 +38,23 @@ export default function ProfileLayout(props) {
 						data: {},
 					});
 				} else {
-					getProfileData("*", id).then(({ avatar_url, display_name, bio }) => {
-						setProfileData({
-							profileExists: true,
-							accountName,
-							data: {
-								avatar_url,
-								display_name,
-								bio,
-							},
-						});
-					});
+					getProfileData(supabase, "*", id).then(
+						({ avatar_url, display_name, bio }) => {
+							setProfileData({
+								profileExists: true,
+								accountName,
+								data: {
+									avatar_url,
+									display_name,
+									bio,
+								},
+							});
+						}
+					);
 				}
 			});
 		}
-	}, [router]);
+	}, [router, supabase]);
 
 	// PROFILE CAN'T BE EDITED IF NO USER SIGNED IN OR PROFILE ISN'T SAME AS CURRENLTY SIGNED IN
 	useEffect(() => {
@@ -60,11 +64,13 @@ export default function ProfileLayout(props) {
 		if (!profileID) {
 			setIsAccountEditable(false);
 		} else if (profileID && profileExists) {
-			getProfileData("account_name", profileID).then(({ account_name }) => {
-				setIsAccountEditable(account_name === accountName);
-			});
+			getProfileData(supabase, "account_name", profileID).then(
+				({ account_name }) => {
+					setIsAccountEditable(account_name === accountName);
+				}
+			);
 		}
-	}, [profileID, profileData]);
+	}, [profileID, profileData, supabase]);
 
 	function toggleSidebar(value) {
 		setSidebarIsOpen(value);

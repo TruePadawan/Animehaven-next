@@ -8,11 +8,12 @@ import Select from "../../components/Select/Select";
 import { UserAuthContext } from "../../context/UserAuthContext";
 import { DISCUSSION_TAGS } from "../../utilities/app-utilities";
 import styles from "../../styles/create-discussion.module.css";
-import { supabase } from "../../supabase/config";
 import HeaderLayout from "../../components/HeaderLayout/HeaderLayout";
+import { useSupabaseClient } from "@supabase/auth-helpers-react";
 
 const allowed_tags = DISCUSSION_TAGS.map((tag) => tag.toLowerCase());
 export default function Create() {
+	const supabase = useSupabaseClient();
 	const { profileID } = useContext(UserAuthContext);
 	const [errorText, setErrorText] = useState("");
 	const [createBtnDisabled, setCreateBtnDisabled] = useState(false);

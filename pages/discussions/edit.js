@@ -8,11 +8,12 @@ import Select from "../../components/Select/Select";
 import { UserAuthContext } from "../../context/UserAuthContext";
 import { DISCUSSION_TAGS } from "../../utilities/app-utilities";
 import styles from "../../styles/create-discussion.module.css";
-import { supabase } from "../../supabase/config";
 import Loading from "../../components/Loading/Loading";
 import HeaderLayout from "../../components/HeaderLayout/HeaderLayout";
+import { useSupabaseClient } from "@supabase/auth-helpers-react";
 
 export default function Edit() {
+	const supabase = useSupabaseClient();
 	const { profileID } = useContext(UserAuthContext);
 	const [loading, setLoading] = useState(true);
 	const [errorText, setErrorText] = useState("");
@@ -51,7 +52,7 @@ export default function Edit() {
 					});
 			}
 		}
-	}, [router, profileID]);
+	}, [router, profileID, supabase]);
 
 	if (router.isReady === false || loading) {
 		return (

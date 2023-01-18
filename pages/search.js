@@ -8,13 +8,14 @@ import UserItem from "../components/Items/UserItem/UserItem";
 import Loading from "../components/Loading/Loading";
 import { searchAnime } from "../utilities/mal-api";
 import { Alert, Box, Snackbar } from "@mui/material";
-import { supabase } from "../supabase/config";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { defaultSnackbarState, getUsefulData } from "../utilities/app-utilities";
 import HeaderLayout from "../components/HeaderLayout/HeaderLayout";
+import { useSupabaseClient } from "@supabase/auth-helpers-react";
 
 export default function Search() {
+	const supabase = useSupabaseClient();
 	const [searchResult, setSearchResult] = useState([]);
 	const [loading, setLoading] = useState(false);
 	const [snackbarData, setSnackbarData] = useState(defaultSnackbarState);

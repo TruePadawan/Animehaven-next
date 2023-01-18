@@ -1,7 +1,6 @@
-import { Divider, IconButton, Menu, MenuItem, Skeleton } from "@mui/material";
+import { Divider, IconButton, MenuItem, Skeleton } from "@mui/material";
 import ReplyIcon from "@mui/icons-material/Reply";
 import Link from "next/link";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { Fragment, useEffect, useState } from "react";
 import {
 	getProfileData,
@@ -13,12 +12,13 @@ import ThumbUpAltIcon from "@mui/icons-material/ThumbUpAlt";
 import ThumbUpOffAltIcon from "@mui/icons-material/ThumbUpOffAlt";
 import styles from "../Comments-Reviews.module.css";
 import EditCommentItem from "./EditCommentItem";
-import { supabase } from "../../../supabase/config";
 import Image from "next/image";
 import MoreOptions from "../MoreOptions";
 import { usePopupState } from "material-ui-popup-state/hooks";
+import { useSupabaseClient } from "@supabase/auth-helpers-react";
 
 const CommentItem = (props) => {
+	const supabase = useSupabaseClient();
 	const { commentData, setReplyData, triggerAlert, profileID } = props;
 	const [commentCreatorData, setCommentCreatorData] = useState({
 		avatar_url: null,
@@ -46,17 +46,21 @@ const CommentItem = (props) => {
 	useEffect(() => {
 		const { creator_id, parent_comment_id } = commentData;
 
-		getProfileData("account_name,display_name,avatar_url", creator_id)
+		getProfileData(supabase, "account_name,display_name,avatar_url", creator_id)
 			.then(async (profileData) => {
 				setCommentCreatorData(profileData);
 
 				const isReply = parent_comment_id !== null;
 				if (isReply) {
 					try {
-						const parentCommentData = await getCommentData(parent_comment_id);
+						const parentCommentData = await getCommentData(
+							supabase,
+							parent_comment_id
+						);
 						const { text, creator_id: parentCommentCreatorID } =
 							parentCommentData;
 						const profileDataForParentCommentCreator = await getProfileData(
+							supabase,
 							"display_name,account_name",
 							parentCommentCreatorID
 						);
@@ -86,7 +90,7 @@ const CommentItem = (props) => {
 					error,
 				});
 			});
-	}, [commentData, triggerAlert]);
+	}, [commentData, supabase, triggerAlert]);
 
 	// LISTEN FOR WHEN PARENT COMMENT IS UPDATED OR DELETED
 	useEffect(() => {
@@ -187,7 +191,7 @@ const CommentItem = (props) => {
 			return { ...snapshot, upvote: true };
 		});
 		try {
-			await toggleUpvoteForComment(commentData.id, profileID);
+			await toggleUpvoteForComment(supabase, commentData.id, profileID);
 		} catch (error) {
 			triggerAlert("Failed to complete action", { severity: "error", error });
 		}

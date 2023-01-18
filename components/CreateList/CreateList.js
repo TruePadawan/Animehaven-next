@@ -23,11 +23,12 @@ import Input from "../Input/Input";
 import SearchInput from "../Input/SearchInput/SearchInput";
 import Loading from "../Loading/Loading";
 import styles from "./style.module.css";
-import { supabase } from "../../supabase/config";
 import { defaultSnackbarState, getUsefulData, LIST_GENRES } from "../../utilities/app-utilities";
 import { useRouter } from "next/router";
+import { useSupabaseClient } from "@supabase/auth-helpers-react";
 
 const CreateList = (props) => {
+	const supabase = useSupabaseClient();
 	const [visibility, setVisibility] = useState(() => {
 		if (props.update === true) {
 			return props.defaultValues.is_public === true ? "public" : "private";

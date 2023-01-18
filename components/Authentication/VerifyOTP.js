@@ -1,7 +1,7 @@
 import { Typography, Button, TextField } from "@mui/material";
 import { useState } from "react";
 import useInterval from "../../hooks/use-interval";
-import { supabase } from "../../supabase/config";
+import { useSupabaseClient } from "@supabase/auth-helpers-react";
 
 const VerifyOTP = ({
 	email,
@@ -13,6 +13,7 @@ const VerifyOTP = ({
 	const [OTPValue, setOTPValue] = useState("");
 	const [countdown, setCountdown] = useState(60);
 	const [countdownIsRunning, setCountdownIsRunning] = useState(true);
+	const supabase = useSupabaseClient();
 
 	useInterval(
 		() => {

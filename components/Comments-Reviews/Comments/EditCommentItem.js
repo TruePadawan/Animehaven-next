@@ -1,9 +1,10 @@
 import { Button, TextareaAutosize } from "@mui/material";
 import { useState } from "react";
-import { supabase } from "../../../supabase/config";
 import styles from "../Comments-Reviews.module.css";
+import { useSupabaseClient } from "@supabase/auth-helpers-react";
 
 const EditCommentItem = (props) => {
+	const supabase = useSupabaseClient();
 	const [commentText, setCommentText] = useState(props.defaultValue);
 	async function formSubmitHandler(event) {
 		event.preventDefault();

@@ -21,12 +21,12 @@ const UserAccountBtn = ({ profileID, errorHandler }) => {
 	const isMenuOpen = Boolean(menuAnchorEl);
 
 	useEffect(() => {
-		getProfileData("*", profileID).then(({ account_name, avatar_url }) => {
+		getProfileData(supabase, "*", profileID).then(({ account_name, avatar_url }) => {
 			setAccountName(account_name);
 			setPhotoSrc(avatar_url);
 			setLoading(false);
 		});
-	}, [profileID]);
+	}, [profileID, supabase]);
 
 	const openMenu = (e) => {
 		setMenuAnchorEl(e.currentTarget);

@@ -17,11 +17,11 @@ import ListItem from "../../components/Items/ListItem/ListItem";
 import { UserAuthContext } from "../../context/UserAuthContext";
 import CreateList from "../../components/CreateList/CreateList";
 import { LIST_GENRES } from "../../utilities/app-utilities";
-import { supabase } from "../../supabase/config";
 import Loading from "../../components/Loading/Loading";
 import Head from "next/head";
 import CheckboxList from "../../components/CheckboxList/CheckboxList";
 import HeaderLayout from "../../components/HeaderLayout/HeaderLayout";
+import { useSupabaseClient } from "@supabase/auth-helpers-react";
 
 const applyGenreFilter = (lists, acceptedGenres) => {
 	const filtered = lists.filter((list) => {
@@ -39,6 +39,7 @@ const applyGenreFilter = (lists, acceptedGenres) => {
 };
 
 const Lists = () => {
+	const supabase = useSupabaseClient();
 	const { profileID } = useContext(UserAuthContext);
 	const [showCreateListDialog, setShowCreateListDialog] = useState(false);
 	const [lists, setLists] = useState([]);

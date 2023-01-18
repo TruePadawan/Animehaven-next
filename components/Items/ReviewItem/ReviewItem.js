@@ -13,9 +13,10 @@ import { getUsefulData } from "../../../utilities/app-utilities";
 import Link from "next/link";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import styles from "./style.module.css";
-import { supabase } from "../../../supabase/config";
+import { useSupabaseClient } from "@supabase/auth-helpers-react";
 
 export default function ReviewItem({ itemID, creatorID, index }) {
+	const supabase = useSupabaseClient();
 	const [loading, setLoading] = useState(true);
 	const [itemData, setItemData] = useState({});
 	const [modalOpen, setModalOpen] = useState(false);

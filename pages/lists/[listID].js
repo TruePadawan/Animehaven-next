@@ -9,7 +9,6 @@ import CreateList from "../../components/CreateList/CreateList";
 import Error from "../../components/Error/Error";
 import CommentsList from "../../components/Comments-Reviews/Comments/CommentsList";
 import BodyLayout from "../../components/BodyLayout/BodyLayout";
-import { supabase } from "../../supabase/config";
 import {
 	getListByID,
 	getUsefulData,
@@ -19,8 +18,10 @@ import { getAnimeByID } from "../../utilities/mal-api";
 import { UserAuthContext } from "../../context/UserAuthContext";
 import { useRouter } from "next/router";
 import HeaderLayout from "../../components/HeaderLayout/HeaderLayout";
+import { useSupabaseClient } from "@supabase/auth-helpers-react";
 
 const Item = ({ itemID, itemTitle, index }) => {
+	const supabase = useSupabaseClient();
 	const [loading, setLoading] = useState(true);
 	const [itemData, setItemData] = useState({
 		title: "",
@@ -89,7 +90,7 @@ const List = () => {
 	// REQUEST FOR AND LOAD LIST DATA TO UI
 	useEffect(() => {
 		if (listID === undefined) return;
-		getListByID(listID)
+		getListByID(supabase, listID)
 			.then((data) => {
 				const {
 					title,
@@ -125,7 +126,7 @@ const List = () => {
 
 						// SINCE LIST EXISTS, ADD TO RECENTLY VIEWED LISTS
 						if (profileID !== null) {
-							setRecentItem("lists", profileID, listID);
+							setRecentItem(supabase, "lists", profileID, listID);
 						}
 					});
 			})
@@ -136,7 +137,7 @@ const List = () => {
 				});
 				setLoading(false);
 			});
-	}, [listID, profileID]);
+	}, [listID, profileID, supabase]);
 
 	const openCreateListDialog = () => setShowCreateListDialog(true);
 	const closeCreateListDialog = () => setShowCreateListDialog(false);

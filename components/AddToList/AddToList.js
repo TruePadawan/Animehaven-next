@@ -14,8 +14,8 @@ import LockOpenIcon from "@mui/icons-material/LockOpen";
 import { useTheme } from "@mui/material/styles";
 import SearchInput from "../Input/SearchInput/SearchInput";
 import styles from "./styles.module.css";
-import { supabase } from "../../supabase/config";
 import Loading from "../Loading/Loading";
+import { useSupabaseClient } from "@supabase/auth-helpers-react";
 
 const Item = ({
 	id,
@@ -25,6 +25,7 @@ const Item = ({
 	closeDialog,
 	isPrivate = false,
 }) => {
+	const supabase = useSupabaseClient();
 	const addAnimeToList = async () => {
 		try {
 			const { data } = await supabase

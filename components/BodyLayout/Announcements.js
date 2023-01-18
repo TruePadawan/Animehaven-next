@@ -1,9 +1,9 @@
 import Loading from "../Loading/Loading";
 import useSWRImmutable from "swr/immutable";
 import AnnouncementItem from "../Items/AnnouncementItem/AnnouncementItem";
-import { supabase } from "../../supabase/config";
 import AnnouncementOutlinedIcon from '@mui/icons-material/AnnouncementOutlined';
 import styles from "./styles.module.css";
+import { useSupabaseClient } from "@supabase/auth-helpers-react";
 
 async function announcementsFetcher(tag) {
 	const { data } = await supabase
@@ -17,6 +17,7 @@ async function announcementsFetcher(tag) {
 
 export default function Announcements() {
 	const { data, error } = useSWRImmutable("announcement", announcementsFetcher);
+	const supabase = useSupabaseClient();
 
 	const loading = !data && !error;
 	let content = (

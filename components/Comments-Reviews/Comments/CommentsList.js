@@ -11,7 +11,6 @@ import CommentItem from "./CommentItem";
 import CommentBox from "./CommentBox";
 import styles from "../Comments-Reviews.module.css";
 import { Alert, Button, Snackbar } from "@mui/material";
-import { supabase } from "../../../supabase/config";
 import {
 	defaultSnackbarState,
 	getCommentsData,
@@ -20,9 +19,11 @@ import {
 import { UserAuthContext } from "../../../context/UserAuthContext";
 import CommentIcon from "@mui/icons-material/Comment";
 import ShareButton from "../../ShareButton/ShareButton";
+import { useSupabaseClient } from "@supabase/auth-helpers-react";
 
 const COMMENTS_PER_REQUEST = 10;
 const CommentsList = ({ id, className = "" }) => {
+	const supabase = useSupabaseClient();
 	const { profileID } = useContext(UserAuthContext);
 	const [commentsData, setCommentsData] = useState([]);
 	const [loadingComments, setLoadingComments] = useState(false);
@@ -56,7 +57,7 @@ const CommentsList = ({ id, className = "" }) => {
 
 	// LOAD COMMENTS ASSOCIATED WITH INSTANCE ID
 	useEffect(() => {
-		getCommentsData(id, COMMENTS_PER_REQUEST)
+		getCommentsData(supabase, id, COMMENTS_PER_REQUEST)
 			.then(({ data, count }) => {
 				totalCommentsCount.current = count;
 				setCommentsData(data);
@@ -65,7 +66,7 @@ const CommentsList = ({ id, className = "" }) => {
 				triggerAlert("Failed to load comments", { severity: "error", error });
 				setCommentsData([]);
 			});
-	}, [id, triggerAlert]);
+	}, [id, supabase, triggerAlert]);
 
 	// LISTEN FOR NEW COMMENTS AND UPDATES TO COMMENTS
 	useEffect(() => {
@@ -154,6 +155,7 @@ const CommentsList = ({ id, className = "" }) => {
 		const lastCommentIndex = commentsData.at(-1).index;
 		try {
 			const { data } = await getCommentsData(
+				supabase,
 				id,
 				COMMENTS_PER_REQUEST,
 				lastCommentIndex

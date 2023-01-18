@@ -16,14 +16,14 @@ import {
 	getDiscussionByAccountName,
 	getUserItemRecommendations,
 	getUserItemReviews,
-	PROFILE_IMG_MAX_SIZE,
 	verifyProfileImage,
+	getProfileID,
+	getProfileData,
 } from "../../../utilities/app-utilities";
-import { getProfileID, getProfileData } from "../../../utilities/app-utilities";
-import { supabase } from "../../../supabase/config";
 import { useRouter } from "next/router";
 import Image from "next/image";
 import { Fragment } from "react";
+import { useSupabaseClient } from "@supabase/auth-helpers-react";
 
 const ProfileSectionContainer = ({ title, children }) => {
 	return (
@@ -42,10 +42,11 @@ const ProfileSectionContainer = ({ title, children }) => {
 export function UserDiscussions({ accountName }) {
 	const [loading, setLoading] = useState(false);
 	const [items, setItems] = useState([]);
+	const supabase = useSupabaseClient();
 
 	useEffect(() => {
 		setLoading(true);
-		getDiscussionByAccountName(accountName)
+		getDiscussionByAccountName(supabase, accountName)
 			.then((data) => {
 				const list = data.map((discussion) => (
 					<DiscussionItem
@@ -61,7 +62,7 @@ export function UserDiscussions({ accountName }) {
 			.finally(() => {
 				setLoading(false);
 			});
-	}, [accountName]);
+	}, [accountName, supabase]);
 
 	return (
 		<ProfileSectionContainer title="Discussions">
@@ -74,10 +75,11 @@ export function UserDiscussions({ accountName }) {
 export function UserLists({ accountName }) {
 	const [lists, setLists] = useState([]);
 	const [loading, setLoading] = useState(false);
+	const supabase = useSupabaseClient();
 
 	useEffect(() => {
 		setLoading(true);
-		getProfileID(accountName).then((id) => {
+		getProfileID(supabase, accountName).then((id) => {
 			supabase
 				.from("anime_lists")
 				.select("id")
@@ -98,7 +100,7 @@ export function UserLists({ accountName }) {
 					}
 				);
 		});
-	}, [accountName]);
+	}, [accountName, supabase]);
 
 	return (
 		<ProfileSectionContainer title="Lists">
@@ -118,6 +120,7 @@ export function UserLists({ accountName }) {
 export function UserSavedLists({ accountName }) {
 	const [loading, setLoading] = useState(false);
 	const [items, setItems] = useState([]);
+	const supabase = useSupabaseClient();
 
 	useEffect(() => {
 		setLoading(true);
@@ -131,7 +134,7 @@ export function UserSavedLists({ accountName }) {
 				setItems(transformed);
 				setLoading(false);
 			});
-	}, [accountName]);
+	}, [accountName, supabase]);
 
 	return (
 		<ProfileSectionContainer title="Saved Lists">
@@ -151,15 +154,16 @@ export function UserSavedLists({ accountName }) {
 export function UserItems({ title, status, accountName }) {
 	const [loading, setLoading] = useState(true);
 	const [items, setItems] = useState([]);
+	const supabase = useSupabaseClient();
 
 	useEffect(() => {
 		setLoading(true);
-		getProfileID(accountName)
+		getProfileID(supabase, accountName)
 			.then((profileID) => {
 				if (profileID === null) {
 					throw new Error(`No profile with name '${accountName}'`);
 				}
-				getProfileData("items_watch_status", profileID).then(
+				getProfileData(supabase, "items_watch_status", profileID).then(
 					({ items_watch_status }) => {
 						const items = [];
 						for (const itemID in items_watch_status) {
@@ -178,10 +182,10 @@ export function UserItems({ title, status, accountName }) {
 					}
 				);
 			})
-			.catch((error) => {
+			.catch(() => {
 				setItems([]);
 			});
-	}, [accountName, status]);
+	}, [accountName, status, supabase]);
 
 	return (
 		<ProfileSectionContainer title={title}>
@@ -198,11 +202,12 @@ export function UserItems({ title, status, accountName }) {
 export function UserRecommendedItems({ accountName }) {
 	const [items, setItems] = useState([]);
 	const [loading, setLoading] = useState(false);
+	const supabase = useSupabaseClient();
 
 	useEffect(() => {
 		setLoading(true);
-		getProfileID(accountName).then((profileID) => {
-			getUserItemRecommendations(profileID)
+		getProfileID(supabase, accountName).then((profileID) => {
+			getUserItemRecommendations(supabase, profileID)
 				.then(({ data }) => {
 					const recommendedItems = data.map(({ item_id }, index) => (
 						<RecommendedItem key={item_id} itemID={item_id} index={index} />
@@ -216,7 +221,7 @@ export function UserRecommendedItems({ accountName }) {
 					setLoading(false);
 				});
 		});
-	}, [accountName]);
+	}, [accountName, supabase]);
 
 	return (
 		<ProfileSectionContainer title="Recommended">
@@ -233,11 +238,12 @@ export function UserRecommendedItems({ accountName }) {
 export function UserReviews({ accountName }) {
 	const [items, setItems] = useState([]);
 	const [loading, setLoading] = useState(false);
+	const supabase = useSupabaseClient();
 
 	useEffect(() => {
 		setLoading(true);
-		getProfileID(accountName).then((profileID) => {
-			getUserItemReviews(profileID)
+		getProfileID(supabase, accountName).then((profileID) => {
+			getUserItemReviews(supabase, profileID)
 				.then(({ data }) => {
 					const reviewedItems = data.map(({ item_id }, index) => (
 						<ReviewItem
@@ -256,7 +262,7 @@ export function UserReviews({ accountName }) {
 					setLoading(false);
 				});
 		});
-	}, [accountName]);
+	}, [accountName, supabase]);
 
 	return (
 		<ProfileSectionContainer title="Reviews">
@@ -271,6 +277,7 @@ export function UserReviews({ accountName }) {
 }
 
 export function EditProfile({ open, closeDialog }) {
+	const supabase = useSupabaseClient();
 	const router = useRouter();
 	const { profileID } = useContext(UserAuthContext);
 	const [loading, setLoading] = useState(true);
@@ -317,7 +324,7 @@ export function EditProfile({ open, closeDialog }) {
 			if (!open) return;
 			setLoading(true);
 			const { avatar_url, account_name, display_name, bio } =
-				await getProfileData("*", profileID);
+				await getProfileData(supabase, "*", profileID);
 			setProfileData({
 				avatarURL: avatar_url,
 				accountName: account_name,
@@ -333,7 +340,7 @@ export function EditProfile({ open, closeDialog }) {
 		} else {
 			loadAccountData();
 		}
-	}, [closeDialog, profileID, open]);
+	}, [closeDialog, profileID, open, supabase]);
 
 	useEffect(() => {
 		if (!open) return;
@@ -363,7 +370,7 @@ export function EditProfile({ open, closeDialog }) {
 			}
 		}, 600);
 		return () => clearTimeout(identifier);
-	}, [profileData, open]);
+	}, [profileData, open, supabase]);
 
 	const accountNameChangeHandler = (event) => {
 		const value = event.target.value.replace(/[^a-zA-Z0-9]/g, "").toLowerCase();

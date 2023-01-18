@@ -4,11 +4,12 @@ import SendIcon from "@mui/icons-material/Send";
 import CancelIcon from "@mui/icons-material/Cancel";
 import styles from "../Comments-Reviews.module.css";
 import Link from "next/link";
-import { supabase } from "../../../supabase/config";
+import { useSupabaseClient } from "@supabase/auth-helpers-react";
 
 const CommentBox = (props) => {
 	const [commentText, setCommentText] = useState("");
 	const [sendBtnDisabled, setSendBtnDisabled] = useState(false);
+	const supabase = useSupabaseClient();
 
 	const commentTextChangeHandler = (event) => {
 		setCommentText(event.target.value);
