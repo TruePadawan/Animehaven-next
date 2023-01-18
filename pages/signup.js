@@ -162,7 +162,7 @@ export default function SignUp() {
 	const completeSignup = async (authData) => {
 		try {
 			const uid = authData.user.id;
-			const { error } = await createProfile({
+			const { error } = await createProfile(supabase, {
 				id: uid,
 				account_name: accountName,
 				display_name: displayName,

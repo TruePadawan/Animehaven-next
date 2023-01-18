@@ -76,7 +76,7 @@ const AuthComplete = ({ userData }) => {
 			disableButtons();
 			const profileExists = await hasProfile(supabase, userData.profile_id);
 			if (profileExists) throw new Error("Profile already exists");
-			await createProfile({
+			await createProfile(supabase, {
 				id: userData.profile_id,
 				account_name: accountName,
 				display_name: displayNameRef.current.value,
