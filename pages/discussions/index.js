@@ -20,8 +20,10 @@ import { getDiscussionsByTags } from "../../utilities/app-utilities";
 import DiscussionItem from "../../components/Items/DiscussionItem/DiscussionItem";
 import Loading from "../../components/Loading/Loading";
 import HeaderLayout from "../../components/HeaderLayout/HeaderLayout";
+import { useSupabaseClient } from "@supabase/auth-helpers-react";
 
 export default function Discussions() {
+	const supabase = useSupabaseClient();
 	const { profileID } = useContext(UserAuthContext);
 	const [discussionsList, setDiscussionsList] = useState([]);
 	const [filterDrawerIsOpen, setFilterDrawerIsOpen] = useState(false);
@@ -44,17 +46,17 @@ export default function Discussions() {
 		}
 		setQueryingDB(true);
 		if (filter === "all") {
-			getDiscussionsByTags(selectedTags).then((data) => {
+			getDiscussionsByTags(supabase, selectedTags).then((data) => {
 				setDiscussionsList(data);
 				setQueryingDB(false);
 			});
 		} else if (filter === "your_discussions" && profileID !== null) {
-			getDiscussionsByTags(selectedTags, profileID).then((data) => {
+			getDiscussionsByTags(supabase, selectedTags, profileID).then((data) => {
 				setDiscussionsList(data);
 				setQueryingDB(false);
 			});
 		}
-	}, [discussionTags, filter, profileID]);
+	}, [discussionTags, filter, profileID, supabase]);
 
 	function toggleFilterDrawer(open) {
 		setFilterDrawerIsOpen(open);

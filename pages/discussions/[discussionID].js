@@ -1,4 +1,4 @@
-import { Button, IconButton } from "@mui/material";
+import { IconButton } from "@mui/material";
 import { Fragment, useContext, useEffect, useState } from "react";
 import Link from "next/link";
 import Head from "next/head";
@@ -16,9 +16,11 @@ import { UserAuthContext } from "../../context/UserAuthContext";
 import { useRouter } from "next/router";
 import EditIcon from "@mui/icons-material/Edit";
 import HeaderLayout from "../../components/HeaderLayout/HeaderLayout";
+import { useSupabaseClient } from "@supabase/auth-helpers-react";
 
 const initialErrorState = { occurred: false, text: "" };
 const Discussion = () => {
+	const supabase = useSupabaseClient();
 	const router = useRouter();
 	const { profileID } = useContext(UserAuthContext);
 	const [loading, setLoading] = useState(false);
@@ -36,9 +38,9 @@ const Discussion = () => {
 		if (discussionID) {
 			setLoading(true);
 
-			getDiscussionByID(discussionID)
+			getDiscussionByID(supabase, discussionID)
 				.then((data) => {
-					getProfileData("account_name", data.creator_id).then(
+					getProfileData(supabase, "account_name", data.creator_id).then(
 						({ account_name }) => {
 							setData({
 								title: data.title,
@@ -52,7 +54,7 @@ const Discussion = () => {
 
 							// SINCE DISCUSSION HAS BEEN CONFIRMED TO EXIST, ADD IT TO RECENTLY VIEWED DISCUSISONS
 							if (profileID !== null) {
-								setRecentItem("discussions", profileID, discussionID);
+								setRecentItem(supabase, "discussions", profileID, discussionID);
 							}
 						}
 					);
@@ -65,7 +67,7 @@ const Discussion = () => {
 					setLoading(false);
 				});
 		}
-	}, [discussionID, profileID]);
+	}, [discussionID, profileID, supabase]);
 
 	if (router.isReady === false || loading) {
 		return (

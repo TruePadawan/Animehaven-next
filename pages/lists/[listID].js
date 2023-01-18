@@ -21,7 +21,6 @@ import HeaderLayout from "../../components/HeaderLayout/HeaderLayout";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
 
 const Item = ({ itemID, itemTitle, index }) => {
-	const supabase = useSupabaseClient();
 	const [loading, setLoading] = useState(true);
 	const [itemData, setItemData] = useState({
 		title: "",
@@ -79,6 +78,7 @@ const Item = ({ itemID, itemTitle, index }) => {
 
 const initialErrorState = { occurred: false, text: "" };
 const List = () => {
+	const supabase = useSupabaseClient();
 	const { listID } = useRouter().query;
 	const { profileID } = useContext(UserAuthContext);
 	const [loading, setLoading] = useState(true);
