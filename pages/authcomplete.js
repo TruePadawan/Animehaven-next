@@ -56,6 +56,16 @@ const AuthComplete = ({ userData }) => {
 		alert(`${errorText} - ${error.message || error.error_description}`);
 	}
 
+	function disableButtons() {
+		setCreateProfileBtnDisabled(true);
+			setCancelAuthBtnDisabled(true);
+	}
+
+	function enableButtons() {
+		setCreateProfileBtnDisabled(true);
+			setCancelAuthBtnDisabled(true);
+	}
+
 	async function formSubmitHandler(event) {
 		event.preventDefault();
 		if (!accountNameIsValid || accountNameHasError) {
@@ -63,8 +73,7 @@ const AuthComplete = ({ userData }) => {
 			return;
 		}
 		try {
-			setCreateProfileBtnDisabled(true);
-			setCancelAuthBtnDisabled(true);
+			disableButtons();
 			const profileExists = await hasProfile(supabase, userData.profile_id);
 			if (profileExists) throw new Error("Profile already exists");
 			await createProfile({
@@ -76,21 +85,18 @@ const AuthComplete = ({ userData }) => {
 			router.reload();
 		} catch (error) {
 			handleError("Failed to create profile", error);
-			setCreateProfileBtnDisabled(false);
-			setCancelAuthBtnDisabled(false);
+			enableButtons();
 		}
 	}
 
 	async function cancelAuthentication() {
-		setCreateProfileBtnDisabled(true);
-		setCancelAuthBtnDisabled(true);
+		disableButtons();
 		try {
 			await supabase.auth.signOut();
 			router.reload();
 		} catch (error) {
 			handleError("Error occurred while signing out", error);
-			setCreateProfileBtnDisabled(false);
-			setCancelAuthBtnDisabled(false);
+			enableButtons();
 		}
 	}
 
