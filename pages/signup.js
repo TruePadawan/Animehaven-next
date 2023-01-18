@@ -90,14 +90,11 @@ export default function SignUp() {
 
 	// CLEAR FORM TEXT IF VALIDITY IS BEING PROCESSED OR WHEN INPUT HAS NO ERROR
 	useEffect(() => {
-		if (
-			checkingAcctNameValidity === true ||
-			(!checkingAcctNameValidity && !accountNameHasError)
-		) {
+		if (checkingAcctNameValidity || !accountNameHasError) {
 			setFormText((snapshot) => {
 				return { ...snapshot, acctName: "" };
 			});
-		} else if (!checkingAcctNameValidity && accountNameHasError) {
+		} else if (accountNameHasError) {
 			if (accountName.length >= 3) {
 				setFormText((snapshot) => {
 					return {
@@ -117,14 +114,11 @@ export default function SignUp() {
 	}, [checkingAcctNameValidity, accountNameHasError, accountName]);
 
 	useEffect(() => {
-		if (
-			checkingEmailValidity === true ||
-			(!checkingEmailValidity && !emailHasError)
-		) {
+		if (checkingEmailValidity || !emailHasError) {
 			setFormText((snapshot) => {
 				return { ...snapshot, email: "" };
 			});
-		} else if (!checkingEmailValidity && emailHasError) {
+		} else if (emailHasError) {
 			if (email.length >= 4 && email.includes("@")) {
 				setFormText((snapshot) => {
 					return {
@@ -285,9 +279,5 @@ export default function SignUp() {
 }
 
 SignUp.getLayout = (page) => {
-	return (
-		<HeaderLayout>
-			{page}
-		</HeaderLayout>
-	)
-}
+	return <HeaderLayout>{page}</HeaderLayout>;
+};
