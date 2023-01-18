@@ -52,6 +52,10 @@ const AuthComplete = ({ userData }) => {
 		setCreateProfileBtnDisabled(!accountNameIsValid);
 	}, [accountNameIsValid]);
 
+	function handleError(errorText, error) {
+		alert(`${errorText} - ${error.message || error.error_description}`);
+	}
+
 	async function formSubmitHandler(event) {
 		event.preventDefault();
 		if (!accountNameIsValid || accountNameHasError) {
@@ -71,9 +75,7 @@ const AuthComplete = ({ userData }) => {
 			});
 			router.reload();
 		} catch (error) {
-			alert(
-				`Failed to create profile - ${error.message || error.error_description}`
-			);
+			handleError("Failed to create profile", error);
 			setCreateProfileBtnDisabled(false);
 			setCancelAuthBtnDisabled(false);
 		}
@@ -86,9 +88,7 @@ const AuthComplete = ({ userData }) => {
 			await supabase.auth.signOut();
 			router.reload();
 		} catch (error) {
-			alert(
-				`Error occurred while signing out - ${error.message || error.error_description}`
-			);
+			handleError("Error occurred while signing out", error);
 			setCreateProfileBtnDisabled(false);
 			setCancelAuthBtnDisabled(false);
 		}
