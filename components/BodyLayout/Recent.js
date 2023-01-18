@@ -6,9 +6,11 @@ import { getRecentItems } from "../../utilities/app-utilities";
 import Anime from "../RecentItems/Anime";
 import List from "../RecentItems/List";
 import Discussion from "../RecentItems/Discussion";
+import { useSupabaseClient } from "@supabase/auth-helpers-react";
 
 export default function Recent({ profileID, type }) {
-	const { data, error } = useSWRImmutable([type, profileID], getRecentItems);
+	const supabase = useSupabaseClient();
+	const { data, error } = useSWRImmutable([supabase, type, profileID], getRecentItems);
 
 	const loading = !data && !error;
 	let content = (

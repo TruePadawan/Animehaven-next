@@ -3,15 +3,17 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { getDiscussionByID } from "../../utilities/app-utilities";
 import styles from "./style.module.css";
+import { useSupabaseClient } from "@supabase/auth-helpers-react";
 
 export default function Discussion({ id }) {
+	const supabase = useSupabaseClient();
 	const [loading, setLoading] = useState(false);
 	const [data, setData] = useState(null);
 	const [notFound, setNotFound] = useState(false);
 
 	useEffect(() => {
 		setLoading(true);
-		getDiscussionByID(id)
+		getDiscussionByID(supabase, id)
 			.then((data) => {
 				const { title, body } = data;
 				setData({ title, body });
@@ -21,7 +23,7 @@ export default function Discussion({ id }) {
 				setNotFound(true);
 				setLoading(false);
 			});
-	}, [id]);
+	}, [id, supabase]);
 
 	const dataNotLoaded = loading === true && data === null;
 	const dataLoaded = loading === false && data !== null;

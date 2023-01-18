@@ -143,7 +143,6 @@ export async function toggleUpvoteForReview(supabase, reviewID, profileID) {
 	if (!profileID) {
 		throw new Error("NO_PROFILE_ID_SPECIFIED");
 	}
-
 	// CONFIRM THAT REVIEW EXISTS
 	try {
 		const exist = await reviewExist(supabase, reviewID);
@@ -197,7 +196,6 @@ export async function deleteReview(supabase, reviewID, profileID) {
 	if (!profileID) {
 		throw new Error("NO_PROFILE_ID_SPECIFIED");
 	}
-
 	// CONFIRM THAT REVIEW EXISTS
 	try {
 		const exist = await reviewExist(supabase, reviewID);

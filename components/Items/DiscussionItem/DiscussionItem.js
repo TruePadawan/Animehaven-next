@@ -4,16 +4,18 @@ import styles from "./style.module.css";
 import { useEffect, useState } from "react";
 import { getProfileData } from "../../../utilities/app-utilities";
 import { Skeleton } from "@mui/material";
+import { useSupabaseClient } from "@supabase/auth-helpers-react";
 
 export default function DiscussionItem(props) {
+	const supabase = useSupabaseClient();
 	const [creatorAcctName, setCreatorAcctName] = useState("");
 
 	useEffect(() => {
 		const { creatorID } = props;
-		getProfileData("account_name", creatorID).then((data) => {
+		getProfileData(supabase, "account_name", creatorID).then((data) => {
 			setCreatorAcctName(data.account_name);
 		});
-	}, [props]);
+	}, [props, supabase]);
 
 	const loading = creatorAcctName === "";
 	if (loading) {

@@ -15,8 +15,10 @@ import styles from "../Comments-Reviews.module.css";
 import Image from "next/image";
 import MoreOptions from "../MoreOptions";
 import { usePopupState } from "material-ui-popup-state/hooks";
+import { useSupabaseClient } from "@supabase/auth-helpers-react";
 
 const ReviewItem = ({ reviewData, profileID, editReview, handleError }) => {
+	const supabase = useSupabaseClient();
 	const [profileData, setProfileData] = useState({
 		avatar_url: DEFAULT_AVATAR_URL,
 		account_name: "",
@@ -42,7 +44,7 @@ const ReviewItem = ({ reviewData, profileID, editReview, handleError }) => {
 	// LOAD REVIEW
 	useEffect(() => {
 		const { creator_id } = reviewData;
-		getProfileData("account_name,display_name,avatar_url", creator_id)
+		getProfileData(supabase, "account_name,display_name,avatar_url", creator_id)
 			.then((data) => {
 				setProfileData(data);
 				setLoading(false);
@@ -50,21 +52,25 @@ const ReviewItem = ({ reviewData, profileID, editReview, handleError }) => {
 			.catch((error) => {
 				handleError("Failed to load review", error);
 			});
-	}, [reviewData, handleError]);
+	}, [reviewData, handleError, supabase]);
 
 	const onUpvoteButtonClicked = async () => {
 		if (ownReview || profileID === null) return;
 
 		const { id: reviewID } = reviewData;
 		try {
-			const { status, code } = await toggleUpvoteForReview(reviewID, profileID);
+			const { status, code } = await toggleUpvoteForReview(
+				supabase,
+				reviewID,
+				profileID
+			);
 			if (status === "COMPLETE") {
 				if (code === "UPVOTE_REMOVED") {
 					setUpvoteIcon(<ThumbUpOffAltIcon />);
 				} else {
 					setUpvoteIcon(<ThumbUpAltIcon />);
 				}
-				const upvotes = await getReviewUpvoteList(reviewID);
+				const upvotes = await getReviewUpvoteList(supabase, reviewID);
 				setNUpvotes(upvotes.length);
 			} else if (status === "FAILED" && code === "REVIEW_NOT_FOUND") {
 				setReviewState({
@@ -82,7 +88,7 @@ const ReviewItem = ({ reviewData, profileID, editReview, handleError }) => {
 
 		const { id: reviewID } = reviewData;
 		try {
-			const { status } = await deleteReview(reviewID, profileID);
+			const { status } = await deleteReview(supabase, reviewID, profileID);
 			if (status === "COMPLETE") {
 				setReviewState({
 					deleted: true,

@@ -3,15 +3,17 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { getListByID } from "../../utilities/app-utilities";
 import styles from "./style.module.css";
+import { useSupabaseClient } from "@supabase/auth-helpers-react";
 
 export default function List({ id }) {
+	const supabase = useSupabaseClient();
 	const [loading, setLoading] = useState(false);
 	const [data, setData] = useState({ title: "", description: "" });
 	const [notFound, setNotFound] = useState(false);
 
 	useEffect(() => {
 		setLoading(true);
-		getListByID(id)
+		getListByID(supabase, id)
 			.then((data) => {
 				const { title, description } = data;
 				setData({ title, description });
@@ -20,7 +22,7 @@ export default function List({ id }) {
 			.catch(() => {
 				setNotFound(true);
 			});
-	}, [id]);
+	}, [id, supabase]);
 
 	const dataNotLoaded = loading === true || data.title === "";
 	return (
