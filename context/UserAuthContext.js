@@ -21,10 +21,20 @@ export const UserAuthContextProvider = ({ children }) => {
 	const router = useRouter();
 
 	useEffect(() => {
-		if (user) {
+		if (user && !profileID) {
 			loadAuthSession({ user });
 		}
-	}, [user]);
+	}, [user, profileID]);
+
+	useEffect(() => {
+		supabase.auth.onAuthStateChange((event, session) => {
+			if (event === "SIGNED_IN" && profileID === null) {
+				loadAuthSession(session);
+			} else if (event === "SIGNED_OUT") {
+				setProfileID(null);
+			}
+		});
+	}, []);
 
 	async function handleGoogleAuth() {
 		const { error } = await supabase.auth.signInWithOAuth({
@@ -37,12 +47,9 @@ export const UserAuthContextProvider = ({ children }) => {
 	}
 
 	async function loadAuthSession(session) {
-		console.log(session);
 		const userID = session.user.id;
-
 		try {
 			const profileExists = await hasProfile(supabase, userID);
-
 			if (profileExists) {
 				setProfileID(userID);
 			} else {
@@ -52,15 +59,6 @@ export const UserAuthContextProvider = ({ children }) => {
 			alert(`Authentication failed! - ${error.message}`);
 		}
 	}
-
-	supabase.auth.onAuthStateChange((event, session) => {
-		// ON SIGN IN, IF THERE IS NO ACCOUNT ASSOCIATED WITH SIGNED IN USER, CREATE ONE ELSE SIGN INTO IT
-		if (event === "SIGNED_IN" && profileID === null) {
-			loadAuthSession(session);
-		} else if (event === "SIGNED_OUT") {
-			setProfileID(null);
-		}
-	});
 
 	const value = { profileID, handleGoogleAuth };
 	return (
