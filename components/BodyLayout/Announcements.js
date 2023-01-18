@@ -5,7 +5,7 @@ import AnnouncementOutlinedIcon from '@mui/icons-material/AnnouncementOutlined';
 import styles from "./styles.module.css";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
 
-async function announcementsFetcher(tag) {
+async function announcementsFetcher(supabase, tag) {
 	const { data } = await supabase
 		.from("discussions")
 		.select()
@@ -16,8 +16,8 @@ async function announcementsFetcher(tag) {
 }
 
 export default function Announcements() {
-	const { data, error } = useSWRImmutable("announcement", announcementsFetcher);
 	const supabase = useSupabaseClient();
+	const { data, error } = useSWRImmutable([supabase, "announcement"], announcementsFetcher);
 
 	const loading = !data && !error;
 	let content = (
