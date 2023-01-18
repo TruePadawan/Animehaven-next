@@ -77,6 +77,7 @@ const AuthComplete = ({ userData }) => {
 	}
 
 	async function cancelAuthentication() {
+		setCreateProfileBtnDisabled(true);
 		await supabase.auth.signOut();
 		router.reload();
 	}
