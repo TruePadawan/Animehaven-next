@@ -42,7 +42,9 @@ const AuthComplete = ({ userData }) => {
 		customTransformation: accountNameTransformation,
 		defaultValue: generateAccountNameFromEmail(userData.email),
 	});
-	const [createProfileBtnDisabled, setCreateProfileBtnDisabled] = useState(!accountNameIsValid);
+	const [createProfileBtnDisabled, setCreateProfileBtnDisabled] = useState(
+		!accountNameIsValid
+	);
 	const displayNameRef = useRef();
 
 	useEffect(() => {
@@ -67,9 +69,16 @@ const AuthComplete = ({ userData }) => {
 			});
 			router.reload();
 		} catch (error) {
-			alert(`Failed to create profile - ${error.message || error.error_description}`);
+			alert(
+				`Failed to create profile - ${error.message || error.error_description}`
+			);
 			setCreateProfileBtnDisabled(false);
 		}
+	}
+
+	async function cancelAuthentication() {
+		await supabase.auth.signOut();
+		router.reload();
 	}
 
 	return (
@@ -113,6 +122,9 @@ const AuthComplete = ({ userData }) => {
 						disabled={createProfileBtnDisabled}>
 						Create Profile
 					</Button>
+					<Button variant="contained" color="error" type="button" onClick={cancelAuthentication}>
+						Cancel Authentication
+					</Button>
 				</form>
 			</main>
 		</Fragment>
@@ -139,12 +151,11 @@ export async function getServerSideProps(context) {
 		const userData = {
 			profile_id: session.user.id,
 			email: session.user.email,
-			d_name: session.user.user_metadata?.full_name ?? "Default User"
-
+			d_name: session.user.user_metadata?.full_name ?? "Default User",
 		};
 		return {
 			props: {
-				userData
+				userData,
 			},
 		};
 	} else {
