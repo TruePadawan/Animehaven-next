@@ -45,6 +45,7 @@ const AuthComplete = ({ userData }) => {
 	const [createProfileBtnDisabled, setCreateProfileBtnDisabled] = useState(
 		!accountNameIsValid
 	);
+	const [cancelAuthBtnDisabled, setCancelAuthBtnDisabled] = useState(false);
 	const displayNameRef = useRef();
 
 	useEffect(() => {
@@ -123,7 +124,12 @@ const AuthComplete = ({ userData }) => {
 						disabled={createProfileBtnDisabled}>
 						Create Profile
 					</Button>
-					<Button variant="contained" color="error" type="button" onClick={cancelAuthentication}>
+					<Button
+						variant="contained"
+						color="error"
+						type="button"
+						disabled={cancelAuthBtnDisabled}
+						onClick={cancelAuthentication}>
 						Cancel Authentication
 					</Button>
 				</form>
