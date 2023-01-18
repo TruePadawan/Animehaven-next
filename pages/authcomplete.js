@@ -77,7 +77,8 @@ const AuthComplete = ({ userData }) => {
 			<Head>
 				<title>Animehaven | Create Profile</title>
 			</Head>
-			<main className="d-flex justify-content-center align-items-center h-100 p-2">
+			<main className="d-flex flex-column justify-content-center align-items-center h-100 p-2">
+				<h1 className="mb-4">Create Profile</h1>
 				<form
 					className={styles["auth-complete-form"]}
 					onSubmit={formSubmitHandler}>
