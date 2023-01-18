@@ -58,12 +58,12 @@ const AuthComplete = ({ userData }) => {
 
 	function disableButtons() {
 		setCreateProfileBtnDisabled(true);
-			setCancelAuthBtnDisabled(true);
+		setCancelAuthBtnDisabled(true);
 	}
 
 	function enableButtons() {
 		setCreateProfileBtnDisabled(true);
-			setCancelAuthBtnDisabled(true);
+		setCancelAuthBtnDisabled(true);
 	}
 
 	async function formSubmitHandler(event) {
