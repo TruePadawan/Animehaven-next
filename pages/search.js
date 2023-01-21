@@ -10,7 +10,10 @@ import { searchAnime } from "../utilities/mal-api";
 import { Alert, Box, Snackbar } from "@mui/material";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import { defaultSnackbarState, getUsefulData } from "../utilities/app-utilities";
+import {
+	defaultSnackbarState,
+	getUsefulData,
+} from "../utilities/app-utilities";
 import HeaderLayout from "../components/HeaderLayout/HeaderLayout";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
 
@@ -162,5 +165,5 @@ Search.getLayout = (page) => {
 		<HeaderLayout>
 			<BodyLayout>{page}</BodyLayout>
 		</HeaderLayout>
-	)
-}
+	);
+};
