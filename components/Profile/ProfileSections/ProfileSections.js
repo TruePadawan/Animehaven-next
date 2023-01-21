@@ -346,7 +346,7 @@ export function EditProfile({ open, closeDialog }) {
 		setFormIsValid(false);
 		// CHECK IF THE ACCOUNT NAME INPUTTED BY USER IS NOT ALREADY TAKEN
 		const identifier = setTimeout(() => {
-			const { accountName } = profileData;
+			const accountName = profileData.accountName;
 			if (
 				accountName.length >= 3 &&
 				accountName !== currentAccountNameRef.current
@@ -369,7 +369,7 @@ export function EditProfile({ open, closeDialog }) {
 			}
 		}, 600);
 		return () => clearTimeout(identifier);
-	}, [profileData, open, supabase]);
+	}, [profileData.accountName, open, supabase]);
 
 	const accountNameChangeHandler = (event) => {
 		const value = event.target.value.replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
