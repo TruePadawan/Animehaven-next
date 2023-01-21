@@ -35,10 +35,9 @@ export default function Search() {
 						return (
 							<SearchResultItem
 								key={id}
-								itemID={id}
+								linkTo={`/anime/${id}`}
 								title={title}
 								photoURL={imageURL}
-								type="item"
 							/>
 						);
 					});

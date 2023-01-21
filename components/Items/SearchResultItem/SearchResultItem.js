@@ -3,17 +3,12 @@ import styles from "./styles.module.css";
 
 const SearchResultItem = (props) => {
 	return (
-		<div className={styles.item}>
+		<Link href={props.linkTo} className={styles.item}>
 			<img src={props.photoURL} alt={props.title} />
 			<span className={styles["item-name"]} title={props.title}>
-				{props.type === "item" ? (
-					<Link href={`/anime/${props.itemID}`}>{props.title}</Link>
-				) : (
-					<Link href={`/users/${props.accountName}`}>{props.title}</Link>
-				)}
+				{props.title}
 			</span>
-			{props.children && props.children}
-		</div>
+		</Link>
 	);
 };
 
