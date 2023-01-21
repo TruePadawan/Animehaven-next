@@ -76,12 +76,17 @@ const AuthComplete = ({ userData }) => {
 			disableButtons();
 			const profileExists = await hasProfile(supabase, userData.profile_id);
 			if (profileExists) throw new Error("Profile already exists");
-			await createProfile(supabase, {
+
+			const profileData = {
 				id: userData.profile_id,
 				account_name: accountName,
 				display_name: displayNameRef.current.value,
 				email: userData.email,
-			});
+			};
+			if (userData?.avatar_url) {
+				profileData.avatar_url = userData.avatar_url;
+			}
+			await createProfile(supabase, profileData);
 			router.reload();
 		} catch (error) {
 			handleError("Failed to create profile", error);
@@ -177,6 +182,9 @@ export async function getServerSideProps(context) {
 			email: session.user.email,
 			d_name: session.user.user_metadata?.full_name ?? "Default User",
 		};
+		if (session.user.user_metadata?.avatar_url) {
+			userData.avatar_url = session.user.user_metadata.avatar_url;
+		}
 		return {
 			props: {
 				userData,
