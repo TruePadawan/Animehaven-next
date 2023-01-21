@@ -415,7 +415,6 @@ export function EditProfile({ open, closeDialog }) {
 			await supabase.from("profiles").update(newData).eq("id", profileID);
 			closeDialog();
 			router.replace(`/users/${accountName}`);
-			router.reload();
 		} else {
 			triggerAlert("Update process failed. No user signed in", {
 				severity: "warning",
