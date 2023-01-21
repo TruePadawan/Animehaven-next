@@ -68,6 +68,7 @@ const Item = ({
 };
 
 const AddToList = ({ itemData, profileID, triggerAlert }) => {
+	const supabase = useSupabaseClient();
 	const [dialogOpen, setDialogOpen] = useState(false);
 	const [searchText, setSearchText] = useState("");
 	const [items, setItems] = useState([]);
@@ -87,7 +88,7 @@ const AddToList = ({ itemData, profileID, triggerAlert }) => {
 				setItems(lists);
 				setQueryOngoing(false);
 			});
-	}, [profileID, dialogOpen]);
+	}, [profileID, dialogOpen, supabase]);
 
 	const openDialog = () => {
 		setDialogOpen(true);

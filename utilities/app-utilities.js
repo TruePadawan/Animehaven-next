@@ -456,7 +456,7 @@ export async function getRecentItems(supabase, type, profileID) {
 }
 
 export async function setRecentItem(supabase, type, profileID, item) {
-	const recentItems = await getRecentItems(type, profileID);
+	const recentItems = await getRecentItems(supabase, type, profileID);
 	let itemAlreadyExists = false;
 	if (type === "animes") {
 		itemAlreadyExists = recentItems.some((r_item) => r_item.id === item.id);
