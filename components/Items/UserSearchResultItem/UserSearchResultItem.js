@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import styles from "./style.module.css";
 
-const UserItem = ({ accountName, title, avatarURL, timestamp }) => {
+const UserSearchResultItem = ({ accountName, title, avatarURL, timestamp }) => {
     const dateJoined = new Date(timestamp);
     return (
       <li className={styles.userItem}>
@@ -15,4 +15,4 @@ const UserItem = ({ accountName, title, avatarURL, timestamp }) => {
     );
 };
 
-export default UserItem;
+export default UserSearchResultItem;

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import styles from "./styles.module.css";
 
-const SearchResultItem = (props) => {
+const AnimeSearchResultItem = (props) => {
 	return (
 		<Link href={props.linkTo} className={styles.item}>
 			<img src={props.photoURL} alt={props.title} />
@@ -12,4 +12,4 @@ const SearchResultItem = (props) => {
 	);
 };
 
-export default SearchResultItem;
+export default AnimeSearchResultItem;

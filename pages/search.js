@@ -3,8 +3,8 @@ import { Fragment, useEffect, useState } from "react";
 import { useMemo } from "react";
 import { useCallback } from "react";
 import SearchBar from "../components/SearchBar/SearchBar";
-import SearchResultItem from "../components/Items/SearchResultItem/SearchResultItem";
-import UserItem from "../components/Items/UserItem/UserItem";
+import AnimeSearchResultItem from "../components/Items/AnimeSearchResultItem/AnimeSearchResultItem";
+import UserSearchResultItem from "../components/Items/UserSearchResultItem/UserSearchResultItem";
 import Loading from "../components/Loading/Loading";
 import { searchAnime } from "../utilities/mal-api";
 import { Alert, Box, Snackbar } from "@mui/material";
@@ -33,7 +33,7 @@ export default function Search() {
 					const list = data.map((anime) => {
 						const { id, title, imageURL } = getUsefulData(anime);
 						return (
-							<SearchResultItem
+							<AnimeSearchResultItem
 								key={id}
 								linkTo={`/anime/${id}`}
 								title={title}
@@ -57,7 +57,7 @@ export default function Search() {
 					users.forEach((user) => {
 						const { account_name, display_name, created_at, avatar_url } = user;
 						result.push(
-							<UserItem
+							<UserSearchResultItem
 								key={account_name}
 								accountName={account_name}
 								title={display_name}
