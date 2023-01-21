@@ -17,7 +17,7 @@ import styles from "./styles.module.css";
 import Loading from "../Loading/Loading";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
 
-const Item = ({
+const AnimeListItem = ({
 	id,
 	itemData,
 	title,
@@ -117,7 +117,7 @@ const AddToList = ({ itemData, profileID, triggerAlert }) => {
 	};
 
 	const transformedItems = items.map((item) => (
-		<Item
+		<AnimeListItem
 			key={item.id}
 			id={item.id}
 			itemData={itemData}
