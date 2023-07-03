@@ -492,7 +492,7 @@ export function EditProfile({ open, closeDialog }) {
 							className={styles.editProfileForm}
 							onSubmit={formSubmitHandler}>
 							<div className="d-flex gap-3 align-items-center">
-								<label className={styles.formLabel} htmlFor="acct_name">
+								<label className={styles.formLabel} htmlFor="profile_picture">
 									<span>Update profile picture</span>
 									<span
 										className="d-block text-center"
@@ -514,6 +514,7 @@ export function EditProfile({ open, closeDialog }) {
 										sx={uploadBtnStyle}
 										component="label">
 										<input
+											id="profile_picture"
 											hidden
 											accept="image/*"
 											type="file"
