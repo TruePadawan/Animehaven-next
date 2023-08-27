@@ -156,36 +156,16 @@ export async function toggleUpvoteForReview(supabase, reviewID, profileID) {
 		throw new Error("REVIEW_EXISTENCE_NOT_CONFIRMED");
 	}
 
-	const { data } = await supabase
-		.from("item_reviews")
-		.select("upvoted_by")
-		.eq("id", reviewID)
-		.throwOnError()
-		.limit(1)
-		.single();
-	let upvoteList = data.upvoted_by;
-	if (upvoteList.includes(profileID)) {
-		upvoteList = upvoteList.filter((id) => id !== profileID);
-		await supabase
-			.from("item_reviews")
-			.update({ upvoted_by: upvoteList })
-			.eq("id", reviewID)
-			.throwOnError();
-		return {
-			status: "COMPLETE",
-			code: "UPVOTE_REMOVED",
-		};
-	} else {
-		upvoteList.push(profileID);
-		await supabase
-			.from("item_reviews")
-			.update({ upvoted_by: upvoteList })
-			.eq("id", reviewID);
-		return {
-			status: "COMPLETE",
-			code: "UPVOTE_ADDED",
-		};
-	}
+	const { data, error } = await supabase.rpc("toggle_review_upvote", {
+		profile_id: profileID,
+		review_id: reviewID,
+	});
+
+	if (error) throw error;
+	return {
+		status: "COMPLETE",
+		code: data,
+	};
 }
 
 export async function deleteReview(supabase, reviewID, profileID) {
