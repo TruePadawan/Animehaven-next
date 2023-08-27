@@ -226,42 +226,16 @@ export async function toggleUpvoteForComment(supabase, commentID, profileID) {
 		throw new Error("NO_PROFILE_ID_SPECIFIED");
 	}
 
-	let upvoteList = [];
-	try {
-		const { upvoted_by } = await getCommentData(
-			supabase,
-			commentID,
-			"upvoted_by"
-		);
-		upvoteList = upvoted_by;
-	} catch (error) {
-		throw error;
-	}
-	if (upvoteList.includes(profileID)) {
-		upvoteList = upvoteList.filter((id) => id !== profileID);
-		await supabase
-			.from("comments")
-			.update({ upvoted_by: upvoteList })
-			.eq("id", commentID)
-			.select("upvoted_by")
-			.throwOnError();
-		return {
-			status: "COMPLETE",
-			code: "UPVOTE REMOVED",
-		};
-	} else {
-		upvoteList = upvoteList.concat(profileID);
-		await supabase
-			.from("comments")
-			.update({ upvoted_by: upvoteList })
-			.eq("id", commentID)
-			.select("upvoted_by")
-			.throwOnError();
-		return {
-			status: "COMPLETE",
-			code: "UPVOTE ADDED",
-		};
-	}
+	const { data, error } = await supabase.rpc("toggle_comment_upvote", {
+		comment_id: commentID,
+		profile_id: profileID,
+	});
+
+	if (error) throw error;
+	return {
+		status: "COMPLETE",
+		code: data,
+	};
 }
 
 export async function getUserItemRecommendations(supabase, profileID) {
