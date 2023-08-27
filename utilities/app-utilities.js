@@ -158,15 +158,11 @@ export async function toggleUpvoteForReview(supabase, reviewID, profileID) {
 
 	const { data } = await supabase
 		.from("item_reviews")
-		.select("upvoted_by,creator_id")
+		.select("upvoted_by")
 		.eq("id", reviewID)
 		.throwOnError()
 		.limit(1)
 		.single();
-	const reviewCreatorID = data.creator_id;
-	if (reviewCreatorID === profileID) {
-		throw new Error("CANNOT UPVOTE OWN REVIEW");
-	}
 	let upvoteList = data.upvoted_by;
 	if (upvoteList.includes(profileID)) {
 		upvoteList = upvoteList.filter((id) => id !== profileID);
