@@ -16,15 +16,19 @@ import SearchInput from "../Input/SearchInput/SearchInput";
 import styles from "./styles.module.css";
 import Loading from "../Loading/Loading";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
+import {AnimeListItemProps} from "./types/types";
 
-const AnimeListItem = ({
-	id,
-	itemData,
-	title,
-	triggerAlert,
-	closeDialog,
-	isPrivate = false,
-}) => {
+
+
+const AnimeListItem = (props: AnimeListItemProps) => {
+	const {
+		id,
+		itemData,
+		title,
+		triggerAlert,
+		closeDialog,
+		isPrivate = false,
+	} = props;
 	const supabase = useSupabaseClient();
 	const addAnimeToList = async () => {
 		try {
