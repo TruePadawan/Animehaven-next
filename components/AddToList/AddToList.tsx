@@ -21,58 +21,6 @@ import {Database} from "../../database.types";
 import {PostgrestError} from "@supabase/supabase-js";
 
 
-const AnimeListItem = (props: AnimeListItemProps) => {
-    const {
-        id,
-        itemData,
-        title,
-        triggerAlert,
-        closeDialog,
-        isPrivate = false,
-    } = props;
-    const supabase = useSupabaseClient<Database>();
-    const addAnimeToList = async () => {
-        try {
-            const {data, error} = await supabase
-                .from("anime_lists")
-                .select("items")
-                .eq("id", id)
-                .limit(1)
-                .single()
-            if (error) throw error;
-
-            const {items} = data;
-            const itemInList = items.some((item) => item.id === itemData.id);
-            if (!itemInList) {
-                items.push(itemData);
-                await supabase
-                    .from("anime_lists")
-                    .update({items})
-                    .eq("id", id)
-                    .throwOnError();
-                triggerAlert("Anime added successfully!", {severity: "success"});
-            } else {
-                triggerAlert("Anime already in List!");
-            }
-            closeDialog();
-        } catch (error) {
-            triggerAlert("Failed to add anime to list", {severity: "error", error: error as PostgrestError});
-        }
-    };
-
-    return (
-        <ListItem>
-            <ListItemButton onClick={addAnimeToList}>
-                <ListItemIcon>
-                    {isPrivate && <LockIcon color="primary"/>}
-                    {!isPrivate && <LockOpenIcon color="primary"/>}
-                </ListItemIcon>
-                <ListItemText primary={title}/>
-            </ListItemButton>
-        </ListItem>
-    );
-};
-
 const AddToList = (props: AddToListProps) => {
     const {itemData, profileID, triggerAlert} = props;
     const supabase = useSupabaseClient<Database>();
@@ -105,7 +53,7 @@ const AddToList = (props: AddToListProps) => {
         setDialogOpen(false);
     };
 
-    const searchHandler = async (event: FormEvent) => {
+    const searchHandler = async (event: FormEvent<HTMLInputElement>) => {
         event.preventDefault();
 
         setQueryOngoing(true);
@@ -173,6 +121,58 @@ const AddToList = (props: AddToListProps) => {
                 </div>
             </Dialog>
         </Fragment>
+    );
+};
+
+const AnimeListItem = (props: AnimeListItemProps) => {
+    const {
+        id,
+        itemData,
+        title,
+        triggerAlert,
+        closeDialog,
+        isPrivate = false,
+    } = props;
+    const supabase = useSupabaseClient<Database>();
+    const addAnimeToList = async () => {
+        try {
+            const {data, error} = await supabase
+                .from("anime_lists")
+                .select("items")
+                .eq("id", id)
+                .limit(1)
+                .single()
+            if (error) throw error;
+
+            const {items} = data;
+            const itemInList = items.some((item) => item.id === itemData.id);
+            if (!itemInList) {
+                items.push(itemData);
+                await supabase
+                    .from("anime_lists")
+                    .update({items})
+                    .eq("id", id)
+                    .throwOnError();
+                triggerAlert("Anime added successfully!", {severity: "success"});
+            } else {
+                triggerAlert("Anime already in List!");
+            }
+            closeDialog();
+        } catch (error) {
+            triggerAlert("Failed to add anime to list", {severity: "error", error: error as PostgrestError});
+        }
+    };
+
+    return (
+        <ListItem>
+            <ListItemButton onClick={addAnimeToList}>
+                <ListItemIcon>
+                    {isPrivate && <LockIcon color="primary"/>}
+                    {!isPrivate && <LockOpenIcon color="primary"/>}
+                </ListItemIcon>
+                <ListItemText primary={title}/>
+            </ListItemButton>
+        </ListItem>
     );
 };
 
