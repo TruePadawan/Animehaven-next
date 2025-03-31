@@ -1,3 +1,5 @@
+import {MergeDeep} from "type-fest";
+
 export type Json =
   | string
   | number
@@ -6,7 +8,7 @@ export type Json =
   | { [key: string]: Json | undefined }
   | Json[]
 
-export type Database = {
+export type DatabaseGenerated = {
   public: {
     Tables: {
       anime_lists: {
@@ -369,6 +371,22 @@ export type Database = {
     }
   }
 }
+
+type AddToListAnimeItem = { id: string, title: string }
+export type Database = MergeDeep<DatabaseGenerated, {
+  public: {
+    Tables: {
+      anime_lists: {
+        Row: {
+          items: Array<AddToListAnimeItem>
+        },
+          Update: {
+            items?: Array<AddToListAnimeItem>
+          }
+      }
+    }
+  }
+}>
 
 type PublicSchema = Database[Extract<keyof Database, "public">]
 
