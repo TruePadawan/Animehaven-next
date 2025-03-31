@@ -8,7 +8,7 @@ import {
 	ListItemText,
 	useMediaQuery,
 } from "@mui/material";
-import { Fragment, useEffect, useState } from "react";
+import {ChangeEvent, FormEvent, Fragment, useEffect, useState} from "react";
 import LockIcon from "@mui/icons-material/Lock";
 import LockOpenIcon from "@mui/icons-material/LockOpen";
 import { useTheme } from "@mui/material/styles";
@@ -16,7 +16,9 @@ import SearchInput from "../Input/SearchInput/SearchInput";
 import styles from "./styles.module.css";
 import Loading from "../Loading/Loading";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
-import {AnimeListItemProps} from "./types/types";
+import {AddToListProps, AnimeListItemProps, StrippedAnimeListItemData} from "./types/types";
+import {Database} from "../../database.types";
+import {PostgrestError} from "@supabase/supabase-js";
 
 
 
@@ -29,16 +31,16 @@ const AnimeListItem = (props: AnimeListItemProps) => {
 		closeDialog,
 		isPrivate = false,
 	} = props;
-	const supabase = useSupabaseClient();
+	const supabase = useSupabaseClient<Database>();
 	const addAnimeToList = async () => {
 		try {
-			const { data } = await supabase
+			const { data, error } = await supabase
 				.from("anime_lists")
 				.select("items")
 				.eq("id", id)
-				.throwOnError()
 				.limit(1)
-				.single();
+				.single()
+			if (error) throw error;
 			const { items } = data;
 			const itemInList = items.some((item) => item.id === itemData.id);
 			if (!itemInList) {
@@ -54,7 +56,7 @@ const AnimeListItem = (props: AnimeListItemProps) => {
 			}
 			closeDialog();
 		} catch (error) {
-			triggerAlert("Failed to add anime to list", { severity: "error", error });
+			triggerAlert("Failed to add anime to list", { severity: "error", error: error as PostgrestError });
 		}
 	};
 
@@ -71,24 +73,25 @@ const AnimeListItem = (props: AnimeListItemProps) => {
 	);
 };
 
-const AddToList = ({ itemData, profileID, triggerAlert }) => {
-	const supabase = useSupabaseClient();
+const AddToList = (props: AddToListProps) => {
+	const { itemData, profileID, triggerAlert } = props;
+	const supabase = useSupabaseClient<Database>();
 	const [dialogOpen, setDialogOpen] = useState(false);
 	const [searchText, setSearchText] = useState("");
-	const [items, setItems] = useState([]);
+	const [items, setItems] = useState<Array<StrippedAnimeListItemData>>([]);
 	const [queryOngoing, setQueryOngoing] = useState(false);
 	const theme = useTheme();
 	const fullScreenBreakpoints = useMediaQuery(theme.breakpoints.down(480));
 
 	useEffect(() => {
-		if (dialogOpen === false) return;
+		if (!dialogOpen) return;
 		setQueryOngoing(true);
 		supabase
 			.from("anime_lists")
 			.select("id,title,is_public")
 			.eq("creator_id", profileID)
-			.throwOnError()
-			.then(({ data: lists }) => {
+			.then(({ data: lists, error }) => {
+				if (error) throw error;
 				setItems(lists);
 				setQueryOngoing(false);
 			});
@@ -102,19 +105,20 @@ const AddToList = ({ itemData, profileID, triggerAlert }) => {
 		setDialogOpen(false);
 	};
 
-	const searchHandler = async (event) => {
+	const searchHandler = async (event: FormEvent) => {
 		event.preventDefault();
 
 		setQueryOngoing(true);
 		try {
-			const { data: searchResults } = await supabase
+			const { data: searchResults, error } = await supabase
 				.rpc("search_list", { phrase: searchText, profile_id: profileID })
-				.throwOnError();
+                .select("id,title,is_public");
+			if (error) throw error;
 			setItems(searchResults);
 		} catch (error) {
 			triggerAlert("Error while trying to search", {
 				severity: "error",
-				error,
+				error: error as PostgrestError
 			});
 		}
 		setQueryOngoing(false);
@@ -152,7 +156,7 @@ const AddToList = ({ itemData, profileID, triggerAlert }) => {
 						searchFunc={searchHandler}
 						minLength={4}
 						value={searchText}
-						onChange={(e) => setSearchText(e.target.value)}
+						onChange={(e: ChangeEvent<HTMLInputElement>) => setSearchText(e.target.value)}
 					/>
 					{queryOngoing && (
 						<Loading sx={{ margin: "10px" }} progressElAttr={{ size: 20 }} />

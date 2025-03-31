@@ -2,8 +2,8 @@ import SearchIcon from "@mui/icons-material/Search";
 import Input from "../Input";
 import styles from "./style.module.css";
 
-const SearchInput = ({ searchFunc, className, ...inputAttr }) => {
-	const inputClassName = `flex-grow-1 ${className || ""}`;
+const SearchInput = ({ searchFunc, className = "", ...inputAttr }) => {
+	const inputClassName = `flex-grow-1 ${className}`;
 
 	return (
 		<form className="input-group flex-nowrap" onSubmit={searchFunc}>
