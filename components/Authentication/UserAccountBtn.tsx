@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useState } from "react";
+import React, { Fragment, useEffect, useState } from "react";
 import {
 	Menu,
 	MenuItem,
@@ -11,14 +11,18 @@ import { DEFAULT_AVATAR_URL } from "../../utilities/app-utilities";
 import { getProfileData } from "../../utilities/app-utilities";
 import Image from "next/image";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
+import {AccountMenuButtonProps} from "./types/UserAccountButton.types";
+import {Database} from "../../database.types";
+import {PostgrestError} from "@supabase/supabase-js";
 
-const UserAccountBtn = ({ profileID, errorHandler }) => {
-	const supabase = useSupabaseClient();
+const UserAccountBtn = (props: AccountMenuButtonProps) => {
+	const supabase = useSupabaseClient<Database>();
 	const [accountName, setAccountName] = useState("");
-	const [menuAnchorEl, setMenuAnchorEl] = useState(null);
+	const [menuAnchorEl, setMenuAnchorEl] = useState<Element|null>(null);
 	const [photoSrc, setPhotoSrc] = useState(DEFAULT_AVATAR_URL);
 	const [loading, setLoading] = useState(true);
 	const isMenuOpen = Boolean(menuAnchorEl);
+	const { profileID, errorHandler } = props;
 
 	useEffect(() => {
 		getProfileData(supabase, "*", profileID).then(({ account_name, avatar_url }) => {
@@ -28,8 +32,8 @@ const UserAccountBtn = ({ profileID, errorHandler }) => {
 		});
 	}, [profileID, supabase]);
 
-	const openMenu = (e) => {
-		setMenuAnchorEl(e.currentTarget);
+	const openMenu = (e: React.MouseEvent<HTMLButtonElement>) => {
+		setMenuAnchorEl(e.currentTarget as Element);
 	};
 
 	const closeMenu = () => {
@@ -45,7 +49,7 @@ const UserAccountBtn = ({ profileID, errorHandler }) => {
 				window.location.reload();
 			})
 			.catch((error) => {
-				errorHandler("Failed to signout!", error);
+				errorHandler("Failed to sign out!", error as PostgrestError);
 			});
 	};
 
