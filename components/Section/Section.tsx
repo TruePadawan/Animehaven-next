@@ -2,13 +2,14 @@ import PropTypes from "prop-types";
 import styles from "./section.module.css";
 import { IconButton } from "@mui/material";
 import CachedIcon from "@mui/icons-material/Cached";
+import {SectionProps} from "./Section.types";
 
-const Section = (props) => {
+const Section = (props: SectionProps) => {
 	const className = `${styles["section"]} ${props.className || ""}`;
 	return (
-		<section aria-labelledby={props.headingID} className={className}>
+		<section aria-labelledby={props.headingId} className={className}>
 			<div className="d-flex justify-content-between align-items-center">
-				<h2 id={props.headingID} className={styles["section-title"]}>
+				<h2 id={props.headingId} className={styles["section-title"]}>
 					{props.title}
 				</h2>
 				{props.refreshable && (
@@ -24,14 +25,6 @@ const Section = (props) => {
 			{props.children}
 		</section>
 	);
-};
-
-Section.propTypes = {
-	title: PropTypes.string,
-	className: PropTypes.string,
-	headingID: PropTypes.string,
-	onBtnClick: PropTypes.func,
-	refreshable: PropTypes.bool,
 };
 
 export default Section;

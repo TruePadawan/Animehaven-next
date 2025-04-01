@@ -5,10 +5,13 @@ import { UserAuthContext } from "../../context/UserAuthContext";
 import { Box, useMediaQuery } from "@mui/material";
 import Announcements from "./Announcements";
 import Recent from "./Recent";
+import {BodyLayoutProps} from "./types/BodyLayout.types";
 
-const BodyLayout = ({ children, className, recentItems = "animes" }) => {
+const BodyLayout = (props: BodyLayoutProps) => {
 	const { profileID } = useContext(UserAuthContext);
 	const showSideSection = useMediaQuery("(min-width:1200px)");
+	const { children, className, recentItems = "animes" } = props;
+
 	return (
 		<div className={styles["page-container"]}>
 			<Box component="main" sx={{ minWidth: "0" }} className={className}>
