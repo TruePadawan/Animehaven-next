@@ -1,4 +1,4 @@
-import { Alert, Button, ButtonGroup, Snackbar, styled } from "@mui/material";
+import {Alert, Button, ButtonGroup, Snackbar, SnackbarOrigin, styled} from "@mui/material";
 import { useContext, useState } from "react";
 import { UserAuthContext } from "../../context/UserAuthContext";
 import UserAccountBtn from "./UserAccountBtn";
@@ -18,14 +18,14 @@ const Authentication = () => {
 	const [error, setError] = useState({ occurred: false, text: "" });
 	const router = useRouter();
 
-	const handleError = (text, error) => {
+	const handleError = (text: string, error: HasErrorMessage) => {
 		setError({
 			occurred: true,
 			text: `${text} - ${error.message || error.error_description}`,
 		});
 	};
 
-	const resetError = (event, reason) => {
+	const resetError = (event: React.SyntheticEvent<any> | Event, reason: string) => {
 		if (reason === "clickaway") {
 			return;
 		}
@@ -33,7 +33,7 @@ const Authentication = () => {
 	};
 
 	const userSignedIn = profileID !== null;
-	const alertAnchorOrigin = {
+	const alertAnchorOrigin: SnackbarOrigin = {
 		vertical: "top",
 		horizontal: "center",
 	};
@@ -57,7 +57,7 @@ const Authentication = () => {
 						autoHideDuration={6000}
 						onClose={resetError}
 						anchorOrigin={alertAnchorOrigin}>
-						<Alert severity="error" sx={{ width: "100%" }} onClose={resetError}>
+						<Alert severity="error" sx={{ width: "100%" }}>
 							{error.text}
 						</Alert>
 					</Snackbar>
