@@ -7,9 +7,13 @@ import Anime from "../RecentItems/Anime";
 import List from "../RecentItems/List";
 import Discussion from "../RecentItems/Discussion";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
+import {RecentProps} from "./types/Recent.types";
+import {Database} from "../../database.types";
 
-export default function Recent({ profileID, type }) {
-	const supabase = useSupabaseClient();
+// TODO: Fully Port this component to TypeScript
+export default function Recent(props: RecentProps) {
+	const { profileID, type } = props;
+	const supabase = useSupabaseClient<Database>();
 	const { data, error } = useSWRImmutable([supabase, type, profileID], getRecentItems);
 
 	const loading = !data && !error;
