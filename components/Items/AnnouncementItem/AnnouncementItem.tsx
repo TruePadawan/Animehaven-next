@@ -1,9 +1,11 @@
 import { Skeleton } from "@mui/material";
 import Link from "next/link";
-import PropTypes from "prop-types";
 import styles from "./announcementItem.module.css";
+import {AnnouncementItemProps} from "./AnnouncementItem.types";
 
-const AnnouncementItem = ({ id, title, body, isDataLoaded = true }) => {
+const AnnouncementItem = (props: AnnouncementItemProps) => {
+	const { id, title, body, isDataLoaded = true } = props;
+
 	return (
 		<li>
 			{!isDataLoaded && (
@@ -30,13 +32,6 @@ const AnnouncementItem = ({ id, title, body, isDataLoaded = true }) => {
 			)}
 		</li>
 	);
-};
-
-AnnouncementItem.propTypes = {
-	id: PropTypes.string,
-	title: PropTypes.string,
-	body: PropTypes.string,
-	isDataLoaded: PropTypes.bool,
 };
 
 export default AnnouncementItem;
