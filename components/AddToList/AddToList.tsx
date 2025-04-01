@@ -16,7 +16,7 @@ import SearchInput from "../Input/SearchInput/SearchInput";
 import styles from "./styles.module.css";
 import Loading from "../Loading/Loading";
 import {useSupabaseClient} from "@supabase/auth-helpers-react";
-import {AddToListProps, AnimeListItemProps, StrippedAnimeListItemData} from "./types/types";
+import {AddToListProps, AnimeListItemProps, StrippedAnimeListItemData} from "./types";
 import {Database} from "../../database.types";
 import {PostgrestError} from "@supabase/supabase-js";
 

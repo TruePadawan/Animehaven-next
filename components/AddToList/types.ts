@@ -1,5 +1,5 @@
 import {AlertProps} from "@mui/material";
-import {Tables} from "../../../database.types";
+import {Tables} from "../../database.types";
 
 interface TriggerAlertOptions {
     severity: AlertProps["severity"];
