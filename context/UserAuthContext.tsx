@@ -12,6 +12,7 @@ export const UserAuthContext = createContext<UserAuthContextType>({
 	handleGoogleAuth: () => Promise.resolve(),
 });
 
+// TODO: UserAuthContext and its related code should be moved under an auth folder
 export const UserAuthContextProvider = (props: UserAuthContextProviderProps) => {
 	const [profileID, setProfileID] = useState<string | null>(null);
 	const supabase = useSupabaseClient<Database>();
@@ -60,7 +61,7 @@ export const UserAuthContextProvider = (props: UserAuthContextProviderProps) => 
 		}
 	}
 
-	// Rename handleGoogleAuth to something more appropriate
+	// Rename handleGoogleAuth to something more appropriate and it might not have to be passed through context
 	return (
 		<UserAuthContext.Provider value={{ profileID, handleGoogleAuth }}>
 			{props.children}
