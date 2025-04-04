@@ -1,21 +1,23 @@
-import { useState } from "react";
+import {ChangeEvent, FormEvent, useState} from "react";
 import { IconButton, TextareaAutosize, Typography } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
 import CancelIcon from "@mui/icons-material/Cancel";
 import styles from "../Comments-Reviews.module.css";
 import Link from "next/link";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
+import {CommentBoxProps} from "./types/CommentBox.types";
+import {PostgrestError} from "@supabase/supabase-js";
 
-const CommentBox = (props) => {
+const CommentBox = (props: CommentBoxProps) => {
 	const [commentText, setCommentText] = useState("");
 	const [sendBtnDisabled, setSendBtnDisabled] = useState(false);
 	const supabase = useSupabaseClient();
 
-	const commentTextChangeHandler = (event) => {
+	const commentTextChangeHandler = (event: ChangeEvent<HTMLTextAreaElement>) => {
 		setCommentText(event.target.value);
 	};
 
-	const postComment = async (commentText) => {
+	const postComment = async (commentText: string) => {
 		await supabase
 			.from("comments")
 			.insert({
@@ -29,7 +31,7 @@ const CommentBox = (props) => {
 		}
 	};
 
-	const postReply = async (commentText) => {
+	const postReply = async (commentText: string) => {
 		const { parentCommentID } = props.replyData;
 		if (parentCommentID === "") {
 			throw new Error("No parent comment set for reply");
@@ -49,7 +51,7 @@ const CommentBox = (props) => {
 	};
 
 	// HANDLE POSTING COMMENT OR REPLY
-	const formSubmitHandler = async (event) => {
+	const formSubmitHandler = async (event: FormEvent) => {
 		event.preventDefault();
 		if (commentText.trim().length === 0) {
 			props.triggerAlert("Comment must have 1 or more characters", {
@@ -67,7 +69,7 @@ const CommentBox = (props) => {
 			} catch (error) {
 				props.triggerAlert("Failed to post reply to comment", {
 					severity: "error",
-					error,
+					error: error as PostgrestError,
 				});
 			}
 		} else {
@@ -77,7 +79,7 @@ const CommentBox = (props) => {
 			} catch (error) {
 				props.triggerAlert("Failed to post comment", {
 					severity: "error",
-					error,
+					error: error as PostgrestError,
 				});
 			}
 		}
