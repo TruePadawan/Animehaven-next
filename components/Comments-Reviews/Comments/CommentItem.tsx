@@ -16,16 +16,20 @@ import Image from "next/image";
 import MoreOptions from "../MoreOptions";
 import { usePopupState } from "material-ui-popup-state/hooks";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
+import {Database, Tables} from "../../../database.types";
+import {CommentCreatorData, CommentItemProps, ParentCommentData} from "./types/CommentItem.types";
+import {PostgrestError, RealtimePostgresDeletePayload, RealtimePostgresUpdatePayload} from "@supabase/supabase-js";
+import {RealtimeChannel} from "@supabase/realtime-js";
 
-const CommentItem = (props) => {
-	const supabase = useSupabaseClient();
+const CommentItem = (props: CommentItemProps) => {
+	const supabase = useSupabaseClient<Database>();
 	const { commentData, setReplyData, triggerAlert, profileID } = props;
-	const [commentCreatorData, setCommentCreatorData] = useState({
-		avatar_url: null,
-		account_name: null,
-		display_name: null,
+	const [commentCreatorData, setCommentCreatorData] = useState<CommentCreatorData>({
+		avatar_url: "",
+		account_name: "",
+		display_name: "",
 	});
-	const [parentCommentData, setParentCommentData] = useState({
+	const [parentCommentData, setParentCommentData] = useState<ParentCommentData>({
 		id: null,
 		text: null,
 		creator_display_name: null,
@@ -73,12 +77,13 @@ const CommentItem = (props) => {
 							creator_account_name: account_name,
 						});
 					} catch (error) {
-						if (error.code === "PGRST116") {
+						const postgrestError = error as PostgrestError;
+						if (postgrestError.code === "PGRST116") {
 							setParentCommentIsDeleted(true);
 						} else {
 							triggerAlert("Failed to load data for referenced comment", {
 								severity: "error",
-								error,
+								error: postgrestError,
 							});
 						}
 					}
@@ -94,18 +99,18 @@ const CommentItem = (props) => {
 
 	// LISTEN FOR WHEN PARENT COMMENT IS UPDATED OR DELETED
 	useEffect(() => {
-		const onParentCommentUpdated = (payload) => {
+		const onParentCommentUpdated = (payload: RealtimePostgresUpdatePayload<Tables<"comments">>) => {
 			setParentCommentData((snapshot) => {
 				return { ...snapshot, text: payload.new.text };
 			});
 		};
 
-		const onParentCommentDeleted = (payload) => {
+		const onParentCommentDeleted = (payload: RealtimePostgresDeletePayload<Tables<"comments">>) => {
 			setParentCommentIsDeleted(payload.old.id === parentCommentData.id);
 		};
 
 		const parentCommentID = parentCommentData.id;
-		let updatesChannel = null;
+		let updatesChannel: RealtimeChannel | null = null;
 		if (parentCommentID !== null) {
 			updatesChannel = supabase
 				.channel(`public:comments:id=eq.${parentCommentID}`)
@@ -133,13 +138,13 @@ const CommentItem = (props) => {
 		}
 
 		return () => {
-			if (parentCommentData.id) {
+			if (parentCommentData.id && updatesChannel !== null) {
 				supabase.removeChannel(updatesChannel);
 			}
 		};
 	}, [commentData, parentCommentData]);
 
-	const deleteComment = async (closeMenu) => {
+	const deleteComment = async (closeMenu: VoidFunction) => {
 		try {
 			await supabase
 				.from("comments")
@@ -147,7 +152,7 @@ const CommentItem = (props) => {
 				.eq("id", commentData.id)
 				.throwOnError();
 		} catch (error) {
-			triggerAlert("Failed to delete comment", { severity: "error", error });
+			triggerAlert("Failed to delete comment", { severity: "error", error: error as PostgrestError });
 		}
 		closeMenu();
 	};
@@ -162,13 +167,13 @@ const CommentItem = (props) => {
 
 		const { id: commentID, creator_id } = commentData;
 		try {
-			const { data: response } = await supabase
+			const { data: response, error } = await supabase
 				.from("profiles")
 				.select("account_name")
 				.eq("id", creator_id)
-				.throwOnError()
 				.limit(1)
 				.single();
+            if (error) throw error;
 
 			setReplyData({
 				parentCommentID: commentID,
@@ -177,7 +182,7 @@ const CommentItem = (props) => {
 		} catch (error) {
 			triggerAlert(
 				"Error while trying to get data on account associated with comment",
-				{ severity: "error", error }
+				{ severity: "error", error: error as PostgrestError },
 			);
 		}
 		setBtnIsDisabled((snapshot) => {
@@ -193,14 +198,14 @@ const CommentItem = (props) => {
 		try {
 			await toggleUpvoteForComment(supabase, commentData.id, profileID);
 		} catch (error) {
-			triggerAlert("Failed to complete action", { severity: "error", error });
+			triggerAlert("Failed to complete action", { severity: "error", error: error as PostgrestError });
 		}
 		setBtnIsDisabled((snapshot) => {
 			return { ...snapshot, upvote: false };
 		});
 	};
 
-	const handleEditing = (closeMenu) => {
+	const handleEditing = (closeMenu: VoidFunction) => {
 		setCommentState("EDITING");
 		closeMenu();
 	};
@@ -221,10 +226,11 @@ const CommentItem = (props) => {
 	const dividerStyles = {
 		backgroundColor: "darkgrey",
 		height: "2px",
-		margin: "0px!important",
+		margin: "0px!important", // OOF, TODO: Deal with the !important
 	};
 	const { avatar_url, display_name, account_name } = commentCreatorData;
-	const ON_EDIT_COMMENT = commentState === "EDITING";
+    const isUserSignedIn = profileID !== null;
+	const ON_EDIT_COMMENT = isUserSignedIn && commentState === "EDITING";
 	const {
 		creator_account_name: parentCommentCreatorAccountName,
 		creator_display_name: parentCommentCreatorDisplayName,
@@ -232,16 +238,9 @@ const CommentItem = (props) => {
 	} = parentCommentData;
 
 	const showMoreOptions =
-		profileID !== null && profileID === commentData.creator_id;
-
+		isUserSignedIn && profileID === commentData.creator_id;
 	const upvoteList = commentData.upvoted_by;
-	const upvoteIcon = upvoteList.includes(profileID) ? (
-		<ThumbUpAltIcon />
-	) : (
-		<ThumbUpOffAltIcon />
-	);
 
-	const nUpvotes = upvoteList.length;
 	return (
 		<li id={commentData.id}>
 			<Fragment>
@@ -288,31 +287,41 @@ const CommentItem = (props) => {
 										</MoreOptions>
 									)}
 								</div>
+                                {
+                                    isUserSignedIn && (
+                                    <div className="d-flex justify-content-end gap-2">
+                                        <span className={styles.upvote}>
+                                            <IconButton
+                                                aria-label="Upvote"
+                                                title="Upvote"
+                                                size="small"
+                                                type="button"
+                                                onClick={handleUpvote}
+                                                disabled={btnIsDisabled.upvote}>
+                                                {
+                                                    upvoteList.includes(profileID) ? (
+                                                        <ThumbUpAltIcon />
+                                                    ) : (
+                                                        <ThumbUpOffAltIcon />
+                                                    )
+                                                }
+                                            </IconButton>
+                                            <span>{upvoteList.length}</span>
+                                        </span>
 
-								<div className="d-flex justify-content-end gap-2">
-									<span className={styles.upvote}>
-										<IconButton
-											aria-label="Upvote"
-											title="Upvote"
-											size="small"
-											type="button"
-											onClick={handleUpvote}
-											disabled={btnIsDisabled.upvote}>
-											{upvoteIcon}
-										</IconButton>
-										<span>{nUpvotes}</span>
-									</span>
+                                        <IconButton
+                                            aria-label="reply"
+                                            title="reply"
+                                            size="small"
+                                            type="button"
+                                            disabled={btnIsDisabled.reply}
+                                            onClick={setAsParentComment}>
+                                            <ReplyIcon />
+                                        </IconButton>
+                                    </div>
 
-									<IconButton
-										aria-label="reply"
-										title="reply"
-										size="small"
-										type="button"
-										disabled={btnIsDisabled.reply}
-										onClick={setAsParentComment}>
-										<ReplyIcon />
-									</IconButton>
-								</div>
+                                    )
+                                }
 							</div>
 						)}
 						{ON_EDIT_COMMENT && (
