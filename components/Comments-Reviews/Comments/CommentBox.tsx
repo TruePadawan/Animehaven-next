@@ -7,11 +7,12 @@ import Link from "next/link";
 import {useSupabaseClient} from "@supabase/auth-helpers-react";
 import {CommentBoxProps} from "./types/CommentBox.types";
 import {PostgrestError} from "@supabase/supabase-js";
+import {Database} from "../../../database.types";
 
 const CommentBox = (props: CommentBoxProps) => {
     const [commentText, setCommentText] = useState("");
     const [sendBtnDisabled, setSendBtnDisabled] = useState(false);
-    const supabase = useSupabaseClient();
+    const supabase = useSupabaseClient<Database>();
 
     const commentTextChangeHandler = (event: ChangeEvent<HTMLTextAreaElement>) => {
         setCommentText(event.target.value);
