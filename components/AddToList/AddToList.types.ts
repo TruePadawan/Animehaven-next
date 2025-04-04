@@ -1,13 +1,6 @@
-import {AlertProps} from "@mui/material";
 import {Tables} from "../../database.types";
+import {TriggerAlertOptions} from "../../utilities/global.types";
 
-interface TriggerAlertOptions {
-    severity: AlertProps["severity"];
-    error?: {
-        message?: string;
-        error_description?: string;
-    }
-}
 
 export interface AnimeListItemProps {
     id: number;

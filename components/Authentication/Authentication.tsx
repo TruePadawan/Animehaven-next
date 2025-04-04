@@ -4,6 +4,7 @@ import {UserAuthContext} from "../../context/UserAuthContext";
 import UserAccountBtn from "./UserAccountBtn";
 import {Fragment} from "react";
 import {useRouter} from "next/router";
+import {HasErrorMessage} from "../../utilities/global.types";
 
 const AuthBtn = styled(Button)(() => ({
     backgroundColor: "darkslategray",
