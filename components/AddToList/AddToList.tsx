@@ -53,7 +53,7 @@ const AddToList = (props: AddToListProps) => {
         setDialogOpen(false);
     };
 
-    const searchHandler = async (event: FormEvent<HTMLInputElement>) => {
+    const searchHandler = async (event: FormEvent) => {
         event.preventDefault();
 
         setQueryOngoing(true);
