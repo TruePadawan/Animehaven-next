@@ -19,65 +19,65 @@ import {TriggerAlertOptions} from "../../../utilities/global.types";
 import {PostgrestError} from "@supabase/supabase-js";
 
 const COMMENTS_PER_REQUEST = 10;
-const CommentsList = ({ id, className = "" }: CommentsListProps) => {
-	const supabase = useSupabaseClient<Database>();
-	const { profileID } = useContext(UserAuthContext);
-	const [commentsData, setCommentsData] = useState<Tables<"comments">[]>([]);
-	const [loadingComments, setLoadingComments] = useState(false);
-	const [snackbarData, setSnackbarData] = useState<SnackbarProps>({
+const CommentsList = ({id, className = ""}: CommentsListProps) => {
+    const supabase = useSupabaseClient<Database>();
+    const {profileID} = useContext(UserAuthContext);
+    const [commentsData, setCommentsData] = useState<Tables<"comments">[]>([]);
+    const [loadingComments, setLoadingComments] = useState(false);
+    const [snackbarData, setSnackbarData] = useState<SnackbarProps>({
         open: false,
         severity: "info",
         text: ""
     });
-	const [replyData, setReplyData] = useState({
-		parentCommentID: "",
-		accountName: "",
-	});
-	const totalCommentsCount = useRef(0);
+    const [replyData, setReplyData] = useState({
+        parentCommentID: "",
+        accountName: "",
+    });
+    const totalCommentsCount = useRef(0);
 
     function getErrorMessage(error: any) {
         return error?.message || error?.error_description || "";
     }
 
-	const triggerAlert = useCallback((text: string, options?: TriggerAlertOptions) => {
-		const alertSeverity = options?.severity;
-		setSnackbarData({
-			open: true,
-			severity: alertSeverity || "info",
-			text:
-				alertSeverity === "error"
-					? `${text} - ${getErrorMessage(options?.error)}`
-					: text,
-		});
-	}, []);
+    const triggerAlert = useCallback((text: string, options?: TriggerAlertOptions) => {
+        const alertSeverity = options?.severity;
+        setSnackbarData({
+            open: true,
+            severity: alertSeverity || "info",
+            text:
+                alertSeverity === "error"
+                    ? `${text} - ${getErrorMessage(options?.error)}`
+                    : text,
+        });
+    }, []);
 
-	function resetSnackbar(_event: React.SyntheticEvent<any> | Event, reason: string) {
-		if (reason === "clickaway") {
-			return;
-		}
-		setSnackbarData({
+    function resetSnackbar(_event: React.SyntheticEvent<any> | Event, reason: string) {
+        if (reason === "clickaway") {
+            return;
+        }
+        setSnackbarData({
             open: false,
             severity: "info",
             text: ""
         });
-	}
+    }
 
-	// LOAD COMMENTS ASSOCIATED WITH INSTANCE ID
-	useEffect(() => {
-		getCommentsData(supabase, id, COMMENTS_PER_REQUEST)
-			.then(({ data, count }) => {
-				totalCommentsCount.current = count;
-				setCommentsData(data);
-			})
-			.catch((error) => {
-				triggerAlert("Failed to load comments", { severity: "error", error });
-				setCommentsData([]);
-			});
-	}, [id, supabase, triggerAlert]);
+    // LOAD COMMENTS ASSOCIATED WITH INSTANCE ID
+    useEffect(() => {
+        getCommentsData(supabase, id, COMMENTS_PER_REQUEST)
+            .then(({data, count}) => {
+                totalCommentsCount.current = count;
+                setCommentsData(data);
+            })
+            .catch((error) => {
+                triggerAlert("Failed to load comments", {severity: "error", error});
+                setCommentsData([]);
+            });
+    }, [id, supabase, triggerAlert]);
 
-	// LISTEN FOR NEW COMMENTS AND UPDATES TO COMMENTS
-	useEffect(() => {
-		const onCommentAdded = (payload: RealtimePostgresInsertCommentPayload) => {
+    // LISTEN FOR NEW COMMENTS AND UPDATES TO COMMENTS
+    useEffect(() => {
+        const onCommentAdded = (payload: RealtimePostgresInsertCommentPayload) => {
             const newData = payload.new;
             setCommentsData((snapshot) => {
                 snapshot.unshift(newData);
@@ -85,82 +85,83 @@ const CommentsList = ({ id, className = "" }: CommentsListProps) => {
             });
         };
 
-		const onCommentUpdated = (payload: RealtimePostgresUpdateCommentPayload) => {
-			const updatedCommentID = payload.new.id;
-			setCommentsData((snapshot) => {
-				for (let i = 0; i < snapshot.length; ++i) {
-					if (snapshot[i].id === updatedCommentID) {
-						snapshot[i].text = payload.new.text;
-						snapshot[i].upvoted_by = payload.new.upvoted_by;
-						return [...snapshot];
-					}
-				}
-				return snapshot;
-			});
-		};
+        const onCommentUpdated = (payload: RealtimePostgresUpdateCommentPayload) => {
+            const updatedCommentID = payload.new.id;
+            setCommentsData((snapshot) => {
+                for (let i = 0; i < snapshot.length; ++i) {
+                    if (snapshot[i].id === updatedCommentID) {
+                        snapshot[i].text = payload.new.text;
+                        snapshot[i].upvoted_by = payload.new.upvoted_by;
+                        return [...snapshot];
+                    }
+                }
+                return snapshot;
+            });
+        };
 
-		const onCommentDeleted = (payload: RealtimePostgresDeleteCommentPayload) => {
-			const deletedCommentID = payload.old.id;
-			setCommentsData((snapshot) => {
+        const onCommentDeleted = (payload: RealtimePostgresDeleteCommentPayload) => {
+            const deletedCommentID = payload.old.id;
+            setCommentsData((snapshot) => {
                 return snapshot.filter(
                     (commentData) => commentData.id !== deletedCommentID
                 );
-			});
-		};
+            });
+        };
 
-		const channel = supabase
-			.channel(`public:comments:instance_id=eq.${id}`)
-			.on(
-				"postgres_changes",
-				{
-					event: "INSERT",
-					schema: "public",
-					table: "comments",
-					filter: `instance_id=eq.${id}`,
-				},
-				onCommentAdded
-			)
-			.on(
-				"postgres_changes",
-				{
-					event: "UPDATE",
-					schema: "public",
-					table: "comments",
-					filter: `instance_id=eq.${id}`,
-				},
-				onCommentUpdated
-			)
-			.on(
-				"postgres_changes",
-				{
-					event: "DELETE",
-					schema: "public",
-					table: "comments",
-					filter: `instance_id=eq.${id}`,
-				},
-				onCommentDeleted
-			)
-			.subscribe();
+        const channel = supabase
+            .channel(`public:comments:instance_id=eq.${id}`)
+            .on(
+                "postgres_changes",
+                {
+                    event: "INSERT",
+                    schema: "public",
+                    table: "comments",
+                    filter: `instance_id=eq.${id}`,
+                },
+                onCommentAdded
+            )
+            .on(
+                "postgres_changes",
+                {
+                    event: "UPDATE",
+                    schema: "public",
+                    table: "comments",
+                    filter: `instance_id=eq.${id}`,
+                },
+                onCommentUpdated
+            )
+            .on(
+                "postgres_changes",
+                {
+                    event: "DELETE",
+                    schema: "public",
+                    table: "comments",
+                    filter: `instance_id=eq.${id}`,
+                },
+                onCommentDeleted
+            )
+            .subscribe();
 
-		return () => {
-			supabase.removeChannel(channel)
-		};
-	}, [id]);
+        return () => {
+            supabase.removeChannel(channel)
+        };
+    }, [id]);
 
-	function resetReplyData() {
-		setReplyData({ parentCommentID: "", accountName: "" });
-	}
+    function resetReplyData() {
+        setReplyData({parentCommentID: "", accountName: ""});
+    }
 
-	function onShareSuccess() {
-		triggerAlert("Link Copied!", { severity: "success" });
-	}
-	function onShareFailed() {
-		triggerAlert("Failed to Copy Link!", { severity: "warning" });
-	}
+    function onShareSuccess() {
+        triggerAlert("Link Copied!", {severity: "success"});
+    }
 
-	async function loadMoreCommentsClickHandler() {
-		setLoadingComments(true);
-		const lastCommentIndex = commentsData?.at(-1)?.index;
+    function onShareFailed() {
+        triggerAlert("Failed to Copy Link!", {severity: "warning"});
+    }
+
+    async function loadMoreCommentsClickHandler() {
+        setLoadingComments(true);
+        const lastCommentIndex = commentsData?.at(-1)?.index;
         if (lastCommentIndex !== undefined) {
             try {
                 const {data} = await getCommentsData(
@@ -179,91 +180,91 @@ const CommentsList = ({ id, className = "" }: CommentsListProps) => {
                 });
             }
         }
-		setLoadingComments(false);
-	}
+        setLoadingComments(false);
+    }
 
-	const replying = replyData.parentCommentID !== "";
-	const noComments = commentsData.length === 0;
-	const moreComments = commentsData.length < totalCommentsCount.current;
-	const commentsCountText = numberToString(commentsData.length, "Comment");
+    const replying = replyData.parentCommentID !== "";
+    const noComments = commentsData.length === 0;
+    const moreComments = commentsData.length < totalCommentsCount.current;
+    const commentsCountText = numberToString(commentsData.length, "Comment");
 
-	const comments = useMemo(() => {
-		return commentsData.map((commentData) => {
-			return (
-				<CommentItem
-					key={commentData.id}
-					setReplyData={setReplyData}
-					commentData={commentData}
-					triggerAlert={triggerAlert}
-					profileID={profileID}
-				/>
-			);
-		});
-	}, [commentsData, triggerAlert, profileID]);
+    const comments = useMemo(() => {
+        return commentsData.map((commentData) => {
+            return (
+                <CommentItem
+                    key={commentData.id}
+                    setReplyData={setReplyData}
+                    commentData={commentData}
+                    triggerAlert={triggerAlert}
+                    profileID={profileID}
+                />
+            );
+        });
+    }, [commentsData, triggerAlert, profileID]);
 
-	const alertAnchorOrigin: SnackbarOrigin = {
-		vertical: "bottom",
-		horizontal: "left",
-	};
-	const componentClassName = `${styles.component} ${className}`;
-	return (
-		<div className={componentClassName}>
-			{profileID && (
-				<Fragment>
-					<CommentBox
-						instanceID={id}
-						profileID={profileID}
-						replying={replying}
-						replyData={replyData}
-						cancelReply={resetReplyData}
-						onReplyPosted={resetReplyData}
-						triggerAlert={triggerAlert}
-					/>
-				</Fragment>
-			)}
-			<div className="d-flex flex-column gap-1 w-100">
-				<div className="d-flex justify-content-between align-items-center mx-2">
+    const alertAnchorOrigin: SnackbarOrigin = {
+        vertical: "bottom",
+        horizontal: "left",
+    };
+    const componentClassName = `${styles.component} ${className}`;
+    return (
+        <div className={componentClassName}>
+            {profileID && (
+                <Fragment>
+                    <CommentBox
+                        instanceID={id}
+                        profileID={profileID}
+                        replying={replying}
+                        replyData={replyData}
+                        cancelReply={resetReplyData}
+                        onReplyPosted={resetReplyData}
+                        triggerAlert={triggerAlert}
+                    />
+                </Fragment>
+            )}
+            <div className="d-flex flex-column gap-1 w-100">
+                <div className="d-flex justify-content-between align-items-center mx-2">
 					<span className="d-flex gap-1">
-						<CommentIcon />
+						<CommentIcon/>
 						<span>{commentsCountText}</span>
 					</span>
-					<ShareButton
-						onShareSuccess={onShareSuccess}
-						onShareFailed={onShareFailed}
-					/>
-				</div>
-				{noComments && (
-					<div className="d-flex justify-content-center mt-4">No Comments</div>
-				)}
-				{!noComments && (
-					<Fragment>
-						<ul className={styles.items}>{comments}</ul>
-						{moreComments && (
-							<Button
-								type="button"
-								variant="contained"
-								sx={{ backgroundColor: "dimgray" }}
-								disabled={loadingComments}
-								onClick={loadMoreCommentsClickHandler}>
-								Load More Comments
-							</Button>
-						)}
-					</Fragment>
-				)}
-			</div>
-			<Snackbar
-				open={snackbarData.open}
-				autoHideDuration={6000}
-				onClose={resetSnackbar}
-				anchorOrigin={alertAnchorOrigin}>
-				<Alert
-					severity={snackbarData.severity}
-					sx={{ width: "100%" }}>
-					{snackbarData.text}
-				</Alert>
-			</Snackbar>
-		</div>
-	);
+                    <ShareButton
+                        onShareSuccess={onShareSuccess}
+                        onShareFailed={onShareFailed}
+                    />
+                </div>
+                {noComments && (
+                    <div className="d-flex justify-content-center mt-4">No Comments</div>
+                )}
+                {!noComments && (
+                    <Fragment>
+                        <ul className={styles.items}>{comments}</ul>
+                        {moreComments && (
+                            <Button
+                                type="button"
+                                variant="contained"
+                                sx={{backgroundColor: "dimgray"}}
+                                disabled={loadingComments}
+                                onClick={loadMoreCommentsClickHandler}>
+                                Load More Comments
+                            </Button>
+                        )}
+                    </Fragment>
+                )}
+            </div>
+            <Snackbar
+                open={snackbarData.open}
+                autoHideDuration={6000}
+                onClose={resetSnackbar}
+                anchorOrigin={alertAnchorOrigin}>
+                <Alert
+                    severity={snackbarData.severity}
+                    sx={{width: "100%"}}>
+                    {snackbarData.text}
+                </Alert>
+            </Snackbar>
+        </div>
+    );
 };
 
 export default CommentsList;
