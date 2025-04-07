@@ -12,3 +12,5 @@ export interface TriggerAlertOptions {
         error_description?: string;
     }
 }
+
+export type TriggerAlert = (text: string, options?: TriggerAlertOptions) => void;

@@ -330,8 +330,8 @@ const CommentItem = (props: CommentItemProps) => {
 									{display_name}
 								</Link>
 								<EditCommentItem
-									defaultValue={commentData.text}
-									commentID={commentData.id}
+									initialText={commentData.text}
+									commentId={commentData.id}
 									triggerAlert={triggerAlert}
 									onCommentEdited={() => setCommentState("DEFAULT")}
 									onCancelEditing={() => setCommentState("DEFAULT")}

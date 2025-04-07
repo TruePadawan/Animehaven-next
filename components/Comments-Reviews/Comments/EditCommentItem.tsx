@@ -1,12 +1,15 @@
 import { Button, TextareaAutosize } from "@mui/material";
-import { useState } from "react";
+import {ChangeEvent, FormEvent, useState} from "react";
 import styles from "../Comments-Reviews.module.css";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
+import {EditCommentItemProps} from "./types/EditCommentItem.types";
+import {Database} from "../../../database.types";
+import {PostgrestError} from "@supabase/supabase-js";
 
-const EditCommentItem = (props) => {
-	const supabase = useSupabaseClient();
-	const [commentText, setCommentText] = useState(props.defaultValue);
-	async function formSubmitHandler(event) {
+const EditCommentItem = (props: EditCommentItemProps) => {
+	const supabase = useSupabaseClient<Database>();
+	const [commentText, setCommentText] = useState(props.initialText);
+	async function formSubmitHandler(event: FormEvent) {
 		event.preventDefault();
 
 		if (commentText.trim().length === 0) {
@@ -18,18 +21,18 @@ const EditCommentItem = (props) => {
 				await supabase
 					.from("comments")
 					.update({ text: commentText })
-					.eq("id", props.commentID);
+					.eq("id", props.commentId);
 				props.onCommentEdited();
 			} catch (error) {
 				props.triggerAlert("Failed to edit comment", {
 					severity: "error",
-					error,
+					error: error as PostgrestError,
 				});
 			}
 		}
 	}
 
-	function changeHandler(event) {
+	function changeHandler(event: ChangeEvent<HTMLTextAreaElement>) {
 		setCommentText(event.target.value);
 	}
 
