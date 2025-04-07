@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { Fragment } from "react";
 import styles from "../Comments-Reviews.module.css";
+import {ReplyProps} from "./types/Reply.types";
 
-const Reply = (props) => {
+const Reply = (props: ReplyProps) => {
 	return (
 		<div className={styles["referenced-comment"]}>
 			{props.isDeleted && (
