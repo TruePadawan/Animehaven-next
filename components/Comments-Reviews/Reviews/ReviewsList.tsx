@@ -1,10 +1,11 @@
 import {
-	Fragment,
-	useCallback,
-	useEffect,
-	useMemo,
-	useRef,
-	useState,
+    ChangeEvent, FormEvent,
+    Fragment, SyntheticEvent,
+    useCallback,
+    useEffect,
+    useMemo,
+    useRef,
+    useState,
 } from "react";
 import { Alert, Button, Rating, TextareaAutosize } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
@@ -18,19 +19,23 @@ import {
 } from "../../../utilities/app-utilities";
 import ReviewsIcon from "@mui/icons-material/Reviews";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
+import {ReviewsListProps} from "./types/ReviewsList.types";
+import {Database, Tables} from "../../../database.types";
+import {PostgrestError} from "@supabase/supabase-js";
 
 const REVIEWS_PER_REQUESTS = 10;
-const ReviewsList = ({ profileID, animeID, triggerAlert }) => {
-	const supabase = useSupabaseClient();
+const ReviewsList = (props: ReviewsListProps) => {
+	const { profileID, animeID, triggerAlert } = props;
+	const supabase = useSupabaseClient<Database>();
 	const [reviewText, setReviewText] = useState("");
-	const [reviewListData, setReviewListData] = useState([]);
+	const [reviewListData, setReviewListData] = useState<Tables<"item_reviews">[]>([]);
 	const [rating, setRating] = useState(1);
 	const [disableAddReviewBtn, setDisableAddReviewBtn] = useState(false);
 	const [loadingReviews, setLoadingReviews] = useState(false);
 	const totalReviewsCount = useRef(0);
 
 	const handleError = useCallback(
-		(errorText, error) => {
+		(errorText: string, error: any) => {
 			triggerAlert(errorText, { severity: "error", error });
 		},
 		[triggerAlert]
@@ -49,10 +54,19 @@ const ReviewsList = ({ profileID, animeID, triggerAlert }) => {
 			});
 	}, [animeID, profileID, handleError, supabase]);
 
-	const updateRating = (e, newVal) => setRating(newVal < 1 ? 1 : newVal);
-	const textAreaChangeHandler = (e) => setReviewText(e.target.value);
+	function updateRating (event: SyntheticEvent, value: number | null) {
+		if (value !== null) {
+		    setRating(value < 1 ? 1 : value);
+		}
+	}
 
-	async function addReview(onReviewAdded) {
+	const textAreaChangeHandler = (event: ChangeEvent<HTMLTextAreaElement>) => setReviewText(event.target.value);
+
+	async function addReview(onReviewAdded: VoidFunction) {
+        if (profileID === undefined) {
+            return;
+        }
+
 		try {
 			await supabase
 				.from("item_reviews")
@@ -65,17 +79,18 @@ const ReviewsList = ({ profileID, animeID, triggerAlert }) => {
 				})
 				.throwOnError();
 
-			const list = await getReviewsData(supabase, animeID, profileID);
-			setReviewListData(list);
+			const response = await getReviewsData(supabase, animeID, profileID);
+			const reviews: Tables<"item_reviews">[] = response.data
+            setReviewListData(reviews);
 			onReviewAdded();
 		} catch (error) {
 			handleError("Failed to add review", error);
 		}
 	}
 
-	async function updateReview(onReviewUpdated) {
+	async function updateReview(onReviewUpdated: VoidFunction) {
 		try {
-			const { data: updatedData } = await supabase
+			const { data: updatedData, error } = await supabase
 				.from("item_reviews")
 				.update({
 					review: reviewText,
@@ -83,8 +98,8 @@ const ReviewsList = ({ profileID, animeID, triggerAlert }) => {
 				})
 				.eq("item_id", animeID)
 				.eq("creator_id", profileID)
-				.select()
-				.throwOnError();
+				.select();
+            if (error) throw error;
 
 			setReviewListData((snapshot) => {
 				snapshot[0] = updatedData[0];
@@ -101,7 +116,7 @@ const ReviewsList = ({ profileID, animeID, triggerAlert }) => {
 		setRating(ratingValue);
 	}
 
-	async function formSubmitHandler(event) {
+	async function formSubmitHandler(event: FormEvent) {
 		event.preventDefault();
 		// SAFETUY CHECK - THERE MUST BE A SIGNEDIN USER BEFORE REVIEW CAN BE POSTED OR UPDATED
 		if (profileID === null) return;
@@ -131,8 +146,10 @@ const ReviewsList = ({ profileID, animeID, triggerAlert }) => {
 	}
 
 	async function loadMoreReviewsClickHandler() {
-		setLoadingReviews(true);
-		const lastReviewIndex = reviewListData.at(-1).index;
+		if (reviewListData.length === 0) return;
+        setLoadingReviews(true);
+		// @ts-ignore
+        const lastReviewIndex = reviewListData.at(-1).index;
 		try {
 			const { data } = await getReviewsData(
 				supabase,
@@ -146,7 +163,7 @@ const ReviewsList = ({ profileID, animeID, triggerAlert }) => {
 		} catch (error) {
 			triggerAlert("Failed to load more reviews", {
 				severity: "error",
-				error,
+				error: error as PostgrestError,
 			});
 		}
 		setLoadingReviews(false);

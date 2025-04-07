@@ -329,21 +329,21 @@ export async function getReviewsData(
 	supabase,
 	animeID,
 	limit,
-	startAfterIndex = null,
-	profileID = null
+	startAfterIndex,
+	profileID
 ) {
 	let list = [];
 	let totalReviewsCount = 0;
 	const response = { data: [], count: 0 };
 	// GET USER REVIEW FIRST BEFORE OTHER REVIEWS IF PROFILE ID SPECIFIED
-	if (profileID !== null) {
+	if (profileID !== undefined) {
 		const userReview = await getReviewByUser(supabase, animeID, profileID);
 		if (userReview.length > 0) {
 			list.push(userReview[0]);
 			totalReviewsCount += 1;
 		}
 
-		if (startAfterIndex !== null) {
+		if (startAfterIndex !== undefined) {
 			const { data, count } = await supabase
 				.from("item_reviews")
 				.select("*", { count: "exact" })

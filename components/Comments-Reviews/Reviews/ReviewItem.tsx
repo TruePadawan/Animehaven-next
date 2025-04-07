@@ -16,19 +16,24 @@ import Image from "next/image";
 import MoreOptions from "../MoreOptions";
 import { usePopupState } from "material-ui-popup-state/hooks";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
+import {ReviewItemProps} from "./types/ReviewItem.types";
+import {Database} from "../../../database.types";
 
-const ReviewItem = ({ reviewData, profileID, editReview, handleError }) => {
-	const supabase = useSupabaseClient();
+// Rename to AnimeReviewItem
+const ReviewItem = (props: ReviewItemProps) => {
+	const { reviewData, profileID, editReview, handleError } = props;
+	const supabase = useSupabaseClient<Database>();
 	const [profileData, setProfileData] = useState({
 		avatar_url: DEFAULT_AVATAR_URL,
 		account_name: "",
 		display_name: "",
 	});
 	const [loading, setLoading] = useState(true);
-	const [nUpvotes, setNUpvotes] = useState(reviewData.upvoted_by.length);
+	const [numberOfUpvote, setNumberOfUpvote] = useState(reviewData.upvoted_by.length);
 	const [upvoteIcon, setUpvoteIcon] = useState(() => {
-		const isUpvoted = reviewData.upvoted_by.includes(profileID);
-		if (isUpvoted) return <ThumbUpAltIcon />;
+		if (profileID && reviewData.upvoted_by.includes(profileID)) {
+			return <ThumbUpAltIcon />;
+		}
 		return <ThumbUpOffAltIcon />;
 	});
 	const [reviewState, setReviewState] = useState({
@@ -71,7 +76,7 @@ const ReviewItem = ({ reviewData, profileID, editReview, handleError }) => {
 					setUpvoteIcon(<ThumbUpAltIcon />);
 				}
 				const upvotes = await getReviewUpvoteList(supabase, reviewID);
-				setNUpvotes(upvotes.length);
+				setNumberOfUpvote(upvotes.length);
 			} else if (status === "FAILED" && code === "REVIEW_NOT_FOUND") {
 				setReviewState({
 					deleted: true,
@@ -176,7 +181,7 @@ const ReviewItem = ({ reviewData, profileID, editReview, handleError }) => {
 									onClick={onUpvoteButtonClicked}>
 									{upvoteIcon}
 								</IconButton>
-								<span>{nUpvotes}</span>
+								<span>{numberOfUpvote}</span>
 							</span>
 							<IconButton
 								aria-label="delete"
