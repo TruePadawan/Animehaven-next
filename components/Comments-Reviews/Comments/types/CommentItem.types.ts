@@ -1,9 +1,9 @@
 import {Tables} from "../../../../database.types";
-import {TriggerAlertOptions} from "../../../../utilities/global.types";
+import {TriggerAlert} from "../../../../utilities/global.types";
 
 export interface CommentItemProps {
     commentData: Tables<"comments">;
-    triggerAlert: (text: string, options?: TriggerAlertOptions) => void;
+    triggerAlert: TriggerAlert;
     profileID: string | null;
     setReplyData: (
         replyData: { parentCommentID: string, accountName: string }
