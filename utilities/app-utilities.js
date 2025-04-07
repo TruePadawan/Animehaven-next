@@ -63,10 +63,10 @@ export async function getCommentsData(
 	supabase,
 	instanceID,
 	limit,
-	startAfterIndex = null
+	startAfterIndex
 ) {
 	let response;
-	if (startAfterIndex === null) {
+	if (startAfterIndex === undefined) {
 		response = await supabase
 			.from("comments")
 			.select("*", { count: "exact" })

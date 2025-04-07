@@ -1,58 +1,65 @@
-import {
-	Fragment,
-	useCallback,
-	useContext,
-	useEffect,
-	useMemo,
-	useRef,
-	useState,
-} from "react";
+import React, {Fragment, useCallback, useContext, useEffect, useMemo, useRef, useState,} from "react";
 import CommentItem from "./CommentItem";
 import CommentBox from "./CommentBox";
 import styles from "../Comments-Reviews.module.css";
-import { Alert, Button, Snackbar } from "@mui/material";
-import {
-	defaultSnackbarState,
-	getCommentsData,
-	numberToString,
-} from "../../../utilities/app-utilities";
-import { UserAuthContext } from "../../../context/UserAuthContext";
+import {Alert, Button, Snackbar, SnackbarOrigin} from "@mui/material";
+import {defaultSnackbarState, getCommentsData, numberToString,} from "../../../utilities/app-utilities";
+import {UserAuthContext} from "../../../context/UserAuthContext";
 import CommentIcon from "@mui/icons-material/Comment";
 import ShareButton from "../../ShareButton/ShareButton";
-import { useSupabaseClient } from "@supabase/auth-helpers-react";
+import {useSupabaseClient} from "@supabase/auth-helpers-react";
+import {
+    CommentsListProps,
+    RealtimePostgresDeleteCommentPayload,
+    RealtimePostgresInsertCommentPayload,
+    RealtimePostgresUpdateCommentPayload, SnackbarProps
+} from "./types/CommentsList.types";
+import {Database, Tables} from "../../../database.types";
+import {TriggerAlertOptions} from "../../../utilities/global.types";
+import {PostgrestError} from "@supabase/supabase-js";
 
 const COMMENTS_PER_REQUEST = 10;
-const CommentsList = ({ id, className = "" }) => {
-	const supabase = useSupabaseClient();
+const CommentsList = ({ id, className = "" }: CommentsListProps) => {
+	const supabase = useSupabaseClient<Database>();
 	const { profileID } = useContext(UserAuthContext);
-	const [commentsData, setCommentsData] = useState([]);
+	const [commentsData, setCommentsData] = useState<Tables<"comments">[]>([]);
 	const [loadingComments, setLoadingComments] = useState(false);
-	const [snackbarData, setSnackbarData] = useState(defaultSnackbarState);
+	const [snackbarData, setSnackbarData] = useState<SnackbarProps>({
+        open: false,
+        severity: "info",
+        text: ""
+    });
 	const [replyData, setReplyData] = useState({
 		parentCommentID: "",
 		accountName: "",
 	});
 	const totalCommentsCount = useRef(0);
 
-	const triggerAlert = useCallback((text, options) => {
+    function getErrorMessage(error: any) {
+        return error?.message || error?.error_description || "";
+    }
+
+	const triggerAlert = useCallback((text: string, options?: TriggerAlertOptions) => {
 		const alertSeverity = options?.severity;
 		setSnackbarData({
 			open: true,
 			severity: alertSeverity || "info",
 			text:
 				alertSeverity === "error"
-					? `${text} - ${
-							options.error.message || options.error.error_description
-					  }`
+					? `${text} - ${getErrorMessage(options?.error)}`
 					: text,
 		});
 	}, []);
 
-	function resetSnackbar(event, reason) {
+	function resetSnackbar(_event: React.SyntheticEvent<any> | Event, reason: string) {
 		if (reason === "clickaway") {
 			return;
 		}
-		setSnackbarData(defaultSnackbarState);
+		setSnackbarData({
+            open: false,
+            severity: "info",
+            text: ""
+        });
 	}
 
 	// LOAD COMMENTS ASSOCIATED WITH INSTANCE ID
@@ -70,15 +77,15 @@ const CommentsList = ({ id, className = "" }) => {
 
 	// LISTEN FOR NEW COMMENTS AND UPDATES TO COMMENTS
 	useEffect(() => {
-		const onCommentAdded = (payload) => {
-			const newData = payload.new;
-			setCommentsData((snapshot) => {
-				snapshot.unshift(newData);
-				return [...snapshot];
-			});
-		};
+		const onCommentAdded = (payload: RealtimePostgresInsertCommentPayload) => {
+            const newData = payload.new;
+            setCommentsData((snapshot) => {
+                snapshot.unshift(newData);
+                return [...snapshot];
+            });
+        };
 
-		const onCommentUpdated = (payload) => {
+		const onCommentUpdated = (payload: RealtimePostgresUpdateCommentPayload) => {
 			const updatedCommentID = payload.new.id;
 			setCommentsData((snapshot) => {
 				for (let i = 0; i < snapshot.length; ++i) {
@@ -92,13 +99,12 @@ const CommentsList = ({ id, className = "" }) => {
 			});
 		};
 
-		const onCommentDeleted = (payload) => {
+		const onCommentDeleted = (payload: RealtimePostgresDeleteCommentPayload) => {
 			const deletedCommentID = payload.old.id;
 			setCommentsData((snapshot) => {
-				const filteredList = snapshot.filter(
-					(commentData) => commentData.id !== deletedCommentID
-				);
-				return filteredList;
+                return snapshot.filter(
+                    (commentData) => commentData.id !== deletedCommentID
+                );
 			});
 		};
 
@@ -136,7 +142,9 @@ const CommentsList = ({ id, className = "" }) => {
 			)
 			.subscribe();
 
-		return () => supabase.removeChannel(channel);
+		return () => {
+			supabase.removeChannel(channel)
+		};
 	}, [id]);
 
 	function resetReplyData() {
@@ -152,23 +160,25 @@ const CommentsList = ({ id, className = "" }) => {
 
 	async function loadMoreCommentsClickHandler() {
 		setLoadingComments(true);
-		const lastCommentIndex = commentsData.at(-1).index;
-		try {
-			const { data } = await getCommentsData(
-				supabase,
-				id,
-				COMMENTS_PER_REQUEST,
-				lastCommentIndex
-			);
-			setCommentsData((snapshot) => {
-				return [...snapshot, ...data];
-			});
-		} catch (error) {
-			triggerAlert("Failed to load more comments", {
-				severity: "error",
-				error,
-			});
-		}
+		const lastCommentIndex = commentsData?.at(-1)?.index;
+        if (lastCommentIndex !== undefined) {
+            try {
+                const {data} = await getCommentsData(
+                    supabase,
+                    id,
+                    COMMENTS_PER_REQUEST,
+                    lastCommentIndex
+                );
+                setCommentsData((snapshot) => {
+                    return [...snapshot, ...data];
+                });
+            } catch (error) {
+                triggerAlert("Failed to load more comments", {
+                    severity: "error",
+                    error: error as PostgrestError,
+                });
+            }
+        }
 		setLoadingComments(false);
 	}
 
@@ -191,7 +201,7 @@ const CommentsList = ({ id, className = "" }) => {
 		});
 	}, [commentsData, triggerAlert, profileID]);
 
-	const alertAnchorOrigin = {
+	const alertAnchorOrigin: SnackbarOrigin = {
 		vertical: "bottom",
 		horizontal: "left",
 	};
@@ -248,8 +258,7 @@ const CommentsList = ({ id, className = "" }) => {
 				anchorOrigin={alertAnchorOrigin}>
 				<Alert
 					severity={snackbarData.severity}
-					sx={{ width: "100%" }}
-					onClose={resetSnackbar}>
+					sx={{ width: "100%" }}>
 					{snackbarData.text}
 				</Alert>
 			</Snackbar>
