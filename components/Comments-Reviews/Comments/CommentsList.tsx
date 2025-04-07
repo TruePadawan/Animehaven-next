@@ -3,7 +3,7 @@ import CommentItem from "./CommentItem";
 import CommentBox from "./CommentBox";
 import styles from "../Comments-Reviews.module.css";
 import {Alert, Button, Snackbar, SnackbarOrigin} from "@mui/material";
-import {defaultSnackbarState, getCommentsData, numberToString,} from "../../../utilities/app-utilities";
+import {getCommentsData, numberToString,} from "../../../utilities/app-utilities";
 import {UserAuthContext} from "../../../context/UserAuthContext";
 import CommentIcon from "@mui/icons-material/Comment";
 import ShareButton from "../../ShareButton/ShareButton";
