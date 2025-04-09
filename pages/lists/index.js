@@ -202,7 +202,7 @@ const Lists = () => {
 				<CreateList
 					open={showCreateListDialog}
 					onClose={closeCreateListDialog}
-					profileID={profileID}
+					profileId={profileID}
 					update={false}
 				/>
 			)}

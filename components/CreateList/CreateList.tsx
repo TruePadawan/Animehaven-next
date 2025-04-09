@@ -13,85 +13,108 @@ import {
 	FormHelperText,
 	Radio,
 	RadioGroup,
-	Snackbar,
+	Snackbar, SnackbarOrigin,
 	TextareaAutosize,
 } from "@mui/material";
-import { Fragment, useEffect, useMemo, useState } from "react";
+import {ChangeEvent, FormEvent, Fragment, ReactElement, useEffect, useMemo, useState} from "react";
 import { v4 as uuid } from "uuid";
 import { searchAnime } from "../../utilities/mal-api";
 import Input from "../Input/Input";
 import SearchInput from "../Input/SearchInput/SearchInput";
 import Loading from "../Loading/Loading";
 import styles from "./style.module.css";
-import { defaultSnackbarState, getUsefulData, LIST_GENRES } from "../../utilities/app-utilities";
+import {getErrorMessage, getUsefulData, LIST_GENRES} from "../../utilities/app-utilities";
 import { useRouter } from "next/router";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
+import {Database} from "../../database.types";
+import {CreateListProps, ListGenres} from "./CreateList.types";
+import {ResetAlert, TriggerAlert} from "../../utilities/global.types";
+import {PostgrestError} from "@supabase/supabase-js";
+import {SnackbarProps} from "../Comments-Reviews/Comments/types/CommentsList.types";
 
-const CreateList = (props) => {
-	const supabase = useSupabaseClient();
+const CreateList = (props: CreateListProps) => {
+	// props.defaultValues !== undefined when editing an anime list item rather than creating one
+	const supabase = useSupabaseClient<Database>();
 	const [visibility, setVisibility] = useState(() => {
-		if (props.update === true) {
+		if (props.defaultValues !== undefined) {
 			return props.defaultValues.is_public === true ? "public" : "private";
 		}
 		return "public";
 	});
-	const [listGenres, setListGenres] = useState(() => {
-		if (props.update === true) {
-			return props.defaultValues.genres;
+	const [listGenres, setListGenres] = useState<ListGenres>(() => {
+		if (props.defaultValues !== undefined) {
+			return props.defaultValues.genres
 		}
-		let obj = {};
+		const genres: ListGenres = {};
 		LIST_GENRES.forEach((genre) => {
-			obj[genre.toUpperCase()] = false;
+			genres[genre.toUpperCase()] = false;
 		});
-		return obj;
+		return genres;
 	});
 	const [listTitle, setListTitle] = useState(() => {
-		return props.update === true ? props.defaultValues.title : "";
+		if (props.defaultValues !== undefined) {
+			return props.defaultValues.title;
+		}
+		return "";
 	});
 	const [listDesc, setListDesc] = useState(() => {
-		return props.update === true ? props.defaultValues.desc : "";
+		if (props.defaultValues !== undefined) {
+			return props.defaultValues.desc;
+		}
+		return "";
 	});
 	const [items, setItems] = useState(() => {
-		return props.update === true ? props.defaultValues.items : [];
+		if (props.defaultValues !== undefined) {
+			return props.defaultValues.items;
+		}
+		return [];
 	});
 	const [error, setError] = useState(false);
 	const [searchText, setSearchText] = useState("");
-	const [searchResults, setSearchResults] = useState([]);
+	const [searchResults, setSearchResults] = useState<ReactElement[]>([]);
 	const [isSearchOngoing, setIsSearchOngoing] = useState(false);
-	const [snackbarData, setSnackbarData] = useState(defaultSnackbarState);
+	const [snackbarData, setSnackbarData] = useState<SnackbarProps>({
+		open: false,
+		severity: "info",
+		text: ""
+	});
 	const router = useRouter();
 
 	// KEEP TRACK OF WHETHER THERE IS AT LEAST ONE GENRE SELECTED
 	useEffect(() => {
 		const selectedGenres = [];
 		for (const genre in listGenres) {
-			if (listGenres[genre] === true) {
+			if (listGenres[genre]) {
 				selectedGenres.push(genre);
 			}
 		}
 		setError(selectedGenres.length === 0);
 	}, [listGenres, props.open]);
 
-	const triggerAlert = (text, options) => {
+	const triggerAlert: TriggerAlert = (text, options) => {
 		const alertSeverity = options?.severity || "info";
 		const alertText =
 			alertSeverity === "error"
 				? `${text} - ${
-						options.error.message || options.error.error_description
+						getErrorMessage(options?.error)
 				  }`
 				: text;
 		setSnackbarData({ text: alertText, open: true, severity: alertSeverity });
 	};
 
-	const resetAlert = (e, reason) => {
-		if (reason === "clickaway") {
-			return;
+	const resetAlert: ResetAlert = (e, reason) => {
+		if (reason !== "clickaway") {
+			setSnackbarData({
+				open: false,
+				severity: "info",
+				text: ""
+			});
 		}
-		setSnackbarData(defaultSnackbarState);
 	};
 
 	const cleanup = () => {
-		if (props.update === true) {
+		const isEditingAnimeList = props.defaultValues !== undefined;
+		if (isEditingAnimeList) {
 			props.onClose();
 		} else {
 			setItems([]);
@@ -106,18 +129,18 @@ const CreateList = (props) => {
 		}
 	};
 
-	const updateVisibility = (e) => setVisibility(e.target.value);
+	const updateVisibility = (e: ChangeEvent<HTMLInputElement>, value: string) => setVisibility(value);
 
-	const updateGenres = (e) => {
+	const updateGenres = (e: ChangeEvent<HTMLInputElement>) => {
 		setListGenres((current) => {
 			current[e.target.name] = e.target.checked;
 			return { ...current };
 		});
 	};
 
-	const updateSearchText = (e) => setSearchText(e.target.value);
+	const updateSearchText = (e: ChangeEvent<HTMLInputElement>) => setSearchText(e.target.value);
 
-	const addItem = (itemID, itemTitle) => {
+	const addItem = (itemID: string, itemTitle: string) => {
 		setItems((snapshot) => {
 			// PREVENT ADDING DUPLICATES
 			for (let i = 0; i < snapshot.length; ++i) {
@@ -130,7 +153,7 @@ const CreateList = (props) => {
 		});
 	};
 
-	const deleteItem = (itemID) => {
+	const deleteItem = (itemID: string) => {
 		setItems((snapshot) => {
 			for (let i = 0; i < snapshot.length; ++i) {
 				if (snapshot[i].id === itemID) {
@@ -142,8 +165,7 @@ const CreateList = (props) => {
 		});
 	};
 
-	const searchFunction = async (e) => {
-		e.preventDefault();
+	const searchFunction = async () => {
 		setIsSearchOngoing(true);
 		const rawAnimesData = await searchAnime(searchText, 10);
 		const transformed_list = rawAnimesData.map((animeData) => {
@@ -162,14 +184,20 @@ const CreateList = (props) => {
 		setIsSearchOngoing(false);
 	};
 
-	const createList = async (e) => {
+	const createList = async (e: FormEvent) => {
 		e.preventDefault();
 		try {
-			if (error === true) {
-				throw new Error("No genre selected");
+			if (error) {
+				return triggerAlert("Failed to create list", { severity: "error", error: {
+						message: "No genre selected"
+					}
+				});
 			}
-			if (props.profileID === null) {
-				throw new Error("no user signed in");
+			if (props.profileId === null) {
+				return triggerAlert("Failed to create list", { severity: "error", error: {
+						message: "No user signed in"
+					}
+				});
 			}
 
 			await supabase
@@ -179,7 +207,7 @@ const CreateList = (props) => {
 					description: listDesc,
 					genres: listGenres,
 					items,
-					creator_id: props.profileID,
+					creator_id: props.profileId,
 					is_public: visibility === "public",
 				})
 				.throwOnError();
@@ -190,18 +218,30 @@ const CreateList = (props) => {
 				severity: "success",
 			});
 		} catch (error) {
-			triggerAlert("Failed to create list", { severity: "error", error });
+			triggerAlert("Failed to create list", { severity: "error", error: error as PostgrestError });
 		}
 	};
 
-	const updateList = async (e) => {
+	const updateList = async (e: FormEvent) => {
 		e.preventDefault();
 		try {
-			if (error === true) {
-				throw new Error("No genre selected");
+			if (error) {
+				return triggerAlert("Failed to update list", { severity: "error", error: {
+					message: "No genre selected"
+					}
+				});
 			}
-			if (props.profileID === null) {
-				throw new Error("no user signed in");
+			if (props.profileId === null) {
+				return triggerAlert("Failed to update list", { severity: "error", error: {
+						message: "No user signed in"
+					}
+				});
+			}
+			if (props.defaultValues?.id === undefined) {
+				return triggerAlert("Failed to update list", { severity: "error", error: {
+						message: "Could not get the Id of the anime list, try reloading the page"
+					}
+				});
 			}
 
 			await supabase
@@ -211,30 +251,32 @@ const CreateList = (props) => {
 					description: listDesc,
 					genres: listGenres,
 					items,
-					creator_id: props.profileID,
+					creator_id: props.profileId,
 					is_public: visibility === "public",
 				})
 				.eq("id", props.defaultValues.id)
 				.throwOnError();
 			window.location.reload();
 		} catch (error) {
-			triggerAlert("Failed to update list", { severity: "error", error });
+			triggerAlert("Failed to update list", { severity: "error", error: error as PostgrestError });
 		}
 	};
 
-	const deleteList = async (e) => {
+	const deleteList = async () => {
 		try {
-			if (!props.defaultValues.id) {
-				throw new Error("Couldn't get ID of the list, try reloading the page!");
+			if (props.defaultValues?.id === undefined) {
+				return triggerAlert("Failed to delete list", { severity: "error", error: {
+					message: "Could not get the Id of the anime list, try reloading the page"
+				} });
 			}
 			await supabase
 				.from("anime_lists")
 				.delete()
 				.eq("id", props.defaultValues.id)
 				.throwOnError();
-			router.replace("/lists");
+			await router.replace("/lists");
 		} catch (error) {
-			triggerAlert("Failed to delete list", { severity: "error", error });
+			triggerAlert("Failed to delete list", { severity: "error", error: error as PostgrestError });
 		}
 	};
 
@@ -268,10 +310,11 @@ const CreateList = (props) => {
 		});
 	}, [items]);
 
-	const alertAnchorOrigin = {
+	const alertAnchorOrigin: SnackbarOrigin = {
 		vertical: "top",
 		horizontal: "center",
 	};
+	const isEditingAnimeList = props.defaultValues !== undefined;
 	return (
 		<Fragment>
 			<Dialog
@@ -288,14 +331,14 @@ const CreateList = (props) => {
 					},
 				}}>
 				<DialogTitle sx={{ fontSize: "1.4rem" }}>
-					{props.update ? "Update List" : "Create List"}
+					{isEditingAnimeList ? "Update List" : "Create List"}
 				</DialogTitle>
 				<DialogContent sx={{ padding: "2%" }}>
 					<Box className={styles.component}>
 						<Box
 							component="form"
 							className={styles.createListForm}
-							onSubmit={props.update ? updateList : createList}>
+							onSubmit={isEditingAnimeList ? updateList : createList}>
 							<div className="d-flex flex-column">
 								<label htmlFor="title-input-field" className={styles.label}>
 									Title
@@ -360,9 +403,9 @@ const CreateList = (props) => {
 									type="submit"
 									sx={{ fontFamily: "inherit" }}
 									disabled={error}>
-									{props.update ? "Update" : "Create"}
+									{isEditingAnimeList ? "Update" : "Create"}
 								</Button>
-								{props.update && (
+								{isEditingAnimeList && (
 									<Button
 										variant="contained"
 										type="button"
@@ -384,7 +427,7 @@ const CreateList = (props) => {
 						<Box className={styles.addItems}>
 							<div className="d-flex flex-column gap-1">
 								<span className={styles.label}>
-									{props.update ? "Items" : "Items (optional)"}
+									{isEditingAnimeList ? "Items" : "Items (optional)"}
 								</span>
 								<div className="d-flex flex-wrap gap-1">{transformedItems}</div>
 							</div>
@@ -397,10 +440,10 @@ const CreateList = (props) => {
 									value={searchText}
 									onChange={updateSearchText}
 								/>
-								{isSearchOngoing === true && (
+								{isSearchOngoing && (
 									<Loading sx={{ marginTop: "4px" }} />
 								)}
-								{isSearchOngoing === false && (
+								{!isSearchOngoing && (
 									<div className="mt-2 d-flex flex-wrap gap-1">
 										{searchResults}
 									</div>
@@ -416,7 +459,6 @@ const CreateList = (props) => {
 				anchorOrigin={alertAnchorOrigin}
 				onClose={resetAlert}>
 				<Alert
-					onClose={resetAlert}
 					severity={snackbarData.severity}
 					sx={{ width: "100%" }}>
 					{snackbarData.text}

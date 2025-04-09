@@ -174,7 +174,7 @@ const List = () => {
 				<CreateList
 					open={showCreateListDialog}
 					onClose={closeCreateListDialog}
-					profileID={profileID}
+					profileId={profileID}
 					update={true}
 					defaultValues={listData}
 				/>
