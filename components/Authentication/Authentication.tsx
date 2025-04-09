@@ -4,7 +4,7 @@ import {UserAuthContext} from "../../context/UserAuthContext";
 import UserAccountBtn from "./UserAccountBtn";
 import {Fragment} from "react";
 import {useRouter} from "next/router";
-import {HasErrorMessage} from "../../utilities/global.types";
+import {HasErrorMessage, ResetAlert} from "../../utilities/global.types";
 
 const AuthBtn = styled(Button)(() => ({
     backgroundColor: "darkslategray",
@@ -26,11 +26,10 @@ const Authentication = () => {
         });
     };
 
-    const resetError = (event: React.SyntheticEvent<any> | Event, reason: string) => {
-        if (reason === "clickaway") {
-            return;
+    const resetError: ResetAlert = (event, reason) => {
+        if (reason !== "clickaway") {
+            setError({occurred: false, text: ""});
         }
-        setError({occurred: false, text: ""});
     };
 
     const userSignedIn = profileID !== null;

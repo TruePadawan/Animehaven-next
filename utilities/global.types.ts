@@ -1,4 +1,5 @@
 import {AlertProps} from "@mui/material";
+import React from "react";
 
 export interface HasErrorMessage {
     message?: string;
@@ -14,3 +15,4 @@ export interface TriggerAlertOptions {
 }
 
 export type TriggerAlert = (text: string, options?: TriggerAlertOptions) => void;
+export type ResetAlert = (event: React.SyntheticEvent<any> | Event, reason: string) => void;
