@@ -451,3 +451,7 @@ export function verifyProfileImage(file, onVerificationComplete) {
 		onVerificationComplete(false);
 	}
 }
+
+export function getErrorMessage(error) {
+	return error?.message || error?.error_description || "";
+}

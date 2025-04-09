@@ -3,7 +3,7 @@ import CommentItem from "./CommentItem";
 import CommentBox from "./CommentBox";
 import styles from "../Comments-Reviews.module.css";
 import {Alert, Button, Snackbar, SnackbarOrigin} from "@mui/material";
-import {getCommentsData, numberToString,} from "../../../utilities/app-utilities";
+import {getCommentsData, getErrorMessage, numberToString,} from "../../../utilities/app-utilities";
 import {UserAuthContext} from "../../../context/UserAuthContext";
 import CommentIcon from "@mui/icons-material/Comment";
 import ShareButton from "../../ShareButton/ShareButton";
@@ -34,10 +34,6 @@ const CommentsList = ({id, className = ""}: CommentsListProps) => {
         accountName: "",
     });
     const totalCommentsCount = useRef(0);
-
-    function getErrorMessage(error: any) {
-        return error?.message || error?.error_description || "";
-    }
 
     const triggerAlert = useCallback((text: string, options?: TriggerAlertOptions) => {
         const alertSeverity = options?.severity;
