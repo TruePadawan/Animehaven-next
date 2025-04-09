@@ -1,6 +1,7 @@
 import { filetypemime } from "magic-bytes.js";
 
 export const PROFILE_IMG_MAX_SIZE = Math.pow(10, 6);
+// Consider giving this a type of SnackbarProps
 export const defaultSnackbarState = { open: false, severity: "info", text: "" };
 export const LIST_GENRES = [
 	"Action",

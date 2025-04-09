@@ -32,6 +32,7 @@ import {ResetAlert, TriggerAlert} from "../../utilities/global.types";
 import {PostgrestError} from "@supabase/supabase-js";
 import {SnackbarProps} from "../Comments-Reviews/Comments/types/CommentsList.types";
 
+// Consider renaming this to ManageAnimeList or most likely splitting the component into 2 separate ones
 const CreateList = (props: CreateListProps) => {
 	// props.defaultValues !== undefined when editing an anime list item rather than creating one
 	const supabase = useSupabaseClient<Database>();
