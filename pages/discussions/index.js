@@ -95,7 +95,7 @@ export default function Discussions() {
 					id={discussion.id}
 					title={discussion.title}
 					tag={discussion.tag}
-					creatorID={discussion.creator_id}
+					creator_id={discussion.creator_id}
 				/>
 			);
 		});

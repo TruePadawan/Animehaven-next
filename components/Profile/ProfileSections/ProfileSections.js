@@ -3,7 +3,7 @@ import { Masonry } from "@mui/lab";
 import { Alert, Box, IconButton, Modal, Snackbar } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
-import DiscussionItem from "../../../components/Items/DiscussionItem/DiscussionItem";
+import DiscussionItem from "../../Items/DiscussionItem/DiscussionItem";
 import ListItem from "../../../components/Items/ListItem/ListItem";
 import RecommendedItem from "../../../components/Items/RecommendedItem/RecommendedItem";
 import ReviewItem from "../../../components/Items/ReviewItem/ReviewItem";
@@ -54,7 +54,7 @@ export function UserDiscussions({ accountName }) {
 						id={discussion.id}
 						title={discussion.title}
 						tag={discussion.tag}
-						creatorID={discussion.creator_id}
+						creator_id={discussion.creator_id}
 					/>
 				));
 				setItems(list);
