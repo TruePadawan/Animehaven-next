@@ -16,12 +16,7 @@ const Home = (props) => {
 		return transformedData.map((animeData) => (
 			<AnimeItem
 				key={animeData.id}
-				id={animeData.id}
-				title={animeData.title}
-				image={animeData.imageURL}
-				type={animeData.type}
-				score={animeData.score}
-				genres={animeData.genres}
+				data={animeData}
 			/>
 		));
 	})();
@@ -31,12 +26,7 @@ const Home = (props) => {
 		return transformedData.map((animeData) => (
 			<AnimeItem
 				key={animeData.id}
-				id={animeData.id}
-				title={animeData.title}
-				image={animeData.imageURL}
-				type={animeData.type}
-				score={animeData.score}
-				genres={animeData.genres}
+				data={animeData}
 			/>
 		));
 	})();
@@ -46,12 +36,7 @@ const Home = (props) => {
 		return transformedData.map((animeData) => (
 			<AnimeItem
 				key={animeData.id}
-				id={animeData.id}
-				title={animeData.title}
-				image={animeData.imageURL}
-				type={animeData.type}
-				score={animeData.score}
-				genres={animeData.genres}
+				data={animeData}
 			/>
 		));
 	})();
@@ -61,12 +46,7 @@ const Home = (props) => {
 		return transformedData.map((animeData) => (
 			<AnimeItem
 				key={animeData.id}
-				id={animeData.id}
-				title={animeData.title}
-				image={animeData.imageURL}
-				type={animeData.type}
-				score={animeData.score}
-				genres={animeData.genres}
+				data={animeData}
 			/>
 		));
 	})();

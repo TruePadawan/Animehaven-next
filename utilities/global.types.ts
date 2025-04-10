@@ -16,3 +16,17 @@ export interface TriggerAlertOptions {
 
 export type TriggerAlert = (text: string, options?: TriggerAlertOptions) => void;
 export type ResetAlert = (event: React.SyntheticEvent<any> | Event, reason: string) => void;
+
+export interface AnimeItemData {
+    id: number;
+    title: string;
+    imageURL: string;
+    type: string;
+    score: number;
+    genres: Array<{
+        mal_id: number;
+        type: string;
+        name: string;
+        url: string;
+    }>;
+}
