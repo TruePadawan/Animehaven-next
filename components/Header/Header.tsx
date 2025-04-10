@@ -1,46 +1,34 @@
-import { Box, Tab, Tabs, useMediaQuery } from "@mui/material";
+import {Box, Tab, Tabs, useMediaQuery} from "@mui/material";
 import styles from "./header.module.css";
 import { useRouter } from "next/router";
 import Authentication from "../Authentication/Authentication";
-import { useEffect, useState } from "react";
+import {SyntheticEvent, useEffect, useState} from "react";
 import Link from "next/link";
 
-const NavTab = ({ children, ...props }) => {
-	const tabStyles = {
-		color: "gray",
-		"&:hover": {
-			color: "darkgray",
-		},
-		"&.Mui-selected": {
-			color: "whitesmoke",
-		},
-	};
-
-	return <Tab sx={tabStyles} component={Link} label={children} {...props} />;
-};
-
-const routes = { discussions: 1, lists: 2, search: 3 };
-
-const getTabValue = (router) => {
-	if (router.isReady) {
-		const currentRoute = router.pathname.split("/").at(1);
-		if (currentRoute === "") return 0;
-		if (routes[currentRoute] === undefined) return 4;
-		else return routes[currentRoute];
-	}
-	return 0;
-};
-
+interface AvailableRoutes {
+	[key: string]: number;
+}
 const Header = () => {
 	const router = useRouter();
 	const [tabValue, setTabValue] = useState(0);
 	const matchesSmallDevice = useMediaQuery("(max-width:480px)");
+	const routes: AvailableRoutes = { discussions: 1, lists: 2, search: 3 };
 
 	useEffect(() => {
-		setTabValue(getTabValue(router));
+		const getTabValue = () => {
+			if (router.isReady) {
+				const currentRoute = router.pathname.split("/").at(1) ?? "";
+				if (currentRoute === "") return 0;
+				if (routes[currentRoute] === undefined) return 4;
+				else return routes[currentRoute];
+			}
+			return 0;
+		};
+
+		setTabValue(getTabValue());
 	}, [router]);
 
-	const handleTabChange = (event, newValue) => {
+	const handleTabChange = (event: SyntheticEvent, newValue: number) => {
 		setTabValue(newValue);
 	};
 
@@ -95,22 +83,40 @@ const Header = () => {
 					allowScrollButtonsMobile
 					value={tabValue}
 					onChange={handleTabChange}>
-					<NavTab href="/">Home</NavTab>
-					<NavTab href="/discussions">Discussions</NavTab>
-					<NavTab href="/lists">Lists</NavTab>
-					<NavTab href="/search">Search</NavTab>
+					<NavTab href="/" label="Home" />
+					<NavTab href="/discussions" label="Discussions" />
+					<NavTab href="/lists" label="Lists" />
+					<NavTab href="/search" label="Search" />
 					{isAtProfilePage && (
-						<NavTab href={router.query.accountName || ""}>Profile</NavTab>
+						<NavTab href={router.query.accountName?.toString() ?? ""} label="Profile" />
 					)}
 					{isAtAnimeDetailsPage && (
-						<NavTab href={router.query.animeID || ""}>Anime</NavTab>
+						<NavTab href={router.query.animeID?.toString() ?? ""} label="Anime" />
 					)}
-					{isAtSignupPage && <NavTab href={"/signup"}>Sign Up</NavTab>}
-					{isAtSigninPage && <NavTab href={"/signin"}>Sign In</NavTab>}
+					{isAtSignupPage && <NavTab href={"/signup"} label="Sign Up" />}
+					{isAtSigninPage && <NavTab href={"/signin"} label="Sign In" />}
 				</Tabs>
 			</Box>
 		</header>
 	);
+};
+
+interface NavTabProps {
+	href: string;
+	label: string;
+}
+const NavTab = (props: NavTabProps) => {
+	const tabStyles = {
+		color: "gray",
+		"&:hover": {
+			color: "darkgray",
+		},
+		"&.Mui-selected": {
+			color: "whitesmoke",
+		},
+	};
+
+	return <Tab sx={tabStyles} component={Link} {...props} />;
 };
 
 export default Header;
