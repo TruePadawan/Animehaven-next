@@ -7,7 +7,7 @@ import DiscussionItem from "../../Items/DiscussionItem/DiscussionItem";
 import ListItem from "../../../components/Items/ListItem/ListItem";
 import RecommendedItem from "../../../components/Items/RecommendedItem/RecommendedItem";
 import ReviewItem from "../../../components/Items/ReviewItem/ReviewItem";
-import Loading from "../../../components/Loading/Loading";
+import Loading from "../../Loading/Loading";
 import { UserAuthContext } from "../../../context/UserAuthContext";
 import styles from "./ProfileSections.module.css";
 import {
