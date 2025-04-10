@@ -61,7 +61,12 @@ const AddToList = (props: AddToListProps) => {
             const {data: searchResults, error} = await supabase
                 .rpc("search_list", {phrase: searchText, profile_id: profileID})
                 .select("id,title,is_public");
-            if (error) throw error;
+            if (error) {
+                return triggerAlert("Error while trying to search", {
+                    severity: "error",
+                    error: error as PostgrestError
+                });
+            }
             setItems(searchResults);
         } catch (error) {
             triggerAlert("Error while trying to search", {
@@ -142,7 +147,9 @@ const AnimeListItem = (props: AnimeListItemProps) => {
                 .eq("id", id)
                 .limit(1)
                 .single()
-            if (error) throw error;
+            if (error) {
+                return triggerAlert("Failed to add anime to list", {severity: "error", error: error as PostgrestError});
+            }
 
             const {items} = data;
             const itemInList = items.some((item) => item.id === itemData.id);
