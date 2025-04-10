@@ -4,7 +4,7 @@ import styles from "./style.module.css";
 import {FormEvent} from "react";
 
 interface SearchInputProps extends InputProps {
-    searchFunc: VoidFunction;
+    searchFunc: Function;
 }
 
 const SearchInput = ({searchFunc, className = "", ...inputProps}: SearchInputProps) => {
