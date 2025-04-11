@@ -1,5 +1,10 @@
+import {ComponentProps, ReactNode} from "react";
 import styles from "./style.module.css";
-import {ButtonProps} from "./Button.types";
+
+export interface ButtonProps extends ComponentProps<"button"> {
+    text: string;
+    icon: ReactNode;
+}
 
 export default function Button(props: ButtonProps) {
     const {text, className, icon, ...btnAttr} = props
