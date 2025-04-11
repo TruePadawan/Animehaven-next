@@ -5,8 +5,8 @@ import Grid from "@mui/material/Grid";
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import DiscussionItem from "../../Items/DiscussionItem/DiscussionItem";
 import ListItem from "../../Items/ListItem/ListItem";
-import RecommendedItem from "../../../components/Items/RecommendedItem/RecommendedItem";
-import ReviewItem from "../../../components/Items/ReviewItem/ReviewItem";
+import RecommendedItem from "../../Items/RecommendedItem/RecommendedItem";
+import ReviewItem from "../../Items/ReviewItem/ReviewItem";
 import Loading from "../../Loading/Loading";
 import { UserAuthContext } from "../../../context/UserAuthContext";
 import styles from "./ProfileSections.module.css";
@@ -171,7 +171,7 @@ export function UserItems({ title, status, accountName }) {
 								items.push(
 									<RecommendedItem
 										key={itemID}
-										itemID={itemID}
+										itemId={itemID}
 										index={items.length}
 									/>
 								);
@@ -210,7 +210,7 @@ export function UserRecommendedItems({ accountName }) {
 			getUserItemRecommendations(supabase, profileID)
 				.then(({ data }) => {
 					const recommendedItems = data.map(({ item_id }, index) => (
-						<RecommendedItem key={item_id} itemID={item_id} index={index} />
+						<RecommendedItem key={item_id} itemId={item_id} index={index} />
 					));
 					setItems(recommendedItems);
 				})
@@ -248,8 +248,8 @@ export function UserReviews({ accountName }) {
 					const reviewedItems = data.map(({ item_id }, index) => (
 						<ReviewItem
 							key={item_id}
-							itemID={item_id}
-							creatorID={profileID}
+							itemId={item_id}
+							creatorId={profileID}
 							index={index}
 						/>
 					));
