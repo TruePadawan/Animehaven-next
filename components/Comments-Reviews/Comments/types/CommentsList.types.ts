@@ -15,6 +15,7 @@ export type RealtimePostgresInsertCommentPayload = RealtimePostgresInsertPayload
 export type RealtimePostgresUpdateCommentPayload = RealtimePostgresUpdatePayload<Tables<"comments">>
 export type RealtimePostgresDeleteCommentPayload = RealtimePostgresDeletePayload<Tables<"comments">>
 
+// TODO: make type global
 export interface SnackbarProps {
     open: boolean;
     severity: AlertProps["severity"];
