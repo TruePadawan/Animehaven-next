@@ -4,7 +4,7 @@ import { Alert, Box, IconButton, Modal, Snackbar } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import DiscussionItem from "../../Items/DiscussionItem/DiscussionItem";
-import ListItem from "../../../components/Items/ListItem/ListItem";
+import ListItem from "../../Items/ListItem/ListItem";
 import RecommendedItem from "../../../components/Items/RecommendedItem/RecommendedItem";
 import ReviewItem from "../../../components/Items/ReviewItem/ReviewItem";
 import Loading from "../../Loading/Loading";
@@ -88,7 +88,7 @@ export function UserLists({ accountName }) {
 				.then(
 					({ data: listsData }) => {
 						const lists = listsData.map((list) => {
-							return <ListItem key={list.id} listID={list.id} />;
+							return <ListItem key={list.id} listId={list.id} />;
 						});
 						setLists(lists);
 						setLoading(false);
@@ -129,7 +129,7 @@ export function UserSavedLists({ accountName }) {
 			.throwOnError()
 			.then(({ data }) => {
 				const transformed = data.map((list) => {
-					return <ListItem key={list.id} listID={list.id} />;
+					return <ListItem key={list.id} listId={list.id} />;
 				});
 				setItems(transformed);
 				setLoading(false);

@@ -165,7 +165,7 @@ const Lists = () => {
 
 	const transformedLists = useMemo(() => {
 		return lists.map((list) => {
-			return <ListItem key={list.id} listID={list.id} />;
+			return <ListItem key={list.id} listId={list.id} />;
 		});
 	}, [lists]);
 
