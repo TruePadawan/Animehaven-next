@@ -30,7 +30,7 @@ interface ReviewItemData {
     imageURL: string;
 }
 
-export default function ReviewItem({itemId, creatorId, index}: ReviewItemProps) {
+export default function ProfileReviewItem({itemId, creatorId, index}: ReviewItemProps) {
     const supabase = useSupabaseClient<Database>();
     const [loading, setLoading] = useState(true);
     const [itemData, setItemData] = useState<ReviewItemData>({imageURL: "", rating: 0, review: "", title: ""});

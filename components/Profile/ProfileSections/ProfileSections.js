@@ -6,7 +6,7 @@ import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import DiscussionItem from "../../Items/DiscussionItem/DiscussionItem";
 import ListItem from "../../Items/ListItem/ListItem";
 import RecommendedItem from "../../Items/RecommendedItem/RecommendedItem";
-import ReviewItem from "../../Items/ReviewItem/ReviewItem";
+import ProfileReviewItem from "../../Items/ProfileReviewItem/ProfileReviewItem";
 import Loading from "../../Loading/Loading";
 import { UserAuthContext } from "../../../context/UserAuthContext";
 import styles from "./ProfileSections.module.css";
@@ -246,7 +246,7 @@ export function UserReviews({ accountName }) {
 			getUserItemReviews(supabase, profileID)
 				.then(({ data }) => {
 					const reviewedItems = data.map(({ item_id }, index) => (
-						<ReviewItem
+						<ProfileReviewItem
 							key={item_id}
 							itemId={item_id}
 							creatorId={profileID}
