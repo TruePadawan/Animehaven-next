@@ -34,7 +34,8 @@ export default function Recent(props: RecentProps) {
 	} else if (data.length > 0) {
 		switch (type) {
 			case "animes":
-				content = data.map((item) => (
+				// TODO: define a type for item
+				content = data.map((item: any) => (
 					<Anime
 						key={item.id}
 						id={item.id}
@@ -45,10 +46,10 @@ export default function Recent(props: RecentProps) {
 				));
 				break;
 			case "discussions":
-				content = data.map((id) => <Discussion key={id} id={id} />);
+				content = data.map((id :string) => <Discussion key={id} id={id} />);
 				break;
 			case "lists":
-				content = data.map((id) => <List key={id} id={id} />);
+				content = data.map((id: string) => <List key={id} id={id} />);
 				break;
 			default:
 				break;
