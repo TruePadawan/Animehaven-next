@@ -48,14 +48,13 @@ const CommentsList = ({id, className = ""}: CommentsListProps) => {
     }, []);
 
     function resetSnackbar(_event: React.SyntheticEvent<any> | Event, reason: string) {
-        if (reason === "clickaway") {
-            return;
+        if (reason !== "clickaway") {
+            setSnackbarData({
+                open: false,
+                severity: "info",
+                text: ""
+            });
         }
-        setSnackbarData({
-            open: false,
-            severity: "info",
-            text: ""
-        });
     }
 
     // LOAD COMMENTS ASSOCIATED WITH INSTANCE ID
