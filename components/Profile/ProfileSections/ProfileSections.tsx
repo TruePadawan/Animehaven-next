@@ -1,31 +1,44 @@
-import { PhotoCamera } from "@mui/icons-material";
-import { Masonry } from "@mui/lab";
-import { Alert, Box, IconButton, Modal, Snackbar } from "@mui/material";
+import {PhotoCamera} from "@mui/icons-material";
+import {Masonry} from "@mui/lab";
+import {Alert, Box, IconButton, Modal, Snackbar, SnackbarOrigin} from "@mui/material";
 import Grid from "@mui/material/Grid";
-import { useCallback, useContext, useEffect, useRef, useState } from "react";
+import React, {Fragment, ReactElement, useCallback, useContext, useEffect, useRef, useState} from "react";
 import DiscussionItem from "../../Items/DiscussionItem/DiscussionItem";
 import ListItem from "../../Items/ListItem/ListItem";
 import RecommendedItem from "../../Items/RecommendedItem/RecommendedItem";
 import ProfileReviewItem from "../../Items/ProfileReviewItem/ProfileReviewItem";
 import Loading from "../../Loading/Loading";
-import { UserAuthContext } from "../../../context/UserAuthContext";
+import {UserAuthContext} from "../../../context/UserAuthContext";
 import styles from "./ProfileSections.module.css";
 import {
-	defaultSnackbarState,
-	DEFAULT_AVATAR_URL,
-	getDiscussionByAccountName,
-	getUserItemRecommendations,
-	getUserItemReviews,
-	verifyProfileImage,
-	getProfileID,
-	getProfileData,
+    DEFAULT_AVATAR_URL,
+    getDiscussionByAccountName,
+    getErrorMessage,
+    getProfileData,
+    getProfileID,
+    getUserItemRecommendations,
+    getUserItemReviews,
+    verifyProfileImage,
 } from "../../../utilities/app-utilities";
-import { useRouter } from "next/router";
+import {useRouter} from "next/router";
 import Image from "next/image";
-import { Fragment } from "react";
-import { useSupabaseClient } from "@supabase/auth-helpers-react";
+import {useSupabaseClient} from "@supabase/auth-helpers-react";
+import {
+    EditProfileProps,
+    ProfileSectionContainerProps,
+    UserDiscussionsProps,
+    UserItemsProps,
+    UserListsProps,
+    UserRecommendedItemsProps,
+    UserReviewsProps,
+    UserSavedListsProps
+} from "./ProfileSections.types";
+import {Database, Tables, TablesUpdate} from "../../../database.types";
+import {PostgrestError} from "@supabase/supabase-js";
+import {TriggerAlert} from "../../../utilities/global.types";
+import {SnackbarProps} from "../../Comments-Reviews/Comments/types/CommentsList.types";
 
-const ProfileSectionContainer = ({ title, children }) => {
+const ProfileSectionContainer = ({ title, children }: ProfileSectionContainerProps) => {
 	return (
 		<section
 			className={`text-white`}
@@ -39,15 +52,15 @@ const ProfileSectionContainer = ({ title, children }) => {
 	);
 };
 
-export function UserDiscussions({ accountName }) {
+export function UserDiscussions({ accountName }: UserDiscussionsProps) {
 	const [loading, setLoading] = useState(false);
-	const [items, setItems] = useState([]);
-	const supabase = useSupabaseClient();
+	const [items, setItems] = useState<ReactElement[]>([]);
+	const supabase = useSupabaseClient<Database>();
 
 	useEffect(() => {
 		setLoading(true);
 		getDiscussionByAccountName(supabase, accountName)
-			.then((data) => {
+			.then((data: Tables<"discussions">[]) => {
 				const list = data.map((discussion) => (
 					<DiscussionItem
 						key={discussion.id}
@@ -72,10 +85,10 @@ export function UserDiscussions({ accountName }) {
 	);
 }
 
-export function UserLists({ accountName }) {
-	const [lists, setLists] = useState([]);
+export function UserLists({ accountName }: UserListsProps) {
+	const [lists, setLists] = useState<ReactElement[]>([]);
 	const [loading, setLoading] = useState(false);
-	const supabase = useSupabaseClient();
+	const supabase = useSupabaseClient<Database>();
 
 	useEffect(() => {
 		setLoading(true);
@@ -84,9 +97,9 @@ export function UserLists({ accountName }) {
 				.from("anime_lists")
 				.select("id")
 				.eq("creator_id", id)
-				.throwOnError()
 				.then(
-					({ data: listsData }) => {
+					({ data: listsData, error }) => {
+						if (error) throw error;
 						const lists = listsData.map((list) => {
 							return <ListItem key={list.id} listId={list.id} />;
 						});
@@ -117,17 +130,19 @@ export function UserLists({ accountName }) {
 	);
 }
 
-export function UserSavedLists({ accountName }) {
+export function UserSavedLists({ accountName }: UserSavedListsProps) {
 	const [loading, setLoading] = useState(false);
-	const [items, setItems] = useState([]);
-	const supabase = useSupabaseClient();
+	const [items, setItems] = useState<ReactElement[]>([]);
+	const supabase = useSupabaseClient<Database>();
 
 	useEffect(() => {
 		setLoading(true);
 		supabase
-			.rpc("get_saved_lists", { acct_name: accountName })
-			.throwOnError()
-			.then(({ data }) => {
+			.rpc("get_saved_lists", { acct_name: accountName }).single()
+			.then(({ data, error }) => {
+				if (error) throw error;
+				if (data === null) throw new Error("Could not retrieve saved lists");
+
 				const transformed = data.map((list) => {
 					return <ListItem key={list.id} listId={list.id} />;
 				});
@@ -151,10 +166,10 @@ export function UserSavedLists({ accountName }) {
 	);
 }
 
-export function UserItems({ title, status, accountName }) {
+export function UserItems({ title, status, accountName }: UserItemsProps) {
 	const [loading, setLoading] = useState(true);
-	const [items, setItems] = useState([]);
-	const supabase = useSupabaseClient();
+	const [items, setItems] = useState<ReactElement[]>([]);
+	const supabase = useSupabaseClient<Database>();
 
 	useEffect(() => {
 		setLoading(true);
@@ -199,16 +214,17 @@ export function UserItems({ title, status, accountName }) {
 	);
 }
 
-export function UserRecommendedItems({ accountName }) {
-	const [items, setItems] = useState([]);
+export function UserRecommendedItems({ accountName }: UserRecommendedItemsProps) {
+	const [items, setItems] = useState<ReactElement[]>([]);
 	const [loading, setLoading] = useState(false);
-	const supabase = useSupabaseClient();
+	const supabase = useSupabaseClient<Database>();
 
 	useEffect(() => {
 		setLoading(true);
 		getProfileID(supabase, accountName).then((profileID) => {
 			getUserItemRecommendations(supabase, profileID)
-				.then(({ data }) => {
+				.then(({ data, error }: { data: Tables<"item_recommendations">[], error?: PostgrestError}) => {
+					if (error) throw error;
 					const recommendedItems = data.map(({ item_id }, index) => (
 						<RecommendedItem key={item_id} itemId={item_id} index={index} />
 					));
@@ -235,16 +251,17 @@ export function UserRecommendedItems({ accountName }) {
 	);
 }
 
-export function UserReviews({ accountName }) {
-	const [items, setItems] = useState([]);
+export function UserReviews({ accountName }: UserReviewsProps) {
+	const [items, setItems] = useState<ReactElement[]>([]);
 	const [loading, setLoading] = useState(false);
-	const supabase = useSupabaseClient();
+	const supabase = useSupabaseClient<Database>();
 
 	useEffect(() => {
 		setLoading(true);
 		getProfileID(supabase, accountName).then((profileID) => {
 			getUserItemReviews(supabase, profileID)
-				.then(({ data }) => {
+				.then(({ data, error }: { data: Tables<"item_reviews">[], error?: PostgrestError}) => {
+                    if (error) throw error;
 					const reviewedItems = data.map(({ item_id }, index) => (
 						<ProfileReviewItem
 							key={item_id}
@@ -276,8 +293,8 @@ export function UserReviews({ accountName }) {
 	);
 }
 
-export function EditProfile({ open, closeDialog }) {
-	const supabase = useSupabaseClient();
+export function EditProfile({ open, closeDialog }: EditProfileProps) {
+	const supabase = useSupabaseClient<Database>();
 	const router = useRouter();
 	const { profileID } = useContext(UserAuthContext);
 	const [loading, setLoading] = useState(true);
@@ -294,10 +311,14 @@ export function EditProfile({ open, closeDialog }) {
 	});
 	const currentAccountNameRef = useRef();
 	const shouldAvatarChange = useRef(false);
-	const avatarFile = useRef(null);
-	const [snackbarData, setSnackbarData] = useState(defaultSnackbarState);
+	const avatarFile = useRef<File | null>(null);
+	const [snackbarData, setSnackbarData] = useState<SnackbarProps>({
+		open: false,
+		severity: "info",
+		text: ""
+	});
 
-	const triggerAlert = useCallback((text, options) => {
+	const triggerAlert: TriggerAlert = useCallback((text, options) => {
 		const alertSeverity = options?.severity;
 		setSnackbarData({
 			open: true,
@@ -305,17 +326,20 @@ export function EditProfile({ open, closeDialog }) {
 			text:
 				alertSeverity === "error"
 					? `${text} - ${
-							options.error.message || options.error.error_description
+							getErrorMessage(options?.error)
 					  }`
 					: text,
 		});
 	}, []);
 
-	function resetSnackbar(event, reason) {
-		if (reason === "clickaway") {
-			return;
+	function resetSnackbar(_event: React.SyntheticEvent<any> | Event, reason: string) {
+		if (reason !== "clickaway") {
+			setSnackbarData({
+				open: false,
+				severity: "info",
+				text: ""
+			});
 		}
-		setSnackbarData(defaultSnackbarState);
 	}
 
 	useEffect(() => {
@@ -355,8 +379,9 @@ export function EditProfile({ open, closeDialog }) {
 					.from("profiles")
 					.select("*")
 					.eq("account_name", accountName)
-					.then((db_result) => {
-						if (db_result.data.length !== 0) {
+					.then(({ data, error}) => {
+						if (error) throw error;
+						if (data.length !== 0) {
 							triggerAlert(`Account name '${accountName}' is already taken`, {
 								severity: "warning",
 							});
@@ -371,21 +396,21 @@ export function EditProfile({ open, closeDialog }) {
 		return () => clearTimeout(identifier);
 	}, [profileData.accountName, open, supabase]);
 
-	const accountNameChangeHandler = (event) => {
+	const accountNameChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
 		const value = event.target.value.replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
 		setProfileData((snapshot) => {
 			return { ...snapshot, accountName: value };
 		});
 	};
 
-	const displayNameChangeHandler = (event) => {
+	const displayNameChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
 		const { value } = event.target;
 		setProfileData((snapshot) => {
 			return { ...snapshot, displayName: value };
 		});
 	};
 
-	const bioChangeHandler = (event) => {
+	const bioChangeHandler = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
 		const { value } = event.target;
 		setProfileData((snapshot) => {
 			return { ...snapshot, bio: value };
@@ -393,28 +418,28 @@ export function EditProfile({ open, closeDialog }) {
 	};
 
 	// UPDATE ACCOUNT DATA
-	const formSubmitHandler = async (e) => {
+    // TODO: rewrite the logic for this EditProfile component
+	const formSubmitHandler = async (e: React.FormEvent) => {
 		e.preventDefault();
 
 		if (profileID !== null) {
 			setBtnDisabled({ save: true, cancel: true });
-			const newData = {
+			const newData: TablesUpdate<"profiles"> = {
 				account_name: accountName,
 				bio,
 				display_name: displayName,
 			};
-			if (shouldAvatarChange.current === true) {
+			if (shouldAvatarChange.current && avatarFile.current !== null) {
 				await supabase.storage
 					.from("avatars")
 					.upload(`final/${profileID}`, avatarFile.current, { upsert: true });
-				const avatarFileURL = supabase.storage
-					.from("avatars")
-					.getPublicUrl(`final/${profileID}`).data.publicUrl;
-				newData["avatar_url"] = avatarFileURL;
+                newData["avatar_url"] = supabase.storage
+                    .from("avatars")
+                    .getPublicUrl(`final/${profileID}`).data.publicUrl;
 			}
 			await supabase.from("profiles").update(newData).eq("id", profileID);
 			closeDialog();
-			router.replace(`/users/${accountName}`);
+			await router.replace(`/users/${accountName}`);
 		} else {
 			triggerAlert("Update process failed. No user signed in", {
 				severity: "warning",
@@ -422,13 +447,13 @@ export function EditProfile({ open, closeDialog }) {
 		}
 	};
 
-	const updateUserPhoto = (e) => {
-		if (e.target.files.length > 0) {
+	const updateUserPhoto = (e: React.ChangeEvent<HTMLInputElement>) => {
+		if (e.target.files !== null && e.target.files.length > 0) {
 			setBtnDisabled({ save: true, cancel: false });
 
 			// MAKE SURE FILE IS IMAGE AND HAS VALID DIMENSIONS
 			const selectedFile = e.target.files[0];
-			verifyProfileImage(selectedFile, (isValid) => {
+			verifyProfileImage(selectedFile, (isValid: boolean) => {
 				if (isValid) {
 					const img = document.createElement("img");
 					img.addEventListener("load", () => {
@@ -477,7 +502,7 @@ export function EditProfile({ open, closeDialog }) {
 		transform: "translate(-50%, -50%)",
 	};
 
-	const alertAnchorOrigin = {
+	const alertAnchorOrigin: SnackbarOrigin = {
 		vertical: "top",
 		horizontal: "center",
 	};
@@ -588,8 +613,7 @@ export function EditProfile({ open, closeDialog }) {
 				anchorOrigin={alertAnchorOrigin}>
 				<Alert
 					severity={snackbarData.severity}
-					sx={{ width: "100%" }}
-					onClose={resetSnackbar}>
+					sx={{ width: "100%" }}>
 					{snackbarData.text}
 				</Alert>
 			</Snackbar>
