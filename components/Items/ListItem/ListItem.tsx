@@ -7,8 +7,7 @@ import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import {getErrorMessage, getProfileData} from "../../../utilities/app-utilities";
 import {useSupabaseClient} from "@supabase/auth-helpers-react";
 import {Database, Tables} from "../../../database.types";
-import {TriggerAlertOptions} from "../../../utilities/global.types";
-import {SnackbarProps} from "../../Comments-Reviews/Comments/types/CommentsList.types";
+import {SnackbarState, TriggerAlertOptions} from "../../../utilities/global.types";
 import {PostgrestError} from "@supabase/supabase-js";
 
 interface ListItemProps {
@@ -26,7 +25,7 @@ export default function ListItem({listId, skeleton = false}: ListItemProps) {
     const [creatorID, setCreatorID] = useState("");
     const [saveDisabled, setSaveDisabled] = useState(true);
     const [undoSaveDisabled, setUndoSaveDisabled] = useState(true);
-    const [snackbarData, setSnackbarData] = useState<SnackbarProps>({
+    const [snackbarData, setSnackbarData] = useState<SnackbarState>({
         open: false,
         severity: "success",
         text: "",

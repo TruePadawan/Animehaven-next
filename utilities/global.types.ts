@@ -30,3 +30,9 @@ export interface AnimeItemData {
         url: string;
     }>;
 }
+
+export interface SnackbarState {
+    open: boolean;
+    severity: AlertProps["severity"];
+    text: string;
+}

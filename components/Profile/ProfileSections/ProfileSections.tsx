@@ -35,8 +35,7 @@ import {
 } from "./ProfileSections.types";
 import {Database, Tables, TablesUpdate} from "../../../database.types";
 import {PostgrestError} from "@supabase/supabase-js";
-import {TriggerAlert} from "../../../utilities/global.types";
-import {SnackbarProps} from "../../Comments-Reviews/Comments/types/CommentsList.types";
+import {SnackbarState, TriggerAlert} from "../../../utilities/global.types";
 
 const ProfileSectionContainer = ({title, children}: ProfileSectionContainerProps) => {
     return (
@@ -312,7 +311,7 @@ export function EditProfile({open, closeDialog}: EditProfileProps) {
     const currentAccountNameRef = useRef();
     const shouldAvatarChange = useRef(false);
     const avatarFile = useRef<File | null>(null);
-    const [snackbarData, setSnackbarData] = useState<SnackbarProps>({
+    const [snackbarData, setSnackbarData] = useState<SnackbarState>({
         open: false,
         severity: "info",
         text: ""

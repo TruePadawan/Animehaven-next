@@ -28,9 +28,8 @@ import {useRouter} from "next/router";
 import {useSupabaseClient} from "@supabase/auth-helpers-react";
 import {Database} from "../../database.types";
 import {CreateListProps, ListGenres} from "./CreateList.types";
-import {ResetAlert, TriggerAlert} from "../../utilities/global.types";
+import {ResetAlert, SnackbarState, TriggerAlert} from "../../utilities/global.types";
 import {PostgrestError} from "@supabase/supabase-js";
-import {SnackbarProps} from "../Comments-Reviews/Comments/types/CommentsList.types";
 
 // Consider renaming this to ManageAnimeList or most likely splitting the component into 2 separate ones
 const CreateList = (props: CreateListProps) => {
@@ -74,7 +73,7 @@ const CreateList = (props: CreateListProps) => {
     const [searchText, setSearchText] = useState("");
     const [searchResults, setSearchResults] = useState<ReactElement[]>([]);
     const [isSearchOngoing, setIsSearchOngoing] = useState(false);
-    const [snackbarData, setSnackbarData] = useState<SnackbarProps>({
+    const [snackbarData, setSnackbarData] = useState<SnackbarState>({
         open: false,
         severity: "info",
         text: ""

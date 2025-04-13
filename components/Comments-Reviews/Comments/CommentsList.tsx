@@ -12,10 +12,10 @@ import {
     CommentsListProps,
     RealtimePostgresDeleteCommentPayload,
     RealtimePostgresInsertCommentPayload,
-    RealtimePostgresUpdateCommentPayload, SnackbarProps
+    RealtimePostgresUpdateCommentPayload
 } from "./types/CommentsList.types";
 import {Database, Tables} from "../../../database.types";
-import {TriggerAlertOptions} from "../../../utilities/global.types";
+import {SnackbarState, TriggerAlertOptions} from "../../../utilities/global.types";
 import {PostgrestError} from "@supabase/supabase-js";
 
 const COMMENTS_PER_REQUEST = 10;
@@ -24,7 +24,7 @@ const CommentsList = ({id, className = ""}: CommentsListProps) => {
     const {profileID} = useContext(UserAuthContext);
     const [commentsData, setCommentsData] = useState<Tables<"comments">[]>([]);
     const [loadingComments, setLoadingComments] = useState(false);
-    const [snackbarData, setSnackbarData] = useState<SnackbarProps>({
+    const [snackbarData, setSnackbarData] = useState<SnackbarState>({
         open: false,
         severity: "info",
         text: ""
