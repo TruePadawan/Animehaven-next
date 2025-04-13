@@ -1,8 +1,10 @@
 import { filetypemime } from "magic-bytes.js";
+import {SnackbarProps} from "@mui/material";
+import {SnackbarState} from "./global.types";
 
 export const PROFILE_IMG_MAX_SIZE = Math.pow(10, 6);
 // Consider giving this a type of SnackbarProps
-export const defaultSnackbarState = { open: false, severity: "info", text: "" };
+export const DEFAULT_SNACKBAR_STATE: SnackbarState = { open: false, severity: "info", text: "" };
 export const LIST_GENRES = [
 	"Action",
 	"Adventure",

@@ -6,7 +6,7 @@ import { getAnimeByID } from "../../utilities/mal-api";
 import { UserAuthContext } from "../../context/UserAuthContext";
 import Select from "../../components/Select/Select";
 import {
-	defaultSnackbarState,
+	DEFAULT_SNACKBAR_STATE,
 	getUsefulData,
 	getUserItemRecommendations,
 	setRecentItem,
@@ -88,7 +88,7 @@ const transformAnimeData = (data) => {
 const AnimeDetails = () => {
 	const supabase = useSupabaseClient();
 	const { profileID } = useContext(UserAuthContext);
-	const [snackbarData, setSnackbarData] = useState(defaultSnackbarState);
+	const [snackbarData, setSnackbarData] = useState(DEFAULT_SNACKBAR_STATE);
 	const [watchStatus, setWatchStatus] = useState("NOT_WATCHED");
 	const [info, setInfo] = useState(null);
 	const [extraInfo, setExtraInfo] = useState(null);
@@ -120,7 +120,7 @@ const AnimeDetails = () => {
 		if (reason === "clickaway") {
 			return;
 		}
-		setSnackbarData(defaultSnackbarState);
+		setSnackbarData(DEFAULT_SNACKBAR_STATE);
 	};
 
 	// LOAD DATA FOR ITEM AND RENDER IT IN UI

@@ -11,7 +11,7 @@ import { Alert, Box, Snackbar } from "@mui/material";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import {
-	defaultSnackbarState,
+	DEFAULT_SNACKBAR_STATE,
 	getUsefulData,
 } from "../utilities/app-utilities";
 import HeaderLayout from "../components/HeaderLayout/HeaderLayout";
@@ -21,7 +21,7 @@ export default function Search() {
 	const supabase = useSupabaseClient();
 	const [searchResult, setSearchResult] = useState([]);
 	const [loading, setLoading] = useState(false);
-	const [snackbarData, setSnackbarData] = useState(defaultSnackbarState);
+	const [snackbarData, setSnackbarData] = useState(DEFAULT_SNACKBAR_STATE);
 	const searchCategories = useMemo(() => ["Anime", "User"], []);
 	const router = useRouter();
 	const queryParams = router.query;
@@ -102,7 +102,7 @@ export default function Search() {
 		if (reason === "clickaway") {
 			return;
 		}
-		setSnackbarData(defaultSnackbarState);
+		setSnackbarData(DEFAULT_SNACKBAR_STATE);
 	};
 
 	const alertAnchorOrigin = {
