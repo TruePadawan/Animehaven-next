@@ -11,11 +11,11 @@ import { Alert, Box, Snackbar } from "@mui/material";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import {
-	DEFAULT_SNACKBAR_STATE,
 	getUsefulData,
 } from "../utilities/app-utilities";
 import HeaderLayout from "../components/HeaderLayout/HeaderLayout";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
+import {DEFAULT_SNACKBAR_STATE} from "../utilities/global-constants";
 
 export default function Search() {
 	const supabase = useSupabaseClient();

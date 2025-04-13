@@ -11,7 +11,6 @@ import Loading from "../../Loading/Loading";
 import {UserAuthContext} from "../../../context/UserAuthContext";
 import styles from "./ProfileSections.module.css";
 import {
-    DEFAULT_AVATAR_URL,
     getDiscussionByAccountName,
     getErrorMessage,
     getProfileData,
@@ -36,6 +35,7 @@ import {
 import {Database, Tables, TablesUpdate} from "../../../database.types";
 import {PostgrestError} from "@supabase/supabase-js";
 import {SnackbarState, TriggerAlert} from "../../../utilities/global.types";
+import {DEFAULT_AVATAR_URL, DEFAULT_SNACKBAR_STATE} from "../../../utilities/global-constants";
 
 const ProfileSectionContainer = ({title, children}: ProfileSectionContainerProps) => {
     return (
@@ -311,11 +311,7 @@ export function EditProfile({open, closeDialog}: EditProfileProps) {
     const currentAccountNameRef = useRef();
     const shouldAvatarChange = useRef(false);
     const avatarFile = useRef<File | null>(null);
-    const [snackbarData, setSnackbarData] = useState<SnackbarState>({
-        open: false,
-        severity: "info",
-        text: ""
-    });
+    const [snackbarData, setSnackbarData] = useState<SnackbarState>(DEFAULT_SNACKBAR_STATE);
 
     const triggerAlert: TriggerAlert = useCallback((text, options) => {
         const alertSeverity = options?.severity;
@@ -333,11 +329,7 @@ export function EditProfile({open, closeDialog}: EditProfileProps) {
 
     function resetSnackbar(_event: React.SyntheticEvent<any> | Event, reason: string) {
         if (reason !== "clickaway") {
-            setSnackbarData({
-                open: false,
-                severity: "info",
-                text: ""
-            });
+            setSnackbarData(DEFAULT_SNACKBAR_STATE);
         }
     }
 

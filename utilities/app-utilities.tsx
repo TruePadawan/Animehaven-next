@@ -1,27 +1,6 @@
-import { filetypemime } from "magic-bytes.js";
-import {SnackbarProps} from "@mui/material";
-import {SnackbarState} from "./global.types";
+import {filetypemime} from "magic-bytes.js";
+import {PROFILE_IMG_MAX_SIZE} from "./global-constants";
 
-export const PROFILE_IMG_MAX_SIZE = Math.pow(10, 6);
-// Consider giving this a type of SnackbarProps
-export const DEFAULT_SNACKBAR_STATE: SnackbarState = { open: false, severity: "info", text: "" };
-export const LIST_GENRES = [
-	"Action",
-	"Adventure",
-	"Comedy",
-	"Drama",
-	"Ecchi",
-	"Horror",
-	"Sports",
-	"Supernatural",
-	"Romance",
-	"Suspense",
-	"Fantasy",
-	"Slice of Life",
-	"Sci-Fi",
-	"Boys Love",
-];
-export const DISCUSSION_TAGS = ["Chat", "Support"];
 
 export function getUsefulData(rawAnimeData) {
 	const id = rawAnimeData["mal_id"];
@@ -58,9 +37,6 @@ export async function hasProfile(supabase, profileID) {
 		.throwOnError();
 	return count === 1;
 }
-
-export const DEFAULT_AVATAR_URL =
-	"https://bkpyhkkjvgzfjojacrka.supabase.co/storage/v1/object/public/avatars/noprofilepic.jpg";
 
 export async function getCommentsData(
 	supabase,

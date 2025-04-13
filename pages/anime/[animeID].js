@@ -6,7 +6,6 @@ import { getAnimeByID } from "../../utilities/mal-api";
 import { UserAuthContext } from "../../context/UserAuthContext";
 import Select from "../../components/Select/Select";
 import {
-	DEFAULT_SNACKBAR_STATE,
 	getUsefulData,
 	getUserItemRecommendations,
 	setRecentItem,
@@ -22,6 +21,7 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import HeaderLayout from "../../components/HeaderLayout/HeaderLayout";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
+import {DEFAULT_SNACKBAR_STATE} from "../../utilities/global-constants";
 
 const ExtraInfo = (props) => {
 	return (

@@ -9,6 +9,7 @@ import {useSupabaseClient} from "@supabase/auth-helpers-react";
 import {Database, Tables} from "../../../database.types";
 import {SnackbarState, TriggerAlertOptions} from "../../../utilities/global.types";
 import {PostgrestError} from "@supabase/supabase-js";
+import {DEFAULT_SNACKBAR_STATE} from "../../../utilities/global-constants";
 
 interface ListItemProps {
     listId: number;
@@ -25,11 +26,7 @@ export default function ListItem({listId, skeleton = false}: ListItemProps) {
     const [creatorID, setCreatorID] = useState("");
     const [saveDisabled, setSaveDisabled] = useState(true);
     const [undoSaveDisabled, setUndoSaveDisabled] = useState(true);
-    const [snackbarData, setSnackbarData] = useState<SnackbarState>({
-        open: false,
-        severity: "success",
-        text: "",
-    });
+    const [snackbarData, setSnackbarData] = useState<SnackbarState>(DEFAULT_SNACKBAR_STATE);
     const [isSaved, setIsSaved] = useState(false);
 
     const triggerAlert = useCallback((text: string, options?: TriggerAlertOptions) => {

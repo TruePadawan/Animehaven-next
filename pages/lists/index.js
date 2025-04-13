@@ -16,12 +16,12 @@ import SearchInput from "../../components/Input/SearchInput/SearchInput";
 import ListItem from "../../components/Items/ListItem/ListItem";
 import { UserAuthContext } from "../../context/UserAuthContext";
 import CreateList from "../../components/CreateList/CreateList";
-import { LIST_GENRES } from "../../utilities/app-utilities";
 import Loading from "../../components/Loading/Loading";
 import Head from "next/head";
 import CheckboxList from "../../components/CheckboxList/CheckboxList";
 import HeaderLayout from "../../components/HeaderLayout/HeaderLayout";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
+import {LIST_GENRES} from "../../utilities/global-constants";
 
 const applyGenreFilter = (lists, acceptedGenres) => {
 	const filtered = lists.filter((list) => {

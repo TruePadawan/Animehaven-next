@@ -23,13 +23,14 @@ import Input from "../Input/Input";
 import SearchInput from "../Input/SearchInput/SearchInput";
 import Loading from "../Loading/Loading";
 import styles from "./style.module.css";
-import {getErrorMessage, getUsefulData, LIST_GENRES} from "../../utilities/app-utilities";
+import {getErrorMessage, getUsefulData} from "../../utilities/app-utilities";
 import {useRouter} from "next/router";
 import {useSupabaseClient} from "@supabase/auth-helpers-react";
 import {Database} from "../../database.types";
 import {CreateListProps, ListGenres} from "./CreateList.types";
 import {ResetAlert, SnackbarState, TriggerAlert} from "../../utilities/global.types";
 import {PostgrestError} from "@supabase/supabase-js";
+import {DEFAULT_SNACKBAR_STATE, LIST_GENRES} from "../../utilities/global-constants";
 
 // Consider renaming this to ManageAnimeList or most likely splitting the component into 2 separate ones
 const CreateList = (props: CreateListProps) => {
@@ -73,11 +74,7 @@ const CreateList = (props: CreateListProps) => {
     const [searchText, setSearchText] = useState("");
     const [searchResults, setSearchResults] = useState<ReactElement[]>([]);
     const [isSearchOngoing, setIsSearchOngoing] = useState(false);
-    const [snackbarData, setSnackbarData] = useState<SnackbarState>({
-        open: false,
-        severity: "info",
-        text: ""
-    });
+    const [snackbarData, setSnackbarData] = useState<SnackbarState>(DEFAULT_SNACKBAR_STATE);
     const router = useRouter();
 
     // KEEP TRACK OF WHETHER THERE IS AT LEAST ONE GENRE SELECTED
@@ -104,11 +101,7 @@ const CreateList = (props: CreateListProps) => {
 
     const resetAlert: ResetAlert = (e, reason) => {
         if (reason !== "clickaway") {
-            setSnackbarData({
-                open: false,
-                severity: "info",
-                text: ""
-            });
+            setSnackbarData(DEFAULT_SNACKBAR_STATE);
         }
     };
 

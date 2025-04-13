@@ -6,11 +6,11 @@ import Input from "../../components/Input/Input";
 import TextArea from "../../components/Input/TextArea";
 import Select from "../../components/Select/Select";
 import { UserAuthContext } from "../../context/UserAuthContext";
-import { DISCUSSION_TAGS } from "../../utilities/app-utilities";
 import styles from "../../styles/create-discussion.module.css";
 import Loading from "../../components/Loading/Loading";
 import HeaderLayout from "../../components/HeaderLayout/HeaderLayout";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
+import {DISCUSSION_TAGS} from "../../utilities/global-constants";
 
 export default function Edit() {
 	const supabase = useSupabaseClient();

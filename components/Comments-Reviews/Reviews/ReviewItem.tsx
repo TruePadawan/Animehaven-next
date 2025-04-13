@@ -5,7 +5,6 @@ import ThumbUpOffAltIcon from "@mui/icons-material/ThumbUpOffAlt";
 import ThumbUpAltIcon from "@mui/icons-material/ThumbUpAlt";
 import DeleteIcon from "@mui/icons-material/Delete";
 import {
-    DEFAULT_AVATAR_URL,
     deleteReview,
     toggleUpvoteForReview,
     getProfileData,
@@ -18,6 +17,7 @@ import {usePopupState} from "material-ui-popup-state/hooks";
 import {useSupabaseClient} from "@supabase/auth-helpers-react";
 import {ReviewItemProps} from "./types/ReviewItem.types";
 import {Database} from "../../../database.types";
+import {DEFAULT_AVATAR_URL} from "../../../utilities/global-constants";
 
 // Rename to AnimeReviewItem
 const ReviewItem = (props: ReviewItemProps) => {

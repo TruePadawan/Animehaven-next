@@ -3,7 +3,11 @@ import CommentItem from "./CommentItem";
 import CommentBox from "./CommentBox";
 import styles from "../Comments-Reviews.module.css";
 import {Alert, Button, Snackbar, SnackbarOrigin} from "@mui/material";
-import {getCommentsData, getErrorMessage, numberToString,} from "../../../utilities/app-utilities";
+import {
+    getCommentsData,
+    getErrorMessage,
+    numberToString,
+} from "../../../utilities/app-utilities";
 import {UserAuthContext} from "../../../context/UserAuthContext";
 import CommentIcon from "@mui/icons-material/Comment";
 import ShareButton from "../../ShareButton/ShareButton";
@@ -17,6 +21,7 @@ import {
 import {Database, Tables} from "../../../database.types";
 import {SnackbarState, TriggerAlertOptions} from "../../../utilities/global.types";
 import {PostgrestError} from "@supabase/supabase-js";
+import {DEFAULT_SNACKBAR_STATE} from "../../../utilities/global-constants";
 
 const COMMENTS_PER_REQUEST = 10;
 const CommentsList = ({id, className = ""}: CommentsListProps) => {
@@ -24,11 +29,7 @@ const CommentsList = ({id, className = ""}: CommentsListProps) => {
     const {profileID} = useContext(UserAuthContext);
     const [commentsData, setCommentsData] = useState<Tables<"comments">[]>([]);
     const [loadingComments, setLoadingComments] = useState(false);
-    const [snackbarData, setSnackbarData] = useState<SnackbarState>({
-        open: false,
-        severity: "info",
-        text: ""
-    });
+    const [snackbarData, setSnackbarData] = useState<SnackbarState>(DEFAULT_SNACKBAR_STATE);
     const [replyData, setReplyData] = useState({
         parentCommentID: "",
         accountName: "",
@@ -49,11 +50,7 @@ const CommentsList = ({id, className = ""}: CommentsListProps) => {
 
     function resetSnackbar(_event: React.SyntheticEvent<any> | Event, reason: string) {
         if (reason !== "clickaway") {
-            setSnackbarData({
-                open: false,
-                severity: "info",
-                text: ""
-            });
+            setSnackbarData(DEFAULT_SNACKBAR_STATE);
         }
     }
 

@@ -15,12 +15,12 @@ import SearchInput from "../../components/Input/SearchInput/SearchInput";
 import BodyLayout from "../../components/BodyLayout/BodyLayout";
 import Select from "../../components/Select/Select";
 import { UserAuthContext } from "../../context/UserAuthContext";
-import { DISCUSSION_TAGS } from "../../utilities/app-utilities";
 import { getDiscussionsByTags } from "../../utilities/app-utilities";
 import DiscussionItem from "../../components/Items/DiscussionItem/DiscussionItem";
 import Loading from "../../components/Loading/Loading";
 import HeaderLayout from "../../components/HeaderLayout/HeaderLayout";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
+import {DISCUSSION_TAGS} from "../../utilities/global-constants";
 
 export default function Discussions() {
 	const supabase = useSupabaseClient();
