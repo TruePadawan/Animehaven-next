@@ -372,7 +372,7 @@ export type DatabaseGenerated = {
     }
 }
 
-type AddToListAnimeItem = { id: string, title: string }
+type AddToListAnimeItem = { id: number, title: string }
 export type Database = MergeDeep<DatabaseGenerated, {
     public: {
         Tables: {

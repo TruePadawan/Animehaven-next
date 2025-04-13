@@ -133,7 +133,7 @@ const CreateList = (props: CreateListProps) => {
 
     const updateSearchText = (e: ChangeEvent<HTMLInputElement>) => setSearchText(e.target.value);
 
-    const addItem = (itemID: string, itemTitle: string) => {
+    const addItem = (itemID: number, itemTitle: string) => {
         setItems((snapshot) => {
             // PREVENT ADDING DUPLICATES
             for (let i = 0; i < snapshot.length; ++i) {
@@ -146,7 +146,7 @@ const CreateList = (props: CreateListProps) => {
         });
     };
 
-    const deleteItem = (itemID: string) => {
+    const deleteItem = (itemID: number) => {
         setItems((snapshot) => {
             for (let i = 0; i < snapshot.length; ++i) {
                 if (snapshot[i].id === itemID) {
