@@ -177,10 +177,12 @@ export function UserItems({title, status, accountName}: UserItemsProps) {
                 if (profileID === null) {
                     throw new Error(`No profile with name '${accountName}'`);
                 }
-                getProfileData(supabase, "items_watch_status", profileID).then(
+                getProfileData(supabase, profileID).then(
                     ({items_watch_status}) => {
                         const items = [];
+                        // @ts-ignore
                         for (const itemID in items_watch_status) {
+                            // @ts-ignore
                             if (items_watch_status[itemID] === status) {
                                 items.push(
                                     <RecommendedItem
@@ -338,7 +340,7 @@ export function EditProfile({open, closeDialog}: EditProfileProps) {
             if (!open) return;
             setLoading(true);
             const {avatar_url, account_name, display_name, bio} =
-                await getProfileData(supabase, "*", profileID);
+                await getProfileData(supabase, profileID);
             setProfileData({
                 avatarURL: avatar_url,
                 accountName: account_name,

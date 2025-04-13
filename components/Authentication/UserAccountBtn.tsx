@@ -25,7 +25,7 @@ const UserAccountBtn = (props: AccountMenuButtonProps) => {
     const {profileID, errorHandler} = props;
 
     useEffect(() => {
-        getProfileData(supabase, "*", profileID).then(({account_name, avatar_url}) => {
+        getProfileData(supabase, profileID).then(({account_name, avatar_url}) => {
             setAccountName(account_name);
             setPhotoSrc(avatar_url);
             setLoading(false);

@@ -50,7 +50,7 @@ const CommentItem = (props: CommentItemProps) => {
     useEffect(() => {
         const {creator_id, parent_comment_id} = commentData;
 
-        getProfileData(supabase, "account_name,display_name,avatar_url", creator_id)
+        getProfileData(supabase, creator_id)
             .then(async (profileData) => {
                 setCommentCreatorData(profileData);
 
@@ -63,11 +63,7 @@ const CommentItem = (props: CommentItemProps) => {
                         );
                         const {text, creator_id: parentCommentCreatorID} =
                             parentCommentData;
-                        const profileDataForParentCommentCreator = await getProfileData(
-                            supabase,
-                            "display_name,account_name",
-                            parentCommentCreatorID
-                        );
+                        const profileDataForParentCommentCreator = await getProfileData(supabase, parentCommentCreatorID);
                         const {display_name, account_name} =
                             profileDataForParentCommentCreator;
                         setParentCommentData({

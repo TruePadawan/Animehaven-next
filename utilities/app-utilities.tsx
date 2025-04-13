@@ -75,14 +75,14 @@ export async function getCommentData(supabase: SupabaseClient<Database>, comment
     return data;
 }
 
-export async function getProfileData(supabase: SupabaseClient<Database>, fields: string, profileId: Tables<"profiles">["id"]) {
-    const {data} = await supabase
+export async function getProfileData(supabase: SupabaseClient<Database>, profileId: Tables<"profiles">["id"]) {
+    const {data, error} = await supabase
         .from("profiles")
-        .select(fields)
+        .select("*")
         .eq("id", profileId)
-        .throwOnError()
         .limit(1)
         .single();
+    if (error) throw error;
     return data;
 }
 

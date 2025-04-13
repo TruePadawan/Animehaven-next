@@ -13,7 +13,7 @@ export default function DiscussionItem(props: DiscussionItemProps) {
     const [creatorAcctName, setCreatorAcctName] = useState("");
 
     useEffect(() => {
-        getProfileData(supabase, "account_name", props.creator_id).then((data) => {
+        getProfileData(supabase, props.creator_id).then((data) => {
             setCreatorAcctName(data.account_name);
         });
     }, [props.creator_id, supabase]);

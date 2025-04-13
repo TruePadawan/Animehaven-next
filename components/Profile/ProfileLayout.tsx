@@ -50,7 +50,7 @@ export default function ProfileLayout(props: ProfileLayoutProps) {
                         accountName: accountName as string
                     });
                 } else {
-                    getProfileData(supabase, "*", id).then(
+                    getProfileData(supabase, id).then(
                         ({avatar_url, display_name, bio}) => {
                             setProfileData({
                                 profileExists: true,
@@ -76,7 +76,7 @@ export default function ProfileLayout(props: ProfileLayoutProps) {
         if (!profileID) {
             setIsAccountEditable(false);
         } else if (profileID && profileExists) {
-            getProfileData(supabase, "account_name", profileID).then(
+            getProfileData(supabase, profileID).then(
                 ({account_name}) => {
                     setIsAccountEditable(account_name === accountName);
                 }

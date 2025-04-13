@@ -146,7 +146,7 @@ const AnimeDetails = () => {
 			setWatchStatusElDisabled(true);
 			setRecommendBtnDisabled(true);
 			// LOAD ANIME WATCH STATUS FOR SIGNED IN USER
-			getProfileData(supabase, "items_watch_status", profileID)
+			getProfileData(supabase, profileID)
 				.then(({ items_watch_status }) => {
 					const animeIDs = Object.keys(items_watch_status);
 					if (animeIDs.includes(animeID)) {
@@ -240,11 +240,7 @@ const AnimeDetails = () => {
 		const newWatchStatus = e.target.value;
 		setWatchStatusElDisabled(true);
 		try {
-			const { items_watch_status } = await getProfileData(
-				supabase,
-				"items_watch_status",
-				profileID
-			);
+			const { items_watch_status } = await getProfileData(supabase, profileID);
 			items_watch_status[animeID] = newWatchStatus;
 			await supabase
 				.from("profiles")

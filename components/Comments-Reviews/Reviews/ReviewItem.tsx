@@ -49,7 +49,7 @@ const ReviewItem = (props: ReviewItemProps) => {
     // LOAD REVIEW
     useEffect(() => {
         const {creator_id} = reviewData;
-        getProfileData(supabase, "account_name,display_name,avatar_url", creator_id)
+        getProfileData(supabase, creator_id)
             .then((data) => {
                 setProfileData(data);
                 setLoading(false);

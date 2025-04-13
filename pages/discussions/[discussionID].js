@@ -40,7 +40,7 @@ const Discussion = () => {
 
 			getDiscussionByID(supabase, discussionID)
 				.then((data) => {
-					getProfileData(supabase, "account_name", data.creator_id).then(
+					getProfileData(supabase, data.creator_id).then(
 						({ account_name }) => {
 							setData({
 								title: data.title,
