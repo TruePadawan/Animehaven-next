@@ -27,11 +27,11 @@ export function createProfile(supabase: SupabaseClient<Database>, accountData: T
 	return supabase.from("profiles").insert(accountData);
 }
 
-export async function hasProfile(supabase, profileID) {
+export async function hasProfile(supabase: SupabaseClient<Database>, profileId: string) {
 	const { count } = await supabase
 		.from("profiles")
 		.select("*", { count: "exact", head: true })
-		.eq("id", profileID)
+		.eq("id", profileId)
 		.throwOnError();
 	return count === 1;
 }
