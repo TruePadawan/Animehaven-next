@@ -17,13 +17,13 @@ export function getRelevantAnimeData(anime: Anime) {
 	return { id, title, imageURL, type, score, genres, overview };
 }
 
-export function getRandomInt(min, max) {
+export function getRandomInt(min: number, max: number) {
 	min = Math.ceil(min);
 	max = Math.floor(max);
 	return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-export function createProfile(supabase, accountData) {
+export function createProfile(supabase: SupabaseClient<Database>, accountData: TablesInsert<"profiles">) {
 	return supabase.from("profiles").insert(accountData);
 }
 
@@ -37,31 +37,31 @@ export async function hasProfile(supabase, profileID) {
 }
 
 export async function getCommentsData(
-	supabase,
-	instanceID,
-	limit,
-	startAfterIndex
+	supabase: SupabaseClient<Database>,
+	instanceId: string,
+	limit: number,
+	startAfterIndex?: number,
 ) {
-	let response;
 	if (startAfterIndex === undefined) {
-		response = await supabase
+		const { data, error, count } = await supabase
 			.from("comments")
 			.select("*", { count: "exact" })
-			.eq("instance_id", instanceID)
+			.eq("instance_id", instanceId)
 			.limit(limit)
-			.order("created_at", { ascending: false })
-			.throwOnError();
+			.order("created_at", { ascending: false });
+		if (error) throw error;
+		return { data, count: count ?? 0 };
 	} else {
-		response = await supabase
+		const { data, error, count } = await supabase
 			.from("comments")
 			.select("*", { count: "exact" })
-			.eq("instance_id", instanceID)
+			.eq("instance_id", instanceId)
 			.lt("index", startAfterIndex)
 			.limit(limit)
-			.order("created_at", { ascending: false })
-			.throwOnError();
+			.order("created_at", { ascending: false });
+		if (error) throw error;
+		return { data, count: count ?? 0 };
 	}
-	return response;
 }
 
 export async function getCommentData(supabase, commentID, fields = "*") {
