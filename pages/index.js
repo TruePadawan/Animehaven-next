@@ -1,7 +1,7 @@
 import { Fragment } from "react";
 import AnimeItem from "../components/Items/AnimeItem/AnimeItem";
 import BodyLayout from "../components/BodyLayout/BodyLayout";
-import { getUsefulData } from "../utilities/app-utilities";
+import { getRelevantAnimeData } from "../utilities/app-utilities";
 import Section from "../components/Section/Section";
 import { getListOfAnimes, requestNRandomAnime } from "../utilities/mal-api";
 import styles from "../styles/home.module.css";
@@ -12,7 +12,7 @@ const DEFAULT_N_LOADED_ITEMS = 10;
 const Home = (props) => {
 	const randomAnimes = (() => {
 		const animes = props.animes.randomAnimes;
-		const transformedData = animes.map((anime) => getUsefulData(anime));
+		const transformedData = animes.map((anime) => getRelevantAnimeData(anime));
 		return transformedData.map((animeData) => (
 			<AnimeItem
 				key={animeData.id}
@@ -22,7 +22,7 @@ const Home = (props) => {
 	})();
 	const airingAnimes = (() => {
 		const animes = props.animes.airingAnimes;
-		const transformedData = animes.map((anime) => getUsefulData(anime));
+		const transformedData = animes.map((anime) => getRelevantAnimeData(anime));
 		return transformedData.map((animeData) => (
 			<AnimeItem
 				key={animeData.id}
@@ -32,7 +32,7 @@ const Home = (props) => {
 	})();
 	const upcomingAnimes = (() => {
 		const animes = props.animes.upcomingAnimes;
-		const transformedData = animes.map((anime) => getUsefulData(anime));
+		const transformedData = animes.map((anime) => getRelevantAnimeData(anime));
 		return transformedData.map((animeData) => (
 			<AnimeItem
 				key={animeData.id}
@@ -42,7 +42,7 @@ const Home = (props) => {
 	})();
 	const popularAnimes = (() => {
 		const animes = props.animes.popularAnimes;
-		const transformedData = animes.map((anime) => getUsefulData(anime));
+		const transformedData = animes.map((anime) => getRelevantAnimeData(anime));
 		return transformedData.map((animeData) => (
 			<AnimeItem
 				key={animeData.id}

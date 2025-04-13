@@ -11,7 +11,7 @@ import CommentsList from "../../components/Comments-Reviews/Comments/CommentsLis
 import BodyLayout from "../../components/BodyLayout/BodyLayout";
 import {
 	getListByID,
-	getUsefulData,
+	getRelevantAnimeData,
 	setRecentItem,
 } from "../../utilities/app-utilities";
 import { getAnimeByID } from "../../utilities/mal-api";
@@ -34,7 +34,7 @@ const Item = ({ itemID, itemTitle, index }) => {
 		setTimeout(() => {
 			getAnimeByID(itemID)
 				.then((data) => {
-					const { overview, imageURL } = getUsefulData(data);
+					const { overview, imageURL } = getRelevantAnimeData(data);
 					setItemData({
 						title: itemTitle,
 						overview,

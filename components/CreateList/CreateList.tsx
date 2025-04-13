@@ -23,7 +23,7 @@ import Input from "../Input/Input";
 import SearchInput from "../Input/SearchInput/SearchInput";
 import Loading from "../Loading/Loading";
 import styles from "./style.module.css";
-import {getErrorMessage, getUsefulData} from "../../utilities/app-utilities";
+import {getErrorMessage, getRelevantAnimeData} from "../../utilities/app-utilities";
 import {useRouter} from "next/router";
 import {useSupabaseClient} from "@supabase/auth-helpers-react";
 import {Database} from "../../database.types";
@@ -162,7 +162,7 @@ const CreateList = (props: CreateListProps) => {
         setIsSearchOngoing(true);
         const rawAnimesData = await searchAnime(searchText, 10);
         const transformed_list = rawAnimesData.map((animeData) => {
-            const {id, title} = getUsefulData(animeData);
+            const {id, title} = getRelevantAnimeData(animeData);
             return (
                 <Chip
                     key={id}

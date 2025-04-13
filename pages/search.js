@@ -11,7 +11,7 @@ import { Alert, Box, Snackbar } from "@mui/material";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import {
-	getUsefulData,
+	getRelevantAnimeData,
 } from "../utilities/app-utilities";
 import HeaderLayout from "../components/HeaderLayout/HeaderLayout";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
@@ -34,7 +34,7 @@ export default function Search() {
 			searchAnime(searchText)
 				.then((data) => {
 					const list = data.map((anime) => {
-						const { id, title, imageURL } = getUsefulData(anime);
+						const { id, title, imageURL } = getRelevantAnimeData(anime);
 						return (
 							<AnimeSearchResultItem
 								key={id}

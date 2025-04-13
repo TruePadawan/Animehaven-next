@@ -6,7 +6,7 @@ import { getAnimeByID } from "../../utilities/mal-api";
 import { UserAuthContext } from "../../context/UserAuthContext";
 import Select from "../../components/Select/Select";
 import {
-	getUsefulData,
+	getRelevantAnimeData,
 	getUserItemRecommendations,
 	setRecentItem,
 	getProfileData,
@@ -61,7 +61,7 @@ const getItemStudio = (itemData) => {
 };
 
 const transformAnimeData = (data) => {
-	let { title, imageURL, type, score, overview } = getUsefulData(data);
+	let { title, imageURL, type, score, overview } = getRelevantAnimeData(data);
 	// REMOVE 'WRITTEN BY MAL REWRITE' TEXT AT THE END OF THE SYNOPSIS
 	if (overview) {
 		overview = overview.replace(" [Written by MAL Rewrite]", "");

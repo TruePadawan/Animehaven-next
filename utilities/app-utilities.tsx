@@ -1,20 +1,18 @@
 import {filetypemime} from "magic-bytes.js";
 import {PROFILE_IMG_MAX_SIZE} from "./global-constants";
+import {SupabaseClient} from "@supabase/supabase-js";
+import {Database, TablesInsert} from "../database.types";
+import {Anime} from "@tutkli/jikan-ts";
 
 
-export function getUsefulData(rawAnimeData) {
-	const id = rawAnimeData["mal_id"];
-	let title = rawAnimeData.title;
-	rawAnimeData.titles.forEach((lang) => {
-		if (lang["type"] === "English") {
-			title = lang["title"];
-		}
-	});
-	let imageURL = rawAnimeData.images.webp["image_url"];
-	const type = rawAnimeData.type;
-	const score = rawAnimeData.score;
-	const genres = rawAnimeData.genres;
-	const overview = rawAnimeData["synopsis"];
+export function getRelevantAnimeData(anime: Anime) {
+	const id = anime["mal_id"];
+	const title = anime.title_english ?? anime.title;
+	const imageURL = anime.images.webp === undefined ? anime.images.jpg["image_url"] : anime.images.webp["image_url"];
+	const type = anime.type;
+	const score = anime.score;
+	const genres = anime.genres;
+	const overview = anime["synopsis"] ?? "";
 
 	return { id, title, imageURL, type, score, genres, overview };
 }

@@ -9,7 +9,7 @@ import {
 } from "@mui/material";
 import {Fragment, useEffect, useState} from "react";
 import {getAnimeByID} from "../../../utilities/mal-api";
-import {getUsefulData} from "../../../utilities/app-utilities";
+import {getRelevantAnimeData} from "../../../utilities/app-utilities";
 import Link from "next/link";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import styles from "./style.module.css";
@@ -58,7 +58,7 @@ export default function ProfileReviewItem({itemId, creatorId, index}: ReviewItem
                     const {rating, review} = result.data;
                     // TODO: this 'any' should be replaced with a proper type when jikan-ts is added to the project
                     getAnimeByID(itemId).then((rawData: any) => {
-                        const {title, imageURL}: AnimeItemData = getUsefulData(rawData);
+                        const {title, imageURL}: AnimeItemData = getRelevantAnimeData(rawData);
                         setItemData({
                             rating,
                             review,
