@@ -10,12 +10,12 @@ import Link from "next/link";
 import {getProfileData} from "../../utilities/app-utilities";
 import Image from "next/image";
 import {useSupabaseClient} from "@supabase/auth-helpers-react";
-import {AccountMenuButtonProps} from "./types/UserAccountButton.types";
+import {ProfileMenuButtonProps} from "./types/ProfileMenuButton.types";
 import {Database} from "../../database.types";
 import {PostgrestError} from "@supabase/supabase-js";
 import {DEFAULT_AVATAR_URL} from "../../utilities/global-constants";
 
-const UserAccountBtn = (props: AccountMenuButtonProps) => {
+const ProfileMenuButton = (props: ProfileMenuButtonProps) => {
     const supabase = useSupabaseClient<Database>();
     const [accountName, setAccountName] = useState("");
     const [menuAnchorEl, setMenuAnchorEl] = useState<Element | null>(null);
@@ -99,4 +99,4 @@ const UserAccountBtn = (props: AccountMenuButtonProps) => {
     );
 };
 
-export default UserAccountBtn;
+export default ProfileMenuButton;

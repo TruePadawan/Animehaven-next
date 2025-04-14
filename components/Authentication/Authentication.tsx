@@ -1,7 +1,7 @@
 import {Alert, Button, ButtonGroup, Snackbar, SnackbarOrigin, styled} from "@mui/material";
 import {useContext, useState} from "react";
 import {UserAuthContext} from "../../context/UserAuthContext";
-import UserAccountBtn from "./UserAccountBtn";
+import ProfileMenuButton from "./ProfileMenuButton";
 import {Fragment} from "react";
 import {useRouter} from "next/router";
 import {HasErrorMessage, ResetAlert} from "../../utilities/global.types";
@@ -40,7 +40,7 @@ const Authentication = () => {
     return (
         <>
             {userSignedIn && (
-                <UserAccountBtn profileID={profileID} errorHandler={handleError}/>
+                <ProfileMenuButton profileID={profileID} errorHandler={handleError}/>
             )}
             {!userSignedIn && (
                 <Fragment>

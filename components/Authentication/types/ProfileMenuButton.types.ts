@@ -1,6 +1,6 @@
 import {HasErrorMessage} from "../../../utilities/global.types";
 
-export interface AccountMenuButtonProps {
+export interface ProfileMenuButtonProps {
     profileID: string;
     errorHandler: (text: string, error: HasErrorMessage) => void;
 }
