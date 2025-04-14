@@ -70,7 +70,7 @@ export const searchAnime = async (title: string, limit = 20) => {
 	return filteredList;
 };
 
-export const getAnimeByID = async (id: number): Promise<Anime> => {
+export const getAnimeById = async (id: number): Promise<Anime> => {
 	const URL = `https://api.jikan.moe/v4/anime/${id}`;
 	const response = await fetch(URL);
   
@@ -79,7 +79,7 @@ export const getAnimeByID = async (id: number): Promise<Anime> => {
 	}
 	// IF API REQUEST LIMIT HITS, KEEP RECURSIVELY SENDING UNTIL IT PROCEEDS
 	if (response.status === 429) {
-		return await getAnimeByID(id);
+		return await getAnimeById(id);
 	} else if (response.status !== 200) {
 		throw new Error(response.statusText);
 	}

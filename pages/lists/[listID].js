@@ -14,7 +14,7 @@ import {
 	getRelevantAnimeData,
 	setRecentItem,
 } from "../../utilities/app-utilities";
-import { getAnimeByID } from "../../utilities/mal-api";
+import { getAnimeById } from "../../utilities/mal-api";
 import { UserAuthContext } from "../../context/UserAuthContext";
 import { useRouter } from "next/router";
 import HeaderLayout from "../../components/HeaderLayout/HeaderLayout";
@@ -32,7 +32,7 @@ const Item = ({ itemID, itemTitle, index }) => {
 		// LAZY REQEUST DUE TO RATE LIMITING
 		const timeout = index > 0 ? index * 500 : 0;
 		setTimeout(() => {
-			getAnimeByID(itemID)
+			getAnimeById(itemID)
 				.then((data) => {
 					const { overview, imageURL } = getRelevantAnimeData(data);
 					setItemData({

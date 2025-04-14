@@ -1,6 +1,6 @@
 import {Grid, Skeleton} from "@mui/material";
 import {useEffect, useState} from "react";
-import {getAnimeByID} from "../../../utilities/mal-api";
+import {getAnimeById} from "../../../utilities/mal-api";
 import {getRelevantAnimeData} from "../../../utilities/app-utilities";
 import Link from "next/link";
 import styles from "./style.module.css";
@@ -18,7 +18,7 @@ const RecommendedItem = ({itemId, index}: RecommendedItemProps) => {
         // LAZY REQEUST DUE TO RATE LIMITING
         const timeout = index > 0 ? index * 700 : 0;
         const getData = async () => {
-            const data = await getAnimeByID(itemId);
+            const data = await getAnimeById(itemId);
             const {title, imageURL} = getRelevantAnimeData(data);
             setItemData({
                 title,

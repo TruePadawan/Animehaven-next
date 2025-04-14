@@ -2,7 +2,7 @@ import BodyLayout from "../../components/BodyLayout/BodyLayout";
 import StarIcon from "@mui/icons-material/Star";
 import { Box, Chip, Snackbar, Alert } from "@mui/material";
 import { Fragment, useCallback, useContext, useEffect, useState } from "react";
-import { getAnimeByID } from "../../utilities/mal-api";
+import { getAnimeById } from "../../utilities/mal-api";
 import { UserAuthContext } from "../../context/UserAuthContext";
 import Select from "../../components/Select/Select";
 import {
@@ -127,7 +127,7 @@ const AnimeDetails = () => {
 	useEffect(() => {
 		if (animeID) {
 			setInfo(null);
-			getAnimeByID(animeID)
+			getAnimeById(animeID)
 				.then((animeData) => {
 					const { main, extra } = transformAnimeData(animeData);
 					setInfo(main);
