@@ -125,7 +125,7 @@ const List = () => {
 						setLoading(false);
 
 						// SINCE LIST EXISTS, ADD TO RECENTLY VIEWED LISTS
-						if (profileID !== null) {
+						if (profileID !== undefined) {
 							setRecentItem(supabase, "lists", profileID, listID);
 						}
 					});

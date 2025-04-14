@@ -27,7 +27,7 @@ export const UserAuthContextProvider = (props: UserAuthContextProviderProps) => 
     useEffect(() => {
         supabase.auth.onAuthStateChange((event, session) => {
             const hasSession = event === "SIGNED_IN" && session !== null;
-            if (hasSession && profileID === null) {
+            if (hasSession && profileID === undefined) {
                 loadUser(session.user);
             } else if (event === "SIGNED_OUT") {
                 setProfileID(undefined);

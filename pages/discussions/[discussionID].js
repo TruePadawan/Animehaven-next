@@ -53,7 +53,7 @@ const Discussion = () => {
 							setLoading(false);
 
 							// SINCE DISCUSSION HAS BEEN CONFIRMED TO EXIST, ADD IT TO RECENTLY VIEWED DISCUSISONS
-							if (profileID !== null) {
+							if (profileID !== undefined) {
 								setRecentItem(supabase, "discussions", profileID, discussionID);
 							}
 						}

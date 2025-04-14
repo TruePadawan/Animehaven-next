@@ -38,8 +38,8 @@ const CommentItem = (props: CommentItemProps) => {
     const [parentCommentIsDeleted, setParentCommentIsDeleted] = useState(false);
     const [commentState, setCommentState] = useState("DEFAULT");
     const [btnIsDisabled, setBtnIsDisabled] = useState({
-        upvote: profileID === null,
-        reply: profileID === null,
+        upvote: profileID === undefined,
+        reply: profileID === undefined,
     });
     const popupState = usePopupState({
         variant: "popover",
@@ -155,7 +155,7 @@ const CommentItem = (props: CommentItemProps) => {
 
     // REFERENCE A COMMENT IN A REPLY
     const setAsParentComment = async () => {
-        if (profileID === null) return;
+        if (profileID === undefined) return;
 
         setBtnIsDisabled((snapshot) => {
             return {...snapshot, reply: true};
@@ -187,7 +187,7 @@ const CommentItem = (props: CommentItemProps) => {
     };
 
     const handleUpvote = async () => {
-        if (profileID === null) return;
+        if (profileID === undefined) return;
         setBtnIsDisabled((snapshot) => {
             return {...snapshot, upvote: true};
         });
@@ -225,7 +225,7 @@ const CommentItem = (props: CommentItemProps) => {
         margin: "0px!important", // OOF, TODO: Deal with the !important
     };
     const {avatar_url, display_name, account_name} = commentCreatorData;
-    const isUserSignedIn = profileID !== null;
+    const isUserSignedIn = profileID !== undefined;
     const ON_EDIT_COMMENT = isUserSignedIn && commentState === "EDITING";
     const {
         creator_account_name: parentCommentCreatorAccountName,

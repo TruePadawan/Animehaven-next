@@ -43,7 +43,7 @@ const ReviewsList = (props: ReviewsListProps) => {
 
     useEffect(() => {
         // IF USER IS SIGNED IN, CHECK IF USER HAS REVIEW THE ANIME AND SHOW THEIRS AT THE TOP
-        getReviewsData(supabase, animeID, profileID)
+        getReviewsData(supabase, animeID, 10, profileID)
             .then(({data, count}) => {
                 totalReviewsCount.current = count;
                 setReviewListData(data);
@@ -79,9 +79,8 @@ const ReviewsList = (props: ReviewsListProps) => {
                 })
                 .throwOnError();
 
-            const response = await getReviewsData(supabase, animeID, profileID);
-            const reviews: Tables<"item_reviews">[] = response.data
-            setReviewListData(reviews);
+            const response = await getReviewsData(supabase, animeID, 10, profileID);
+            setReviewListData(response.data);
             onReviewAdded();
         } catch (error) {
             handleError("Failed to add review", error);
@@ -156,6 +155,7 @@ const ReviewsList = (props: ReviewsListProps) => {
                 supabase,
                 animeID,
                 REVIEWS_PER_REQUESTS,
+                profileID,
                 lastReviewIndex
             );
             setReviewListData((snapshot) => {

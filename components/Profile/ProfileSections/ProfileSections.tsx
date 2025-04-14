@@ -174,7 +174,7 @@ export function UserItems({title, status, accountName}: UserItemsProps) {
         setLoading(true);
         getProfileID(supabase, accountName)
             .then((profileID) => {
-                if (profileID === null) {
+                if (profileID === undefined) {
                     throw new Error(`No profile with name '${accountName}'`);
                 }
                 getProfileData(supabase, profileID).then(
@@ -415,7 +415,7 @@ export function EditProfile({open, closeDialog}: EditProfileProps) {
     const formSubmitHandler = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (profileID !== null) {
+        if (profileID !== undefined) {
             setBtnDisabled({save: true, cancel: true});
             const newData: TablesUpdate<"profiles"> = {
                 account_name: accountName,

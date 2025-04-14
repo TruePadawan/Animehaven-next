@@ -51,7 +51,11 @@ const ReviewItem = (props: ReviewItemProps) => {
         const {creator_id} = reviewData;
         getProfileData(supabase, creator_id)
             .then((data) => {
-                setProfileData(data);
+                setProfileData({
+                    avatar_url: data.avatar_url,
+                    account_name: data.account_name,
+                    display_name: data.display_name ?? ""
+                });
                 setLoading(false);
             })
             .catch((error) => {
@@ -60,7 +64,7 @@ const ReviewItem = (props: ReviewItemProps) => {
     }, [reviewData, handleError, supabase]);
 
     const onUpvoteButtonClicked = async () => {
-        if (ownReview || profileID === null) return;
+        if (ownReview || profileID === undefined) return;
 
         const {id: reviewID} = reviewData;
         try {
@@ -89,7 +93,7 @@ const ReviewItem = (props: ReviewItemProps) => {
     };
 
     const onDeleteButtonClicked = async () => {
-        if (!ownReview || profileID === null) return;
+        if (!ownReview || profileID === undefined) return;
 
         const {id: reviewID} = reviewData;
         try {
@@ -123,7 +127,7 @@ const ReviewItem = (props: ReviewItemProps) => {
     }`;
 
     const showMoreOptions =
-        profileID !== null && profileID === reviewData.creator_id;
+        profileID !== undefined && profileID === reviewData.creator_id;
     const {avatar_url, display_name, account_name} = profileData;
     return (
         <li className={reviewClassName}>

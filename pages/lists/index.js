@@ -92,7 +92,7 @@ const Lists = () => {
 						setQueryOngoing(false);
 					}
 				);
-		} else if (listFilter === "your_lists" && profileID !== null) {
+		} else if (listFilter === "your_lists" && profileID !== undefined) {
 			supabase
 				.from("anime_lists")
 				.select("id,genres")
@@ -136,7 +136,7 @@ const Lists = () => {
 					.rpc("search_list", { phrase: searchText })
 					.throwOnError();
 				filteredSearchResults = applyGenreFilter(searchResults, acceptedGenres);
-			} else if (listFilter === "your_lists" && profileID !== null) {
+			} else if (listFilter === "your_lists" && profileID !== undefined) {
 				let { data: searchResults } = await supabase
 					.rpc("search_list", { phrase: searchText, profile_id: profileID })
 					.throwOnError();

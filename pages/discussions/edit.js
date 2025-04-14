@@ -72,7 +72,7 @@ export default function Edit() {
 	async function formSubmitHandler(event) {
 		event.preventDefault();
 
-		if (profileID !== null) {
+		if (profileID !== undefined) {
 			setUpdateBtnDisabled(true);
 			try {
 				await supabase
@@ -93,7 +93,7 @@ export default function Edit() {
 	}
 
 	async function onDeleteButtonClicked() {
-		if (profileID !== null) {
+		if (profileID !== undefined) {
 			try {
 				await supabase
 					.from("discussions")

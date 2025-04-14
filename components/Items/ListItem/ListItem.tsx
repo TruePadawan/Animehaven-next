@@ -70,7 +70,7 @@ export default function ListItem({listId, skeleton = false}: ListItemProps) {
                     }
                 );
                 // ENABLE SAVE BTN IF LIST WAS NOT CREATED BY SIGNED IN USER AND IT ISN'T ALREADY SAVED
-                if (profileID === null) {
+                if (profileID === undefined) {
                     setSaveDisabled(true);
                 } else {
                     getProfileData(supabase, profileID).then(
@@ -95,7 +95,7 @@ export default function ListItem({listId, skeleton = false}: ListItemProps) {
     }, [listId, profileID, supabase]);
 
     const saveList = async () => {
-        if (profileID !== null && creatorID !== profileID) {
+        if (profileID !== undefined && creatorID !== profileID) {
             setSaveDisabled(true);
             try {
                 const {saved_lists} = await getProfileData(supabase, profileID);
@@ -122,7 +122,7 @@ export default function ListItem({listId, skeleton = false}: ListItemProps) {
     };
 
     const undoSave = async () => {
-        if (profileID !== null && creatorID !== profileID) {
+        if (profileID !== undefined && creatorID !== profileID) {
             setUndoSaveDisabled(true);
             try {
                 let {saved_lists}: Tables<"profiles"> = await getProfileData(supabase, profileID);

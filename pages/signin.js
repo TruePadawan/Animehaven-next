@@ -21,7 +21,7 @@ export default function SignIn() {
 	const router = useRouter();
 
 	useEffect(() => {
-        if (profileID !== null) {
+        if (profileID !== undefined) {
             router.replace("/");
         }
     }, [profileID]);

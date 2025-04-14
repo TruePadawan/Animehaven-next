@@ -35,7 +35,7 @@ export default function Create() {
 	}, []);
 
 	useEffect(() => {
-		if (profileID === null) {
+		if (profileID === undefined) {
 			setCreateBtnDisabled(true);
 			setErrorText("You need to be signed in to create a discussion!");
 		} else {
@@ -53,7 +53,7 @@ export default function Create() {
 	async function formSubmitHandler(event) {
 		event.preventDefault();
 
-		if (profileID !== null) {
+		if (profileID !== undefined) {
 			setCreateBtnDisabled(true);
 			const data = discussionData;
 			data.creator_id = profileID;

@@ -32,7 +32,7 @@ const Authentication = () => {
         }
     };
 
-    const userSignedIn = profileID !== null;
+    const userSignedIn = profileID !== undefined;
     const alertAnchorOrigin: SnackbarOrigin = {
         vertical: "top",
         horizontal: "center",

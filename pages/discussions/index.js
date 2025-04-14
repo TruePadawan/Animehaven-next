@@ -50,7 +50,7 @@ export default function Discussions() {
 				setDiscussionsList(data);
 				setQueryingDB(false);
 			});
-		} else if (filter === "your_discussions" && profileID !== null) {
+		} else if (filter === "your_discussions" && profileID !== undefined) {
 			getDiscussionsByTags(supabase, selectedTags, profileID).then((data) => {
 				setDiscussionsList(data);
 				setQueryingDB(false);
