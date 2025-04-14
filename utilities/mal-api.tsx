@@ -54,20 +54,7 @@ export const searchAnime = async (title: string, limit = 20) => {
     const URL = `https://api.jikan.moe/v4/anime?q=${title}&limit=${limit}&sfw=true`;
     const response = await fetch(URL);
     const list: Anime[] = await (await response.json()).data;
-    const filteredList: Anime[] = [];
-    list.forEach((anime) => {
-        if (
-            anime["type"] === "Music" ||
-            anime.images.jpg["large_image_url"] ===
-            "https://cdn.myanimelist.net/img/sp/icon/apple-touch-icon-256.png" ||
-            isNSFW(anime) ||
-            !ALLOWED_ANIME_TYPES.includes(anime.type)
-        ) {
-            return;
-        }
-        filteredList.push(anime);
-    });
-    return filteredList;
+    return list.filter((anime) => !isFlagged(anime));
 };
 
 export const getAnimeById = async (id: string): Promise<Anime> => {
