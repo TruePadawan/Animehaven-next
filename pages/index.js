@@ -3,7 +3,7 @@ import AnimeItem from "../components/Items/AnimeItem/AnimeItem";
 import BodyLayout from "../components/BodyLayout/BodyLayout";
 import { getRelevantAnimeData } from "../utilities/app-utilities";
 import Section from "../components/Section/Section";
-import { getListOfAnimes, getRandomAnimes } from "../utilities/mal-api";
+import { getAnimes, getRandomAnimes } from "../utilities/mal-api";
 import styles from "../styles/home.module.css";
 import Head from "next/head";
 import HeaderLayout from "../components/HeaderLayout/HeaderLayout";
@@ -90,15 +90,15 @@ const Home = (props) => {
 
 export async function getStaticProps() {
 	const randomAnimes = await getRandomAnimes(DEFAULT_N_LOADED_ITEMS);
-	const airingAnimes = await getListOfAnimes(
+	const airingAnimes = await getAnimes(
 		"airing",
 		DEFAULT_N_LOADED_ITEMS + 5
 	);
-	const upcomingAnimes = await getListOfAnimes(
+	const upcomingAnimes = await getAnimes(
 		"upcoming",
 		DEFAULT_N_LOADED_ITEMS + 5
 	);
-	const popularAnimes = await getListOfAnimes(
+	const popularAnimes = await getAnimes(
 		"bypopularity",
 		DEFAULT_N_LOADED_ITEMS + 5
 	);

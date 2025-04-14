@@ -31,7 +31,7 @@ export const getRandomAnime = async (): Promise<Anime> => {
 	return anime;
 };
 
-export const getListOfAnimes = async (subCategory: string, limit = 20): Promise<Anime[]> => {
+export const getAnimes = async (subCategory: string, limit = 20): Promise<Anime[]> => {
 	const URL = `https://api.jikan.moe/v4/top/anime?filter=${subCategory}&limit=${limit}`;
 	const response = await fetch(URL);
 	return await (await response.json()).data;
