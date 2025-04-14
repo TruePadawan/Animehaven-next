@@ -3,7 +3,7 @@ import AnimeItem from "../components/Items/AnimeItem/AnimeItem";
 import BodyLayout from "../components/BodyLayout/BodyLayout";
 import { getRelevantAnimeData } from "../utilities/app-utilities";
 import Section from "../components/Section/Section";
-import { getListOfAnimes, requestNRandomAnime } from "../utilities/mal-api";
+import { getListOfAnimes, getRandomAnimes } from "../utilities/mal-api";
 import styles from "../styles/home.module.css";
 import Head from "next/head";
 import HeaderLayout from "../components/HeaderLayout/HeaderLayout";
@@ -89,7 +89,7 @@ const Home = (props) => {
 };
 
 export async function getStaticProps() {
-	const randomAnimes = await requestNRandomAnime(DEFAULT_N_LOADED_ITEMS);
+	const randomAnimes = await getRandomAnimes(DEFAULT_N_LOADED_ITEMS);
 	const airingAnimes = await getListOfAnimes(
 		"airing",
 		DEFAULT_N_LOADED_ITEMS + 5
