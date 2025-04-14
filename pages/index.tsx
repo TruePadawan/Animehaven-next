@@ -1,4 +1,4 @@
-import { Fragment } from "react";
+import {Fragment, ReactElement} from "react";
 import AnimeItem from "../components/Items/AnimeItem/AnimeItem";
 import BodyLayout from "../components/BodyLayout/BodyLayout";
 import { getRelevantAnimeData } from "../utilities/app-utilities";
@@ -7,9 +7,18 @@ import { getAnimes, getRandomAnimes } from "../utilities/mal-api";
 import styles from "../styles/home.module.css";
 import Head from "next/head";
 import HeaderLayout from "../components/HeaderLayout/HeaderLayout";
+import {Anime} from "@tutkli/jikan-ts";
 
 const DEFAULT_N_LOADED_ITEMS = 10;
-const Home = (props) => {
+interface HomeProps {
+	animes: {
+		randomAnimes: Anime[];
+		airingAnimes: Anime[];
+		upcomingAnimes: Anime[];
+		popularAnimes: Anime[];
+	}
+}
+const Home = (props: HomeProps) => {
 	const randomAnimes = (() => {
 		const animes = props.animes.randomAnimes;
 		const transformedData = animes.map((anime) => getRelevantAnimeData(anime));
@@ -118,7 +127,7 @@ export async function getStaticProps() {
 
 export default Home;
 
-Home.getLayout = (page) => {
+Home.getLayout = (page: ReactElement) => {
 	return (
 		<HeaderLayout>
 			<BodyLayout className={styles["home-main"]}>{page}</BodyLayout>
