@@ -372,16 +372,22 @@ export type DatabaseGenerated = {
     }
 }
 
-type AddToListAnimeItem = { id: number, title: string }
 export type Database = MergeDeep<DatabaseGenerated, {
     public: {
         Tables: {
             anime_lists: {
                 Row: {
-                    items: Array<AddToListAnimeItem>
+                    items: Array<{ id: number, title: string }>
                 },
                 Update: {
-                    items?: Array<AddToListAnimeItem>
+                    items?: Array<{ id: number, title: string }>
+                },
+            },
+            profiles: {
+                Row: {
+                    items_watch_status: {
+                        [key: string]: "NOT_WATCHED" | "WATCHING" | "WATCHED"
+                    }
                 }
             }
         }

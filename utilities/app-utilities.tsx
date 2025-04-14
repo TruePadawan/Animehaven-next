@@ -12,9 +12,14 @@ export function getRelevantAnimeData(anime: Anime) {
     const type = anime.type;
     const score = anime.score;
     const genres = anime.genres;
-    const overview = anime["synopsis"] ?? "";
+    const overview = anime.synopsis ?? "";
+    const synopsis = anime.synopsis ?? "";
+    const rank = anime.rank;
+    const status = anime.status;
+    const episodes = anime.episodes
+    const studios = anime.studios
 
-    return {id, title, imageURL, type, score, genres, overview};
+    return {id, title, imageURL, type, score, genres, overview, synopsis, rank, status, episodes, studios};
 }
 
 export function getRandomInt(min: number, max: number) {

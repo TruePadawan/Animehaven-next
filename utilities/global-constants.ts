@@ -23,3 +23,4 @@ export const DISCUSSION_TAGS = ["Chat", "Support"];
 export const PROFILE_IMG_MAX_SIZE = Math.pow(10, 6);
 export const ALLOWED_ANIME_TYPES = ["TV", "OVA", "Movie"];
 export const FLAGGED_ANIME_GENRES = ["Hentai", "Boys Love", "Erotica", "Girls Love"];
+export const VALID_WATCH_STATUS = ["WATCHED", "WATCHING", "NOT_WATCHED"]

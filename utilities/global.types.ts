@@ -1,5 +1,6 @@
 import {AlertProps} from "@mui/material";
 import React from "react";
+import {getRelevantAnimeData} from "./app-utilities";
 
 export interface HasErrorMessage {
     message?: string;
@@ -8,31 +9,18 @@ export interface HasErrorMessage {
 
 export interface TriggerAlertOptions {
     severity: AlertProps["severity"];
-    error?: {
-        message?: string;
-        error_description?: string;
-    }
+    error?: HasErrorMessage
 }
 
 export type TriggerAlert = (text: string, options?: TriggerAlertOptions) => void;
 export type ResetAlert = (event: React.SyntheticEvent<any> | Event, reason: string) => void;
 
-export interface AnimeItemData {
-    id: number;
-    title: string;
-    imageURL: string;
-    type: string;
-    score: number;
-    genres: Array<{
-        mal_id: number;
-        type: string;
-        name: string;
-        url: string;
-    }>;
-}
+export type AnimeItemData = ReturnType<typeof getRelevantAnimeData>
 
 export interface SnackbarState {
     open: boolean;
     severity: AlertProps["severity"];
     text: string;
 }
+
+export type WatchStatus = "NOT_WATCHED" | "WATCHING" | "WATCHED"
