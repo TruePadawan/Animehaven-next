@@ -57,8 +57,8 @@ export default function ProfileReviewItem({itemId, creatorId, index}: ReviewItem
                     }
                     const {rating, review} = result.data;
                     // TODO: this 'any' should be replaced with a proper type when jikan-ts is added to the project
-                    getAnimeById(itemId).then((rawData: any) => {
-                        const {title, imageURL}: AnimeItemData = getRelevantAnimeData(rawData);
+                    getAnimeById(itemId).then((anime) => {
+                        const {title, imageURL}: AnimeItemData = getRelevantAnimeData(anime);
                         setItemData({
                             rating,
                             review,
