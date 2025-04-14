@@ -207,7 +207,7 @@ export type DatabaseGenerated = {
                     avatar_url: string
                     bio: string | null
                     created_at: string
-                    display_name: string | null
+                    display_name: string
                     email: string
                     fts: unknown | null
                     id: string
@@ -220,7 +220,7 @@ export type DatabaseGenerated = {
                     avatar_url?: string
                     bio?: string | null
                     created_at?: string
-                    display_name?: string | null
+                    display_name?: string
                     email: string
                     fts?: unknown | null
                     id: string
@@ -233,7 +233,7 @@ export type DatabaseGenerated = {
                     avatar_url?: string
                     bio?: string | null
                     created_at?: string
-                    display_name?: string | null
+                    display_name?: string
                     email?: string
                     fts?: unknown | null
                     id?: string
@@ -339,11 +339,13 @@ export type DatabaseGenerated = {
                     avatar_url: string
                     bio: string | null
                     created_at: string
-                    display_name: string | null
+                    display_name: string
                     email: string
                     fts: unknown | null
                     id: string
-                    items_watch_status: Json
+                    items_watch_status: {
+                        [key: string]: "NOT_WATCHED" | "WATCHING" | "WATCHED"
+                    }
                     roles: string[]
                     saved_lists: string[]
                 }[]

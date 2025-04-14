@@ -7,14 +7,14 @@ import {useMediaQuery} from "@mui/material";
 import Select from "../Select/Select";
 
 interface SearchBarProps {
-    searchText: string | null;
-    searchCategory: string | null;
+    searchText: string;
+    searchCategory: string;
     searchCategories: string[];
 }
 
 const SearchBar = ({searchCategories, searchText, searchCategory}: SearchBarProps) => {
     const router = useRouter();
-    const [inputVal, setInputVal] = useState(searchText || "");
+    const [inputVal, setInputVal] = useState(searchText);
     const [selectVal, setSelectVal] = useState(searchCategories[0]);
     const matchesSmallDevice = useMediaQuery("(max-width: 500px)");
 
@@ -23,12 +23,9 @@ const SearchBar = ({searchCategories, searchText, searchCategory}: SearchBarProp
     };
 
     useEffect(() => {
-        setInputVal(searchText || "");
-        setSelectVal(() => {
-            if (searchCategory) return searchCategory.toUpperCase();
-            return searchCategories[0].toUpperCase();
-        });
-    }, [searchCategory, searchCategories, searchText]);
+        setInputVal(searchText);
+        setSelectVal(searchCategory.toUpperCase());
+    }, [searchCategory, searchText]);
 
     const searchHandler = () => {
         updatePageURL(
