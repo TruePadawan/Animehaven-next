@@ -118,8 +118,8 @@ const ReviewsList = (props: ReviewsListProps) => {
 
     async function formSubmitHandler(event: FormEvent) {
         event.preventDefault();
-        // SAFETUY CHECK - THERE MUST BE A SIGNEDIN USER BEFORE REVIEW CAN BE POSTED OR UPDATED
-        if (profileID === null) return;
+        // THERE MUST BE A SIGNED-IN USER BEFORE REVIEW CAN BE POSTED OR UPDATED
+        if (profileID === undefined) return;
         setDisableAddReviewBtn(true);
         // CHECK TO SEE IF THERE IS ALREADY A REVIEW BY THE USER AND UPDATE IT BECAUSE ONLY ONE REVIEW PER ITEM ELSE CREATE ONE
         const reviewData = await getReviewByUser(supabase, animeID, profileID);

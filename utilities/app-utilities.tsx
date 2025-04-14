@@ -304,8 +304,8 @@ export async function getReviewsData(
     supabase: SupabaseClient<Database>,
     animeId: string,
     limit: number,
+    profileId?: string,
     startAfterIndex?: number,
-    profileId?: string
 ) {
     let list: Tables<"item_reviews">[] = [];
     let totalReviewsCount = 0;
@@ -344,7 +344,7 @@ export async function getReviewsData(
             list = list.concat(data);
         }
     } else {
-        if (startAfterIndex !== null) {
+        if (startAfterIndex !== undefined) {
             const {data, error, count} = await supabase
                 .from("item_reviews")
                 .select("*", {count: "exact"})
