@@ -1,11 +1,11 @@
-import {ReactElement} from "react";
+import {ReactElement, ReactNode} from "react";
 import {SupabaseClient} from "@supabase/supabase-js";
 
 export interface UserAuthContextType {
-    profileID: string | null;
+    profileID?: string;
     handleGoogleAuth: (supabaseClient: SupabaseClient) => Promise<void>;
 }
 
 export interface UserAuthContextProviderProps {
-    children: ReactElement;
+    children: ReactNode;
 }

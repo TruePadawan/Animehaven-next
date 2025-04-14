@@ -8,13 +8,12 @@ import {PostgrestError} from "@supabase/supabase-js";
 import {getRedirectUrl} from "./utilities";
 
 export const UserAuthContext = createContext<UserAuthContextType>({
-    profileID: null,
     handleGoogleAuth: () => Promise.resolve(),
 });
 
 // TODO: UserAuthContext and its related code should be moved under an auth folder
 export const UserAuthContextProvider = (props: UserAuthContextProviderProps) => {
-    const [profileID, setProfileID] = useState<string | null>(null);
+    const [profileID, setProfileID] = useState<string>();
     const supabase = useSupabaseClient<Database>();
     const user = useUser();
     const router = useRouter();
@@ -31,7 +30,7 @@ export const UserAuthContextProvider = (props: UserAuthContextProviderProps) => 
             if (hasSession && profileID === null) {
                 loadUser(session.user);
             } else if (event === "SIGNED_OUT") {
-                setProfileID(null);
+                setProfileID(undefined);
             }
         });
     }, []);
