@@ -70,7 +70,7 @@ export const searchAnime = async (title: string, limit = 20) => {
 	return filteredList;
 };
 
-export const getAnimeById = async (id: number): Promise<Anime> => {
+export const getAnimeById = async (id: string): Promise<Anime> => {
 	const URL = `https://api.jikan.moe/v4/anime/${id}`;
 	const response = await fetch(URL);
   
