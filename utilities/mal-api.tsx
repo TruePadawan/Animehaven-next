@@ -8,13 +8,9 @@ const isNSFW = (anime: Anime) => {
 };
 
 const isFlagged = (anime: Anime) => {
-    const hasNoImage =
-        anime.images.jpg["image_url"] ===
-        "https://cdn.myanimelist.net/img/sp/icon/apple-touch-icon-256.png";
+    const hasNoImage = anime.images.jpg["image_url"] === "https://cdn.myanimelist.net/img/sp/icon/apple-touch-icon-256.png";
     const hasNoDescription = anime.synopsis === null;
-    const hasWrongType =
-        anime.type !== null &&
-        !ALLOWED_ANIME_TYPES.includes(anime.type.toUpperCase());
+    const hasWrongType = anime.type !== null && !ALLOWED_ANIME_TYPES.includes(anime.type.toUpperCase());
     const notSFW = isNSFW(anime);
 
     return hasNoImage || hasWrongType || hasNoDescription || notSFW;
