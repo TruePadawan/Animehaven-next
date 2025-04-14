@@ -1,12 +1,16 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 
-const useInput = (validate, options = {}) => {
+type ValidateFn = (value: string) => Promise<boolean>
+type UseInputOptions = {
+	defaultValue?: string
+	customTransformation?: (value: string) => string
+}
+const useInput = (validate: ValidateFn, options?: UseInputOptions) => {
 	const [inputValue, setInputValue] = useState(options?.defaultValue ?? "");
 	const [inputIsValid, setInputIsValid] = useState(false);
 	const [inputHasError, setInputHasError] = useState(false);
 	const [checkingValidity, setCheckingValidity] = useState(false);
 	const [inputWasTouched, setInputWasTouched] = useState(false);
-	const { customTransformation = null } = options;
 
 	useEffect(() => {
 		setInputIsValid(false);
@@ -14,9 +18,6 @@ const useInput = (validate, options = {}) => {
 		const timeoutID = setTimeout(() => {
 			validate(inputValue)
 				.then((isValid) => {
-					if (isValid !== true && isValid !== false) {
-						throw new Error("Validation callback must resolve to a boolean");
-					}
 					setInputIsValid(isValid);
 					setCheckingValidity(false);
 				})
@@ -35,15 +36,15 @@ const useInput = (validate, options = {}) => {
 		}
 	}, [inputIsValid, inputWasTouched, checkingValidity]);
 
-	const inputChangeHandler = (event) => {
-		if (customTransformation === null) {
-			setInputValue(event.target.value);
+	const inputChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
+		if (options?.customTransformation) {
+			setInputValue(options.customTransformation(event.target.value));
 		} else {
-			setInputValue(customTransformation(event.target.value));
+			setInputValue(event.target.value);
 		}
 	};
 
-	const inputOnBlurHandler = (event) => {
+	const inputOnBlurHandler = (event: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => {
 		setInputWasTouched(true);
 	};
 
