@@ -3,6 +3,7 @@ import { useState } from "react";
 import useInterval from "../../hooks/use-interval";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
 
+// TODO: Get rid of email and password authentication
 const VerifyOTP = ({
 	email,
 	options,
