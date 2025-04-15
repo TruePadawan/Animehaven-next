@@ -33,7 +33,6 @@ import {
     UserSavedListsProps
 } from "./ProfileSections.types";
 import {Database, Tables, TablesUpdate} from "../../../database.types";
-import {PostgrestError} from "@supabase/supabase-js";
 import {SnackbarState, TriggerAlert} from "../../../utilities/global.types";
 import {DEFAULT_AVATAR_URL, DEFAULT_SNACKBAR_STATE} from "../../../utilities/global-constants";
 
@@ -92,6 +91,9 @@ export function UserLists({accountName}: UserListsProps) {
     useEffect(() => {
         setLoading(true);
         getProfileID(supabase, accountName).then((id) => {
+            if (id === undefined) {
+                throw new Error(`No profile with name '${accountName}'`);
+            }
             supabase
                 .from("anime_lists")
                 .select("id")
@@ -137,12 +139,13 @@ export function UserSavedLists({accountName}: UserSavedListsProps) {
     useEffect(() => {
         setLoading(true);
         supabase
-            .rpc("get_saved_lists", {acct_name: accountName}).single()
+            .rpc("get_saved_lists", {acct_name: accountName})
             .then(({data, error}) => {
                 if (error) throw error;
                 if (data === null) throw new Error("Could not retrieve saved lists");
-
+                // data = data as Tables<"anime_lists">[];
                 const transformed = data.map((list) => {
+                    // @ts-ignore, due to supabase specifying a wrong return type
                     return <ListItem key={list.id} listId={list.id}/>;
                 });
                 setItems(transformed);
@@ -223,8 +226,11 @@ export function UserRecommendedItems({accountName}: UserRecommendedItemsProps) {
     useEffect(() => {
         setLoading(true);
         getProfileID(supabase, accountName).then((profileID) => {
+            if (profileID === undefined) {
+                throw new Error(`No profile with name '${accountName}'`);
+            }
             getUserItemRecommendations(supabase, profileID)
-                .then(({data, error}: { data: Tables<"item_recommendations">[], error?: PostgrestError }) => {
+                .then(({data, error}) => {
                     if (error) throw error;
                     const recommendedItems = data.map(({item_id}, index) => (
                         <RecommendedItem key={item_id} itemId={item_id} index={index}/>
@@ -260,8 +266,11 @@ export function UserReviews({accountName}: UserReviewsProps) {
     useEffect(() => {
         setLoading(true);
         getProfileID(supabase, accountName).then((profileID) => {
+            if (profileID === undefined) {
+                throw new Error(`No profile with name '${accountName}'`);
+            }
             getUserItemReviews(supabase, profileID)
-                .then(({data, error}: { data: Tables<"item_reviews">[], error?: PostgrestError }) => {
+                .then(({data, error}) => {
                     if (error) throw error;
                     const reviewedItems = data.map(({item_id}, index) => (
                         <ProfileReviewItem
@@ -294,12 +303,19 @@ export function UserReviews({accountName}: UserReviewsProps) {
     );
 }
 
+type ProfileData = {
+    avatarURL: string;
+    accountName: string;
+    displayName: string;
+    bio: string | null
+}
+
 export function EditProfile({open, closeDialog}: EditProfileProps) {
     const supabase = useSupabaseClient<Database>();
     const router = useRouter();
     const {profileID} = useContext(UserAuthContext);
     const [loading, setLoading] = useState(true);
-    const [profileData, setProfileData] = useState({
+    const [profileData, setProfileData] = useState<ProfileData>({
         avatarURL: DEFAULT_AVATAR_URL,
         accountName: "",
         displayName: "",
@@ -310,7 +326,7 @@ export function EditProfile({open, closeDialog}: EditProfileProps) {
         save: false,
         cancel: false,
     });
-    const currentAccountNameRef = useRef();
+    const currentAccountNameRef = useRef("");
     const shouldAvatarChange = useRef(false);
     const avatarFile = useRef<File | null>(null);
     const [snackbarData, setSnackbarData] = useState<SnackbarState>(DEFAULT_SNACKBAR_STATE);
@@ -336,25 +352,23 @@ export function EditProfile({open, closeDialog}: EditProfileProps) {
     }
 
     useEffect(() => {
-        const loadAccountData = async () => {
-            if (!open) return;
-            setLoading(true);
-            const {avatar_url, account_name, display_name, bio} =
-                await getProfileData(supabase, profileID);
-            setProfileData({
-                avatarURL: avatar_url,
-                accountName: account_name,
-                displayName: display_name,
-                bio,
-            });
-            currentAccountNameRef.current = account_name;
-            setLoading(false);
-        };
-
         if (!profileID) {
             closeDialog();
         } else {
-            loadAccountData();
+            if (!open) return;
+            setLoading(true);
+            getProfileData(supabase, profileID)
+                .then((profileData) => {
+                    const {avatar_url, account_name, display_name, bio} = profileData;
+                    setProfileData({
+                        avatarURL: avatar_url,
+                        accountName: account_name,
+                        displayName: display_name,
+                        bio,
+                    });
+                    currentAccountNameRef.current = account_name;
+                    setLoading(false);
+                })
         }
     }, [closeDialog, profileID, open, supabase]);
 
@@ -574,7 +588,7 @@ export function EditProfile({open, closeDialog}: EditProfileProps) {
                                 </label>
                                 <textarea
                                     id="bio"
-                                    value={bio}
+                                    value={bio ?? ""}
                                     onChange={bioChangeHandler}
                                     spellCheck={false}
                                 />

@@ -40,11 +40,11 @@ export default function ProfileLayout(props: ProfileLayoutProps) {
 
     // CONFIRM THAT PROFILE EXISTS THEN RETRIEVE ITS DATA
     useEffect(() => {
-        if (router.isReady) {
+        if (router.isReady && typeof router.query.accountName === "string") {
             const {accountName} = router.query;
 
             getProfileID(supabase, accountName).then((id) => {
-                if (id === null) {
+                if (id === undefined) {
                     setProfileData({
                         ...defaultProfileDataState,
                         accountName: accountName as string
@@ -58,7 +58,7 @@ export default function ProfileLayout(props: ProfileLayoutProps) {
                                 data: {
                                     avatar_url,
                                     display_name,
-                                    bio,
+                                    bio: bio ?? "",
                                 },
                             });
                         }

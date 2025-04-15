@@ -3,11 +3,7 @@ import CommentItem from "./CommentItem";
 import CommentBox from "./CommentBox";
 import styles from "../Comments-Reviews.module.css";
 import {Alert, Button, Snackbar, SnackbarOrigin} from "@mui/material";
-import {
-    getCommentsData,
-    getErrorMessage,
-    numberToString,
-} from "../../../utilities/app-utilities";
+import {getCommentsData, getErrorMessage, numberToString,} from "../../../utilities/app-utilities";
 import {UserAuthContext} from "../../../context/UserAuthContext";
 import CommentIcon from "@mui/icons-material/Comment";
 import ShareButton from "../../ShareButton/ShareButton";
@@ -72,7 +68,9 @@ const CommentsList = ({id, className = ""}: CommentsListProps) => {
         const onCommentAdded = (payload: RealtimePostgresInsertCommentPayload) => {
             const newData = payload.new;
             setCommentsData((snapshot) => {
-                snapshot.unshift(newData);
+                if (!snapshot.find((comment) => comment.id === newData.id)) {
+                    snapshot.unshift(newData);
+                }
                 return [...snapshot];
             });
         };

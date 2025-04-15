@@ -57,10 +57,12 @@ const CommentItem = (props: CommentItemProps) => {
                 const isReply = parent_comment_id !== null;
                 if (isReply) {
                     try {
-                        const parentCommentData = await getCommentData(
+                        const { data: parentCommentData, error } = await getCommentData(
                             supabase,
                             parent_comment_id
                         );
+                        if (error) throw error;
+
                         const {text, creator_id: parentCommentCreatorID} =
                             parentCommentData;
                         const profileDataForParentCommentCreator = await getProfileData(supabase, parentCommentCreatorID);
@@ -271,13 +273,13 @@ const CommentItem = (props: CommentItemProps) => {
                                         <MoreOptions popupState={popupState}>
                                             <MenuItem
                                                 sx={menuItemStyles}
-                                                onClick={handleEditing.bind(this, popupState.close)}>
+                                                onClick={() => handleEditing(popupState.close)}>
                                                 Edit
                                             </MenuItem>
                                             <Divider sx={dividerStyles}/>
                                             <MenuItem
                                                 sx={menuItemStyles}
-                                                onClick={deleteComment.bind(this, popupState.close)}>
+                                                onClick={() => deleteComment(popupState.close)}>
                                                 Delete
                                             </MenuItem>
                                         </MoreOptions>

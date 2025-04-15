@@ -69,15 +69,13 @@ export async function getCommentsData(
     }
 }
 
-export async function getCommentData(supabase: SupabaseClient<Database>, commentId: Tables<"comments">["id"], fields = "*") {
-    const {data} = await supabase
+export async function getCommentData(supabase: SupabaseClient<Database>, commentId: Tables<"comments">["id"]) {
+    return supabase
         .from("comments")
-        .select(fields)
+        .select("*")
         .eq("id", commentId)
-        .throwOnError()
         .limit(1)
         .single();
-    return data;
 }
 
 export async function getProfileData(supabase: SupabaseClient<Database>, profileId: Tables<"profiles">["id"]) {
@@ -100,7 +98,7 @@ export async function getProfileID(supabase: SupabaseClient<Database>, accountNa
     if (data.length === 1) {
         return data[0].id;
     }
-    return null;
+    return undefined;
 }
 
 export async function getReviewUpvoteList(supabase: SupabaseClient<Database>, reviewId: Tables<"item_reviews">["id"]) {
