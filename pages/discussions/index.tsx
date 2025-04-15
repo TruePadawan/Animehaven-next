@@ -184,7 +184,6 @@ export default function Discussions() {
                     )}
                 </div>
                 <div className="d-flex flex-column flex-grow-1">
-                    // TODO: implement search feature
                     <SearchInput
                         placeholder="Search Discussions"
                         minLength={4}
