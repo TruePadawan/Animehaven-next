@@ -16,10 +16,10 @@ import Loading from "../../components/Loading/Loading";
 import HeaderLayout from "../../components/HeaderLayout/HeaderLayout";
 import {useSupabaseClient} from "@supabase/auth-helpers-react";
 import {DISCUSSION_TAGS} from "../../utilities/global-constants";
-import {Tables} from "../../database.types";
+import {Database, Tables} from "../../database.types";
 
 export default function Discussions() {
-    const supabase = useSupabaseClient();
+    const supabase = useSupabaseClient<Database>();
     const {profileID} = useContext(UserAuthContext);
     const [discussionsList, setDiscussionsList] = useState<Tables<"discussions">[]>([]);
     const [filterDrawerIsOpen, setFilterDrawerIsOpen] = useState(false);
