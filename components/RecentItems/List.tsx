@@ -7,7 +7,7 @@ import {useSupabaseClient} from "@supabase/auth-helpers-react";
 import {Database} from "../../database.types";
 
 interface ListProps {
-    id: string;
+    id: number;
 }
 
 export default function List({id}: ListProps) {
@@ -18,7 +18,7 @@ export default function List({id}: ListProps) {
 
     useEffect(() => {
         setLoading(true);
-        getListByID(supabase, +id)
+        getListByID(supabase, id)
             .then((data) => {
                 const {title, description} = data;
                 setData({title, description});

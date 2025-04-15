@@ -46,10 +46,10 @@ export default function Recent(props: RecentProps) {
 				));
 				break;
 			case "discussions":
-				content = data.map((id :string) => <Discussion key={id} id={id} />);
+				content = data.map((id :number) => <Discussion key={id} id={id} />);
 				break;
 			case "lists":
-				content = data.map((id: string) => <List key={id} id={id} />);
+				content = data.map((id: number) => <List key={id} id={id} />);
 				break;
 			default:
 				break;

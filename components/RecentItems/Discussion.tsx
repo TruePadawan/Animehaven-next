@@ -7,7 +7,7 @@ import {useSupabaseClient} from "@supabase/auth-helpers-react";
 import {Database, Tables} from "../../database.types";
 
 interface DiscussionProps {
-    id: string;
+    id: number;
 }
 
 export default function Discussion({id}: DiscussionProps) {
