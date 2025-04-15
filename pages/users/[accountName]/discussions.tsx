@@ -1,15 +1,17 @@
 import {useRouter} from "next/router";
 import ProfileLayout from "../../../components/Profile/ProfileLayout";
-import {UserSavedLists} from "../../../components/Profile/ProfileSections/ProfileSections";
+import {UserDiscussions} from "../../../components/Profile/ProfileSections/ProfileSections";
 
-export default function SavedLists() {
+export default function Discussions() {
     const router = useRouter();
     const {accountName} = router.query;
+    // TODO: implement a loader here
     return (
         <ProfileLayout router={router}>
             {typeof accountName === "string" && (
-                <UserSavedLists accountName={accountName}/>
-            )}
+                <UserDiscussions accountName={accountName}/>
+            )
+            }
         </ProfileLayout>
     );
 }

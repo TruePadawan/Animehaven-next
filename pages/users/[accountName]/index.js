@@ -7,7 +7,9 @@ export default function Profile() {
 	const { accountName } = router.query;
 	return (
 		<ProfileLayout router={router}>
-			<UserLists accountName={accountName} />
+			{typeof accountName === "string" && (
+				<UserLists accountName={accountName} />
+			)}
 		</ProfileLayout>
 	);
 }
