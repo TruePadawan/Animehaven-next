@@ -60,7 +60,7 @@ const CreateList = (props: CreateListProps) => {
     });
     const [listDesc, setListDesc] = useState(() => {
         if (props.defaultValues !== undefined) {
-            return props.defaultValues.desc;
+            return props.defaultValues.description;
         }
         return "";
     });

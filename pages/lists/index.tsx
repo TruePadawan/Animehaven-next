@@ -1,74 +1,70 @@
-import { Fragment, useContext, useEffect, useMemo, useState } from "react";
-import { Masonry } from "@mui/lab";
+import React, {Fragment, ReactElement, useContext, useEffect, useMemo, useState} from "react";
+import {Masonry} from "@mui/lab";
 import Add from "@mui/icons-material/Add";
-import {
-	Alert,
-	Snackbar,
-	SwipeableDrawer,
-	useMediaQuery,
-	Button as MUIButton,
-} from "@mui/material";
+import {Alert, Button as MUIButton, Snackbar, SnackbarOrigin, SwipeableDrawer, useMediaQuery,} from "@mui/material";
 import BodyLayout from "../../components/BodyLayout/BodyLayout";
 import Button from "../../components/Button/Button";
 import Select from "../../components/Select/Select";
 import Checkbox from "../../components/Checkbox/Checkbox";
 import SearchInput from "../../components/Input/SearchInput/SearchInput";
 import ListItem from "../../components/Items/ListItem/ListItem";
-import { UserAuthContext } from "../../context/UserAuthContext";
+import {UserAuthContext} from "../../context/UserAuthContext";
 import CreateList from "../../components/CreateList/CreateList";
 import Loading from "../../components/Loading/Loading";
 import Head from "next/head";
 import CheckboxList from "../../components/CheckboxList/CheckboxList";
 import HeaderLayout from "../../components/HeaderLayout/HeaderLayout";
-import { useSupabaseClient } from "@supabase/auth-helpers-react";
+import {useSupabaseClient} from "@supabase/auth-helpers-react";
 import {LIST_GENRES} from "../../utilities/global-constants";
+import {Tables} from "../../database.types";
+import {ListGenres} from "../../components/CreateList/CreateList.types";
+import {HasErrorMessage, ResetAlert} from "../../utilities/global.types";
+import {PostgrestError} from "@supabase/supabase-js";
 
-const applyGenreFilter = (lists, acceptedGenres) => {
-	const filtered = lists.filter((list) => {
+const applyGenreFilter = (lists: Tables<"anime_lists">[], acceptedGenres: ListGenres) => {
+	return lists.filter((list) => {
 		let accepted = false;
-		const { genres } = list;
+		const {genres} = list;
 		for (const genre in genres) {
-			if (genres[genre] === true && acceptedGenres[genre] === true) {
+			if (genres[genre] && acceptedGenres[genre]) {
 				accepted = true;
 				break;
 			}
 		}
 		return accepted;
 	});
-	return filtered;
 };
 
 const Lists = () => {
 	const supabase = useSupabaseClient();
 	const { profileID } = useContext(UserAuthContext);
 	const [showCreateListDialog, setShowCreateListDialog] = useState(false);
-	const [lists, setLists] = useState([]);
+	const [lists, setLists] = useState<Tables<"anime_lists">[]>([]);
 	const [listFilter, setListFilter] = useState("all");
 	const [queryOngoing, setQueryOngoing] = useState(false);
 	const [searchText, setSearchText] = useState("");
 	const [acceptedGenres, setAcceptedGenres] = useState(() => {
-		let obj = {};
+		let genres: ListGenres = {};
 		LIST_GENRES.forEach((genre) => {
-			obj[genre.toUpperCase()] = true;
+			genres[genre.toUpperCase()] = true;
 		});
-		return obj;
+		return genres;
 	});
 	const [error, setError] = useState({ occurred: false, text: "" });
 	const [filterDrawerIsOpen, setFilterDrawerIsOpen] = useState(false);
 	const matchesSmallDevice = useMediaQuery("(max-width: 600px)");
 
-	const handleError = (text, error) => {
+	const handleError = (text: string, error: HasErrorMessage) => {
 		setError({
 			occurred: true,
 			text: `${text} - ${error.message || error.error_description}`,
 		});
 	};
 
-	const resetError = (event, reason) => {
-		if (reason === "clickaway") {
-			return;
+	const resetError: ResetAlert = (event, reason) => {
+		if (reason !== "clickaway") {
+			setError({ occurred: false, text: "" });
 		}
-		setError({ occurred: false, text: "" });
 	};
 
 	// SHOW PUBLIC LISTS OR USER OWN LISTS
@@ -77,38 +73,39 @@ const Lists = () => {
 		if (listFilter === "all") {
 			supabase
 				.from("anime_lists")
-				.select("id,genres")
+				.select("*")
 				.order("created_at", { ascending: false })
-				.throwOnError()
 				.then(
-					({ data }) => {
-						const filteredLists = applyGenreFilter(data, acceptedGenres);
-						setLists(filteredLists);
-						setQueryOngoing(false);
-					},
-					(error) => {
-						handleError("Failed to retrieve public lists", error);
-						setLists([]);
-						setQueryOngoing(false);
+					({ data, error }) => {
+						if (error) {
+							handleError("Failed to retrieve public lists", error);
+							setLists([]);
+							setQueryOngoing(false);
+						} else {
+							const filteredLists = applyGenreFilter(data, acceptedGenres);
+							setLists(filteredLists);
+							setQueryOngoing(false);
+						}
 					}
 				);
 		} else if (listFilter === "your_lists" && profileID !== undefined) {
 			supabase
 				.from("anime_lists")
-				.select("id,genres")
+				.select("*")
 				.eq("creator_id", profileID)
 				.order("created_at", { ascending: false })
 				.throwOnError()
 				.then(
-					({ data }) => {
-						const filteredLists = applyGenreFilter(data, acceptedGenres);
-						setLists(filteredLists);
-						setQueryOngoing(false);
-					},
-					(error) => {
-						handleError("Failed to retrieve user lists", error);
-						setLists([]);
-						setQueryOngoing(false);
+					({ data, error }) => {
+						if (error) {
+							handleError("Failed to retrieve user lists", error);
+							setLists([]);
+							setQueryOngoing(false);
+						} else {
+							const filteredLists = applyGenreFilter(data, acceptedGenres);
+							setLists(filteredLists);
+							setQueryOngoing(false);
+						}
 					}
 				);
 		}
@@ -116,35 +113,33 @@ const Lists = () => {
 
 	const openCreateListDialog = () => setShowCreateListDialog(true);
 	const closeCreateListDialog = () => setShowCreateListDialog(false);
-	const onListFilterChanged = (e) => setListFilter(e.target.value);
-	const updateSearchText = (e) => setSearchText(e.target.value);
-	const updateAcceptedGenres = (e) => {
+	const onListFilterChanged = (e: React.ChangeEvent<HTMLSelectElement>) => setListFilter(e.target.value);
+	const updateSearchText = (e: React.ChangeEvent<HTMLInputElement>) => setSearchText(e.target.value);
+	const updateAcceptedGenres = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setAcceptedGenres((current) => {
 			current[e.target.name] = e.target.checked;
 			return { ...current };
 		});
 	};
 
-	const searchForLists = async (e) => {
-		e.preventDefault();
-		let filteredSearchResults = [];
-
+	const searchForLists = async () => {
 		setQueryOngoing(true);
 		try {
 			if (listFilter === "all") {
-				let { data: searchResults } = await supabase
+				const { data: searchResults, error } = await supabase
 					.rpc("search_list", { phrase: searchText })
-					.throwOnError();
-				filteredSearchResults = applyGenreFilter(searchResults, acceptedGenres);
+				if (error) throw error;
+				const filteredSearchResults = applyGenreFilter(searchResults as Tables<"anime_lists">[], acceptedGenres);
+				setLists(filteredSearchResults);
 			} else if (listFilter === "your_lists" && profileID !== undefined) {
-				let { data: searchResults } = await supabase
-					.rpc("search_list", { phrase: searchText, profile_id: profileID })
-					.throwOnError();
-				filteredSearchResults = applyGenreFilter(searchResults, acceptedGenres);
+				let { data: searchResults, error } = await supabase
+					.rpc("search_list", { phrase: searchText, profile_id: profileID });
+				if (error) throw error;
+				const filteredSearchResults = applyGenreFilter(searchResults as Tables<"anime_lists">[], acceptedGenres);
+				setLists(filteredSearchResults);
 			}
-			setLists(filteredSearchResults);
 		} catch (error) {
-			handleError("Error while trying to search", error);
+			handleError("Error while trying to search", error as PostgrestError);
 		}
 		setQueryOngoing(false);
 	};
@@ -169,11 +164,11 @@ const Lists = () => {
 		});
 	}, [lists]);
 
-	const toggleFilterDrawer = (open) => {
+	const toggleFilterDrawer = (open: boolean) => {
 		setFilterDrawerIsOpen(open);
 	};
 
-	const alertAnchorOrigin = {
+	const alertAnchorOrigin: SnackbarOrigin = {
 		vertical: "top",
 		horizontal: "center",
 	};
@@ -203,7 +198,6 @@ const Lists = () => {
 					open={showCreateListDialog}
 					onClose={closeCreateListDialog}
 					profileId={profileID}
-					update={false}
 				/>
 			)}
 			{!matchesSmallDevice && (
@@ -227,8 +221,8 @@ const Lists = () => {
 					anchor="right"
 					PaperProps={{ sx: { backgroundColor: "#1E1E1E" } }}
 					open={filterDrawerIsOpen}
-					onClose={toggleFilterDrawer.bind(this, false)}
-					onOpen={toggleFilterDrawer.bind(this, true)}>
+					onClose={() => toggleFilterDrawer(false)}
+					onOpen={() => toggleFilterDrawer(true)}>
 					<div className="d-flex flex-column gap-3 p-2">
 						<Select
 							title="Sort and filter lists"
@@ -249,7 +243,7 @@ const Lists = () => {
 				<div className="d-flex justify-content-between">
 					{matchesSmallDevice && (
 						<MUIButton
-							onClick={toggleFilterDrawer.bind(this, true)}
+							onClick={() => toggleFilterDrawer(true)}
 							sx={{ color: "whitesmoke" }}>
 							Filter
 						</MUIButton>
@@ -288,7 +282,7 @@ const Lists = () => {
 				autoHideDuration={6000}
 				onClose={resetError}
 				anchorOrigin={alertAnchorOrigin}>
-				<Alert severity="error" sx={{ width: "100%" }} onClose={resetError}>
+				<Alert severity="error" sx={{ width: "100%" }}>
 					{error.text}
 				</Alert>
 			</Snackbar>
@@ -298,7 +292,7 @@ const Lists = () => {
 
 export default Lists;
 
-Lists.getLayout = (page) => {
+Lists.getLayout = (page: ReactElement) => {
 	return (
 		<HeaderLayout>
 			<BodyLayout className="d-flex gap-2" recentItems="lists">

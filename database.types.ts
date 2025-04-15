@@ -1,4 +1,5 @@
 import {MergeDeep} from "type-fest";
+import {ListGenres} from "./components/CreateList/CreateList.types";
 
 export type Json =
     | string
@@ -17,7 +18,7 @@ export type DatabaseGenerated = {
                     created_at: string | null
                     creator_id: string
                     description: string
-                    genres: Json
+                    genres: ListGenres
                     id: number
                     is_public: boolean
                     items: Json
@@ -28,7 +29,7 @@ export type DatabaseGenerated = {
                     created_at?: string | null
                     creator_id: string
                     description?: string
-                    genres?: Json
+                    genres?: ListGenres
                     id?: number
                     is_public?: boolean
                     items?: Json
@@ -39,7 +40,7 @@ export type DatabaseGenerated = {
                     created_at?: string | null
                     creator_id?: string
                     description?: string
-                    genres?: Json
+                    genres?: ListGenres
                     id?: number
                     is_public?: boolean
                     items?: Json
@@ -306,7 +307,7 @@ export type DatabaseGenerated = {
                     created_at: string | null
                     creator_id: string
                     description: string
-                    genres: Json
+                    genres: ListGenres
                     id: number
                     is_public: boolean
                     items: Json
@@ -323,7 +324,7 @@ export type DatabaseGenerated = {
                     created_at: string | null
                     creator_id: string
                     description: string
-                    genres: Json
+                    genres: ListGenres
                     id: number
                     is_public: boolean
                     items: Json
