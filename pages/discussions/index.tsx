@@ -6,7 +6,7 @@ import {
 } from "@mui/material";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import { Fragment, useContext, useMemo, useState } from "react";
+import React, {Fragment, ReactElement, useContext, useMemo, useState} from "react";
 import Button from "../../components/Button/Button";
 import { useEffect } from "react";
 import Checkbox from "../../components/Checkbox/Checkbox";
@@ -21,15 +21,16 @@ import Loading from "../../components/Loading/Loading";
 import HeaderLayout from "../../components/HeaderLayout/HeaderLayout";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import {DISCUSSION_TAGS} from "../../utilities/global-constants";
+import {Tables} from "../../database.types";
 
 export default function Discussions() {
 	const supabase = useSupabaseClient();
 	const { profileID } = useContext(UserAuthContext);
-	const [discussionsList, setDiscussionsList] = useState([]);
+	const [discussionsList, setDiscussionsList] = useState<Tables<"discussions">[]>([]);
 	const [filterDrawerIsOpen, setFilterDrawerIsOpen] = useState(false);
 	const [filter, setFilter] = useState("all");
 	const [discussionTags, setDiscussionTags] = useState(() => {
-		const value = {};
+		const value: { [key: string]: boolean } = {};
 		DISCUSSION_TAGS.forEach((tag) => (value[tag] = true));
 		return value;
 	});
@@ -37,36 +38,41 @@ export default function Discussions() {
 	const router = useRouter();
 	const matchesSmallDevice = useMediaQuery("(max-width: 640px)");
 
+	// TODO: use notification system to notify user of errors in this useEffect
 	useEffect(() => {
 		const selectedTags = [];
 		for (const tag in discussionTags) {
-			if (discussionTags[tag] === true) {
+			if (discussionTags[tag]) {
 				selectedTags.push(tag.toLowerCase());
 			}
 		}
 		setQueryingDB(true);
 		if (filter === "all") {
 			getDiscussionsByTags(supabase, selectedTags).then((data) => {
-				setDiscussionsList(data);
+				if (data !== null) {
+					setDiscussionsList(data);
+				}
 				setQueryingDB(false);
 			});
 		} else if (filter === "your_discussions" && profileID !== undefined) {
 			getDiscussionsByTags(supabase, selectedTags, profileID).then((data) => {
-				setDiscussionsList(data);
+				if (data !== null) {
+					setDiscussionsList(data);
+				}
 				setQueryingDB(false);
 			});
 		}
 	}, [discussionTags, filter, profileID, supabase]);
 
-	function toggleFilterDrawer(open) {
+	function toggleFilterDrawer(open: boolean) {
 		setFilterDrawerIsOpen(open);
 	}
 
-	function onSelectValueChanged(event) {
+	function onSelectValueChanged(event: React.ChangeEvent<HTMLSelectElement>) {
 		setFilter(event.target.value);
 	}
 
-	function onCheckboxValueChanged(event) {
+	function onCheckboxValueChanged(event: React.ChangeEvent<HTMLInputElement>) {
 		setDiscussionTags((snapshot) => {
 			snapshot[event.target.name] = event.target.checked;
 			return { ...snapshot };
@@ -147,8 +153,8 @@ export default function Discussions() {
 					anchor="right"
 					PaperProps={{ sx: { backgroundColor: "#1E1E1E" } }}
 					open={filterDrawerIsOpen}
-					onClose={toggleFilterDrawer.bind(this, false)}
-					onOpen={toggleFilterDrawer.bind(this, true)}>
+					onClose={() => toggleFilterDrawer(false)}
+					onOpen={() => toggleFilterDrawer(true)}>
 					<div className="d-flex flex-column gap-3 p-2">
 						<Select title="Filter discussions">
 							<option value="all">All</option>
@@ -168,7 +174,7 @@ export default function Discussions() {
 				<div className="d-flex justify-content-between">
 					{matchesSmallDevice && (
 						<MUIButton
-							onClick={toggleFilterDrawer.bind(this, true)}
+							onClick={() => toggleFilterDrawer(true)}
 							sx={{ color: "whitesmoke" }}>
 							Filter
 						</MUIButton>
@@ -183,6 +189,7 @@ export default function Discussions() {
 					)}
 				</div>
 				<div className="d-flex flex-column flex-grow-1">
+					// TODO: implement search feature
 					<SearchInput
 						placeholder="Search Discussions"
 						minLength={4}
@@ -196,7 +203,7 @@ export default function Discussions() {
 	);
 }
 
-Discussions.getLayout = (page) => (
+Discussions.getLayout = (page: ReactElement) => (
 	<HeaderLayout>
 		<BodyLayout className="d-flex gap-2" recentItems="discussions">
 			{page}

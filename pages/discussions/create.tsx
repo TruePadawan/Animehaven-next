@@ -1,149 +1,132 @@
 import { Alert, Button } from "@mui/material";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import { Fragment, useContext, useEffect, useState } from "react";
+import React, {Fragment, ReactElement, useContext, useEffect, useState} from "react";
 import Input from "../../components/Input/Input";
 import TextArea from "../../components/Input/TextArea";
 import Select from "../../components/Select/Select";
 import { UserAuthContext } from "../../context/UserAuthContext";
 import styles from "../../styles/create-discussion.module.css";
-import Loading from "../../components/Loading/Loading";
 import HeaderLayout from "../../components/HeaderLayout/HeaderLayout";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import {DISCUSSION_TAGS} from "../../utilities/global-constants";
+import {Database} from "../../database.types";
+import {getErrorMessage} from "../../utilities/app-utilities";
 
-export default function Edit() {
-	const supabase = useSupabaseClient();
+const allowed_tags = DISCUSSION_TAGS.map((tag) => tag.toLowerCase());
+export default function Create() {
+	const supabase = useSupabaseClient<Database>();
 	const { profileID } = useContext(UserAuthContext);
-	const [loading, setLoading] = useState(true);
 	const [errorText, setErrorText] = useState("");
-	const [updateBtnDisabled, setUpdateBtnDisabled] = useState(true);
+	const [createBtnDisabled, setCreateBtnDisabled] = useState(false);
 	const [discussionData, setDiscussionData] = useState({
 		title: "",
 		body: "",
 		tag: "",
 	});
 	const router = useRouter();
-	const discussionID = router.query?.id;
 
 	useEffect(() => {
-		if (router.isReady && profileID) {
-			const discussionID = router.query?.id;
-			if (discussionID === undefined) {
-				router.replace("/discussions");
-			} else {
-				supabase
-					.from("discussions")
-					.select()
-					.eq("id", discussionID)
-					.throwOnError()
-					.then((response) => {
-						const { data } = response;
-						if (data.length === 0) {
-							throw new Error("Failed to get data for discussion!");
-						}
-						const { title, body, tag, creator_id } = data[0];
-						if (creator_id !== profileID) {
-							router.replace("/discussions");
-						}
-						setDiscussionData({ title, body, tag });
-						setUpdateBtnDisabled(false);
-						setLoading(false);
-					});
-			}
+		const cachedTitle = window.localStorage.getItem("discussion_title");
+		const cachedBody = window.localStorage.getItem("discussion_body");
+		setDiscussionData({
+			title: cachedTitle || "",
+			body: cachedBody || "",
+			tag: DISCUSSION_TAGS[0].toLowerCase(),
+		});
+	}, []);
+
+	useEffect(() => {
+		if (profileID === undefined) {
+			setCreateBtnDisabled(true);
+			setErrorText("You need to be signed in to create a discussion!");
+		} else {
+			setCreateBtnDisabled(false);
+			setErrorText("");
 		}
-	}, [router, profileID, supabase]);
+	}, [profileID]);
 
-	if (router.isReady === false || loading) {
-		return (
-			<Fragment>
-				<Head>
-					<title>Animehaven | Edit Discussion</title>
-				</Head>
-				<Loading />
-			</Fragment>
-		);
-	}
-
-	function onDiscussionEdited() {
-		router.push(`/discussions/${discussionID}`);
-	}
-
-	async function formSubmitHandler(event) {
-		event.preventDefault();
-
-		if (profileID !== undefined) {
-			setUpdateBtnDisabled(true);
-			try {
-				await supabase
-					.from("discussions")
-					.update(discussionData)
-					.eq("id", discussionID)
-					.throwOnError();
-				onDiscussionEdited();
-			} catch (error) {
-				setErrorText(
-					`Failed to complete action - ${
-						error.message || error.error_description
-					}`
-				);
-				setUpdateBtnDisabled(false);
-			}
-		}
-	}
-
-	async function onDeleteButtonClicked() {
-		if (profileID !== undefined) {
-			try {
-				await supabase
-					.from("discussions")
-					.delete()
-					.eq("id", discussionID)
-					.throwOnError();
-				router.replace("/discussions");
-			} catch (error) {
-				setErrorText("Failed to delete discussion!");
-			}
-		}
-	}
-
-	function onCancelButtonClicked() {
+	function onDiscussionCreated() {
+		window.localStorage.removeItem("discussion_title");
+		window.localStorage.removeItem("discussion_body");
 		router.push("/discussions");
 	}
 
-	function onTitleInputValueChanged(event) {
+	async function formSubmitHandler(event: React.FormEvent) {
+		event.preventDefault();
+
+		if (profileID !== undefined) {
+			setCreateBtnDisabled(true);
+			const data = {
+				...discussionData,
+				creator_id: ""
+			};
+			data.creator_id = profileID;
+			try {
+				if (!allowed_tags.includes(data.tag)) {
+					setErrorText("Failed to create discussion - Invalid tag specified!");
+				} else {
+					await supabase.from("discussions").insert(data).throwOnError();
+					onDiscussionCreated();
+				}
+			} catch (error) {
+				setErrorText(
+					`Failed to create discussion - ${
+						getErrorMessage(error)
+					}`
+				);
+			}
+			setCreateBtnDisabled(false);
+		}
+	}
+
+	function onCancelBtnClicked() {
+		const { title, body } = discussionData;
+		const titleTrimmed = title.trim();
+		const bodyTrimmed = body.trim();
+
+		if (titleTrimmed.length > 0) {
+			window.localStorage.setItem("discussion_title", titleTrimmed);
+		}
+		if (bodyTrimmed.length > 0) {
+			window.localStorage.setItem("discussion_body", bodyTrimmed);
+		}
+
+		router.push("/discussions");
+	}
+
+	function onTitleInputValueChanged(event: React.ChangeEvent<HTMLInputElement>) {
 		setDiscussionData((snapshot) => {
 			return { ...snapshot, title: event.target.value };
 		});
 	}
 
-	function onBodyInputValueChanged(event) {
+	function onBodyInputValueChanged(event: React.ChangeEvent<HTMLTextAreaElement>) {
 		setDiscussionData((snapshot) => {
 			return { ...snapshot, body: event.target.value };
 		});
 	}
 
-	function onSelectChanged(event) {
+	function onSelectChanged(event: React.ChangeEvent<HTMLSelectElement>) {
 		setDiscussionData((snapshot) => {
 			return { ...snapshot, tag: event.target.value };
 		});
 	}
 
-	const updateBtnStyles = {
+	const createBtnStyles = {
 		backgroundColor: "#1E1E1E",
 		"&:hover": {
 			backgroundColor: "#313131",
 		},
 	};
-
 	return (
 		<Fragment>
 			<Head>
-				<title>Animehaven | Edit Discussion</title>
+				<title>Animehaven | Create a Discussion</title>
 			</Head>
 			<div className={styles["create-discussion-container"]}>
 				{errorText.length > 0 && <Alert severity="warning">{errorText}</Alert>}
-				<h2 className="fs-3 mt-3">Edit Discussion</h2>
+				<h2 className="fs-3 mt-3">Create a Discussion</h2>
 				<form onSubmit={formSubmitHandler} className="d-flex flex-column gap-2">
 					<div className="d-flex flex-column">
 						<label htmlFor="title-field" className={styles.label}>
@@ -186,18 +169,12 @@ export default function Edit() {
 					<div className="mt-2 d-flex flex-column gap-2">
 						<Button
 							variant="contained"
+							sx={createBtnStyles}
 							type="submit"
-							sx={{ updateBtnStyles }}
-							disabled={updateBtnDisabled}>
-							Update
+							disabled={createBtnDisabled}>
+							Create
 						</Button>
-						<Button type="button" color="error" onClick={onDeleteButtonClicked}>
-							Delete
-						</Button>
-						<Button
-							type="button"
-							color="warning"
-							onClick={onCancelButtonClicked}>
+						<Button type="button" color="warning" onClick={onCancelBtnClicked}>
 							Cancel
 						</Button>
 					</div>
@@ -207,4 +184,4 @@ export default function Edit() {
 	);
 }
 
-Edit.getLayout = (page) => <HeaderLayout>{page}</HeaderLayout>;
+Create.getLayout = (page: ReactElement) => <HeaderLayout>{page}</HeaderLayout>;

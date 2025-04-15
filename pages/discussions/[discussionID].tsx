@@ -1,5 +1,5 @@
 import { IconButton } from "@mui/material";
-import { Fragment, useContext, useEffect, useState } from "react";
+import {Fragment, ReactElement, useContext, useEffect, useState} from "react";
 import Link from "next/link";
 import Head from "next/head";
 import styles from "../../styles/discussion.module.css";
@@ -17,28 +17,29 @@ import { useRouter } from "next/router";
 import EditIcon from "@mui/icons-material/Edit";
 import HeaderLayout from "../../components/HeaderLayout/HeaderLayout";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
+import {Database} from "../../database.types";
 
 const initialErrorState = { occurred: false, text: "" };
 const Discussion = () => {
-	const supabase = useSupabaseClient();
+	const supabase = useSupabaseClient<Database>();
 	const router = useRouter();
 	const { profileID } = useContext(UserAuthContext);
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState(initialErrorState);
 	const [data, setData] = useState({
-		title: null,
-		creator: null,
-		body: null,
-		commentInstanceID: null,
+		title: "",
+		creator: "",
+		body: "",
+		commentInstanceID: "",
 	});
 	const [editAllowed, setEditAllowed] = useState(false);
 	const discussionID = router.query?.discussionID;
 
 	useEffect(() => {
-		if (discussionID) {
+		if (typeof discussionID === "string") {
 			setLoading(true);
 
-			getDiscussionByID(supabase, discussionID)
+			getDiscussionByID(supabase, +discussionID)
 				.then((data) => {
 					getProfileData(supabase, data.creator_id).then(
 						({ account_name }) => {
@@ -52,7 +53,7 @@ const Discussion = () => {
 							setError(initialErrorState);
 							setLoading(false);
 
-							// SINCE DISCUSSION HAS BEEN CONFIRMED TO EXIST, ADD IT TO RECENTLY VIEWED DISCUSISONS
+							// SINCE DISCUSSION HAS BEEN CONFIRMED TO EXIST, ADD IT TO RECENTLY VIEWED DISCUSSIONS
 							if (profileID !== undefined) {
 								setRecentItem(supabase, "discussions", profileID, discussionID);
 							}
@@ -69,7 +70,7 @@ const Discussion = () => {
 		}
 	}, [discussionID, profileID, supabase]);
 
-	if (router.isReady === false || loading) {
+	if (!router.isReady || loading) {
 		return (
 			<Fragment>
 				<Head>
@@ -141,7 +142,6 @@ const Discussion = () => {
 			<CommentsList
 				className="mt-4"
 				id={commentInstanceID}
-				profileID={profileID}
 			/>
 		</Fragment>
 	);
@@ -149,7 +149,7 @@ const Discussion = () => {
 
 export default Discussion;
 
-Discussion.getLayout = (page) => (
+Discussion.getLayout = (page: ReactElement) => (
 	<HeaderLayout>
 		<BodyLayout
 			className={`d-flex flex-column gap-2 ${styles.container}`}

@@ -4,7 +4,7 @@ import styles from "./style.module.css";
 import {FormEvent} from "react";
 
 interface SearchInputProps extends InputProps {
-    searchFunc: Function;
+    searchFunc?: Function;
 }
 
 const SearchInput = ({searchFunc, className = "", ...inputProps}: SearchInputProps) => {
@@ -12,7 +12,7 @@ const SearchInput = ({searchFunc, className = "", ...inputProps}: SearchInputPro
 
     function formSubmitHandler(e: FormEvent) {
         e.preventDefault();
-        searchFunc();
+        if (searchFunc) searchFunc()
     }
 
     return (
