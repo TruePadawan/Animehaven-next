@@ -18,21 +18,21 @@ export default function List({id}: ListProps) {
 
     useEffect(() => {
         setLoading(true);
-        getListByID(supabase, id)
+        getListByID(supabase, +id)
             .then((data) => {
                 const {title, description} = data;
                 setData({title, description});
-                setLoading(false);
             })
             .catch(() => {
                 setNotFound(true);
-            });
+            }).finally(() => {
+            setLoading(false);
+        });
     }, [id, supabase]);
 
-    const dataNotLoaded = loading || data.title === "";
     return (
         <li>
-            {dataNotLoaded && (
+            {loading && (
                 <div className={styles.list}>
                     <Skeleton
                         variant={"text"}
