@@ -1,6 +1,6 @@
 import { Button, TextField } from "@mui/material";
 import Head from "next/head";
-import { Fragment, useCallback } from "react";
+import React, { Fragment, useCallback } from "react";
 import useInput from "../hooks/use-input";
 import styles from "../styles/auth.module.css";
 import { useRouter } from "next/router";
@@ -10,25 +10,42 @@ import { useState } from "react";
 import { createProfile, hasProfile } from "../utilities/app-utilities";
 import { createServerSupabaseClient } from "@supabase/auth-helpers-nextjs";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
+import {GetServerSidePropsContext} from "next";
+import {Database} from "../database.types";
+import {HasErrorMessage} from "../utilities/global.types";
 
-function accountNameTransformation(text) {
+function accountNameTransformation(text: string) {
 	return text.replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
 }
 
-function generateAccountNameFromEmail(email) {
-	const emailName = email.split("@").at(0).toLowerCase();
-	return `${emailName}${Date.now()}`;
+function generateAccountNameFromEmail(email: string) {
+	const emailSubstrings = email.split("@")
+	if (emailSubstrings.length > 0) {
+		const emailName = emailSubstrings.at(0)
+		return `${emailName}${Date.now()}`;
+	} else {
+		return `${email}${Date.now()}`;
+	}
 }
 
-const AuthComplete = ({ userData }) => {
-	const supabase = useSupabaseClient();
+interface PageProps {
+	userData: {
+		profile_id: string,
+		email: string,
+		display_name: string,
+		avatar_url?: string
+	}
+}
+const AuthComplete = ({ userData }: PageProps) => {
+	const supabase = useSupabaseClient<Database>();
 	const router = useRouter();
-	const processAccountNameValidation = useCallback(async (value) => {
+	const processAccountNameValidation = useCallback(async (value: string) => {
 		if (value.length >= 3) {
-			const { data } = await supabase
+			const { data, error } = await supabase
 				.from("profiles")
 				.select()
 				.eq("account_name", value);
+			if (error) return false
 			return data.length === 0;
 		}
 		return false;
@@ -46,13 +63,14 @@ const AuthComplete = ({ userData }) => {
 		!accountNameIsValid
 	);
 	const [cancelAuthBtnDisabled, setCancelAuthBtnDisabled] = useState(false);
-	const displayNameRef = useRef();
+	const displayNameRef = useRef<HTMLInputElement>();
 
 	useEffect(() => {
 		setCreateProfileBtnDisabled(!accountNameIsValid);
 	}, [accountNameIsValid]);
 
-	function handleError(errorText, error) {
+	// TODO: This should be a proper notification
+	function handleError(errorText: string, error: HasErrorMessage) {
 		alert(`${errorText} - ${error.message || error.error_description}`);
 	}
 
@@ -66,7 +84,7 @@ const AuthComplete = ({ userData }) => {
 		setCancelAuthBtnDisabled(true);
 	}
 
-	async function formSubmitHandler(event) {
+	async function formSubmitHandler(event: React.FormEvent) {
 		event.preventDefault();
 		if (!accountNameIsValid || accountNameHasError) {
 			alert("Account name is invalid");
@@ -80,8 +98,9 @@ const AuthComplete = ({ userData }) => {
 			const profileData = {
 				id: userData.profile_id,
 				account_name: accountName,
-				display_name: displayNameRef.current.value,
+				display_name: displayNameRef.current?.value ?? userData.display_name,
 				email: userData.email,
+				avatar_url: ""
 			};
 			if (userData?.avatar_url) {
 				profileData.avatar_url = userData.avatar_url;
@@ -89,7 +108,7 @@ const AuthComplete = ({ userData }) => {
 			await createProfile(supabase, profileData);
 			router.reload();
 		} catch (error) {
-			handleError("Failed to create profile", error);
+			handleError("Failed to create profile", error as HasErrorMessage);
 			enableButtons();
 		}
 	}
@@ -100,7 +119,7 @@ const AuthComplete = ({ userData }) => {
 			await supabase.auth.signOut();
 			router.reload();
 		} catch (error) {
-			handleError("Error occurred while signing out", error);
+			handleError("Error occurred while signing out", error as HasErrorMessage);
 			enableButtons();
 		}
 	}
@@ -131,7 +150,7 @@ const AuthComplete = ({ userData }) => {
 						variant="filled"
 						label="Display Name"
 						type="text"
-						defaultValue={userData.d_name}
+						defaultValue={userData.display_name}
 						inputRef={displayNameRef}
 						spellCheck={false}
 						inputProps={{ minLength: 3 }}
@@ -162,8 +181,8 @@ const AuthComplete = ({ userData }) => {
 
 export default AuthComplete;
 
-export async function getServerSideProps(context) {
-	const supabaseClient = createServerSupabaseClient(context);
+export const getServerSideProps = (async (context: GetServerSidePropsContext) => {
+	const supabaseClient = createServerSupabaseClient<Database>(context);
 	const {
 		data: { session },
 	} = await supabaseClient.auth.getSession();
@@ -180,7 +199,8 @@ export async function getServerSideProps(context) {
 		const userData = {
 			profile_id: session.user.id,
 			email: session.user.email,
-			d_name: session.user.user_metadata?.full_name ?? "Default User",
+			display_name: session.user.user_metadata?.full_name ?? "Default User",
+			avatar_url: undefined
 		};
 		if (session.user.user_metadata?.avatar_url) {
 			userData.avatar_url = session.user.user_metadata.avatar_url;
@@ -198,4 +218,4 @@ export async function getServerSideProps(context) {
 			},
 		};
 	}
-}
+})
