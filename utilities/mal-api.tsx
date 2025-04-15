@@ -53,6 +53,7 @@ export const searchAnime = async (title: string, limit = 20) => {
     return list.filter((anime) => !isFlagged(anime));
 };
 
+// TODO: id should be a string
 export const getAnimeById = async (id: string): Promise<Anime> => {
     const URL = `https://api.jikan.moe/v4/anime/${id}`;
     const response = await fetch(URL);
