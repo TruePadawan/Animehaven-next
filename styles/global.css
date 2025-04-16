@@ -1,15 +1,15 @@
 html,
 body,
-body>div {
+body > div {
   height: 100vh;
 }
 
 * {
-  font-family: 'Rubik', sans-serif;
+  font-family: "Rubik", sans-serif;
 }
 
 h1 {
-  font-family: 'Ubuntu', sans-serif;
+  font-family: "Ubuntu", sans-serif;
 }
 
 ul,
@@ -28,24 +28,24 @@ body {
   color: white;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #2B2B2B;
+  background-color: #2b2b2b;
 }
 
-body>div::-webkit-scrollbar {
+body > div::-webkit-scrollbar {
   width: 8px;
 }
 
-body>div::-webkit-scrollbar-track {
+body > div::-webkit-scrollbar-track {
   background-color: rgb(79, 79, 79);
 }
 
-body>div::-webkit-scrollbar-thumb {
+body > div::-webkit-scrollbar-thumb {
   background-color: #252525;
   border-bottom: 4px solid rgb(161, 161, 161);
   border-top: 4px solid rgb(161, 161, 161);
 }
 
-body>div {
+body > div {
   overflow-y: scroll;
   display: flex;
   flex-direction: column;
@@ -66,7 +66,7 @@ body>div {
 }
 
 .font-rubik {
-  font-family: 'Rubik', sans-serif;
+  font-family: "Rubik", sans-serif;
 }
 
 button:disabled {
@@ -75,7 +75,7 @@ button:disabled {
 
 .form-helper-text {
   color: indianred;
-  font-family: 'Lato', sans-serif;
+  font-family: "Lato", sans-serif;
   font-weight: 600;
   font-size: 14px;
 }
@@ -83,7 +83,7 @@ button:disabled {
 .verify-otp-form {
   width: 100%;
   max-width: 500px;
-  font-family: 'Rubik', sans-serif;
+  font-family: "Rubik", sans-serif;
   padding: 1rem;
   display: flex;
   flex-direction: column;

@@ -1,128 +1,128 @@
 .page {
-    padding: 1%;
-    display: flex;
-    justify-content: space-between;
+  padding: 1%;
+  display: flex;
+  justify-content: space-between;
 }
 
 .main-section-container {
-    max-width: 600px;
-    width: 100%;
+  max-width: 600px;
+  width: 100%;
 }
 
 @media screen and (max-width: 1000px) {
-    .page {
-        flex-direction: column-reverse;
-    }
+  .page {
+    flex-direction: column-reverse;
+  }
 
-    .main-section-container {
-        max-width: none;
-    }
+  .main-section-container {
+    max-width: none;
+  }
 }
 
 .photo {
-    --bg-color: #FFCF88;
-    background-color: var(--bg-color);
-    box-sizing: content-box;
-    width: 200px;
-    min-height: 200px;
-    border-radius: 8px;
-    border: 4px solid var(--bg-color);
+  --bg-color: #ffcf88;
+  background-color: var(--bg-color);
+  box-sizing: content-box;
+  width: 200px;
+  min-height: 200px;
+  border-radius: 8px;
+  border: 4px solid var(--bg-color);
 }
 
 .photo img {
-    border-radius: 8px;
-    max-width: 100%;
-    height: auto;
+  border-radius: 8px;
+  max-width: 100%;
+  height: auto;
 }
 
 .name,
 .overview {
-    font-family: 'Ubuntu', sans-serif;
+  font-family: "Ubuntu", sans-serif;
 }
 
 .overview {
-    text-align: justify;
-    margin-top: 1%;
-    white-space: pre-line;
-    font-size: small;
-    line-height: 1.5rem;
-    word-spacing: 3px;
+  text-align: justify;
+  margin-top: 1%;
+  white-space: pre-line;
+  font-size: small;
+  line-height: 1.5rem;
+  word-spacing: 3px;
 }
 
 .mainSection {
-    margin-bottom: 3rem;
+  margin-bottom: 3rem;
 }
 
 .watchStatus {
-    appearance: none;
-    cursor: pointer;
+  appearance: none;
+  cursor: pointer;
 }
 
 .watchStatus,
 .btn {
-    border: 2px solid #748CBC;
-    background-color: transparent;
-    margin-top: 1%;
-    border-radius: 14px;
-    padding: 4px 1.6rem;
-    font-size: small;
-    color: #DADADA;
-    text-align: center;
+  border: 2px solid #748cbc;
+  background-color: transparent;
+  margin-top: 1%;
+  border-radius: 14px;
+  padding: 4px 1.6rem;
+  font-size: small;
+  color: #dadada;
+  text-align: center;
 }
 
 .btn:hover,
 .recommended {
-    background-color: #F8E378;
-    color: black;
+  background-color: #f8e378;
+  color: black;
 }
 
 .btn:disabled,
 .watchStatus:disabled {
-    color: rgb(80, 80, 80);
+  color: rgb(80, 80, 80);
 }
 
 .watchStatus option {
-    background-color: lightblue;
-    color: black;
+  background-color: lightblue;
+  color: black;
 }
 
 .extra-info {
-    min-width: 270px;
-    margin-top: 0.8rem;
-    padding: 0.1rem 0.4rem;
-    background-color: #49494980;
-    align-self: stretch;
-    border-radius: 8px 8px 0px 0px;
-    box-shadow: 2px 2px 2px #202020b4;
+  min-width: 270px;
+  margin-top: 0.8rem;
+  padding: 0.1rem 0.4rem;
+  background-color: #49494980;
+  align-self: stretch;
+  border-radius: 8px 8px 0px 0px;
+  box-shadow: 2px 2px 2px #202020b4;
 }
 
-.extra-info>li {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin: 2% 0;
+.extra-info > li {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 2% 0;
 }
 
-.extra-info>li:nth-child(n):not(:nth-last-child(1)) {
-    border-bottom: 2px solid rgba(0, 0, 0, 0.274);
+.extra-info > li:nth-child(n):not(:nth-last-child(1)) {
+  border-bottom: 2px solid rgba(0, 0, 0, 0.274);
 }
 
 .category {
-    font-family: "Roboto", sans-serif;
-    font-size: large;
-    color: #B9B9B9;
+  font-family: "Roboto", sans-serif;
+  font-size: large;
+  color: #b9b9b9;
 }
 
 .category-data {
-    font-size: 0.9rem;
+  font-size: 0.9rem;
 }
 
 .not_recommended {
-    background-color: transparent;
+  background-color: transparent;
 }
 
 .select {
-    color: rgb(73, 73, 73);
-    background-color: #b6b6b6;
-    width: max-content;
+  color: rgb(73, 73, 73);
+  background-color: #b6b6b6;
+  width: max-content;
 }

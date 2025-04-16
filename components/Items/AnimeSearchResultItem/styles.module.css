@@ -1,26 +1,26 @@
 .item {
-    max-width: 140px;
-    height: max-content;
-    padding: 5px;
-    border-radius: 6px;
-    background-color: rgba(39, 39, 39, 0.705);
-    color: antiquewhite;
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
+  max-width: 140px;
+  height: max-content;
+  padding: 5px;
+  border-radius: 6px;
+  background-color: rgba(39, 39, 39, 0.705);
+  color: antiquewhite;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
 }
 
 .item img {
-    align-self: center;
-    border-radius: 6px;
-    width: 100px;
-    height: auto;
+  align-self: center;
+  border-radius: 6px;
+  width: 100px;
+  height: auto;
 }
 
 .item .item-name {
-    text-align: center;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    font-size: small;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: small;
 }

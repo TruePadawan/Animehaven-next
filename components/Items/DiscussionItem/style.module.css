@@ -1,32 +1,32 @@
 .discussion-item {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    background-color: #252525;
-    border-radius: 8px;
-    padding: 6px;
-    box-shadow: 1px 3px 2px rgba(31, 31, 31, 0.767);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  background-color: #252525;
+  border-radius: 8px;
+  padding: 6px;
+  box-shadow: 1px 3px 2px rgba(31, 31, 31, 0.767);
 }
 
 .title {
-    color: white;
-    font-size: larger;
+  color: white;
+  font-size: larger;
 }
 
 .creator {
-    font-size: 0.8rem;
-    color: bisque;
+  font-size: 0.8rem;
+  color: bisque;
 }
 
 .creator a {
-    color: darkgray;
+  color: darkgray;
 }
 
 .creator a:hover {
-    text-decoration: underline;
+  text-decoration: underline;
 }
 
 .tag {
-    font-size: small;
-    color: gray;
+  font-size: small;
+  color: gray;
 }

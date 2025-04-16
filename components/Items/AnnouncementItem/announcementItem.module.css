@@ -1,44 +1,44 @@
 .announcement-item {
-    max-height: 110px;
-    height: max-content;
+  max-height: 110px;
+  height: max-content;
 
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-    background-color: rgb(85, 85, 85);
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  background-color: rgb(85, 85, 85);
 
-    color: whitesmoke;
-    border-radius: 0px 8px 8px 0px;
-    padding: 5px;
-    cursor: pointer;
-    box-shadow: 3px 1px 6px rgba(91, 91, 91, 0.47);
+  color: whitesmoke;
+  border-radius: 0px 8px 8px 0px;
+  padding: 5px;
+  cursor: pointer;
+  box-shadow: 3px 1px 6px rgba(91, 91, 91, 0.47);
 }
 
 a.announcement-item:hover {
-    color: whitesmoke;
+  color: whitesmoke;
 }
 
 .announcement-item:hover {
-    background-color: rgb(75, 75, 75);
+  background-color: rgb(75, 75, 75);
 }
 
 .announcement-item:active {
-    background-color: rgb(85, 85, 85);
+  background-color: rgb(85, 85, 85);
 }
 
 .title {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .body {
-    color: gainsboro;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 3;
-    overflow: hidden;
-    max-height: 70px;
-    font-family: 'Lato', sans-serif;
-    font-size: 14px;
+  color: gainsboro;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+  max-height: 70px;
+  font-family: "Lato", sans-serif;
+  font-size: 14px;
 }

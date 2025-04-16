@@ -1,46 +1,47 @@
 .sidebar {
-    min-width: max-content;
-    background-color: #242424;
+  min-width: max-content;
+  background-color: #242424;
 }
 
-.sidebar a, .editProfileBtn {
-    font-family: "Roboto", sans-serif;
-    font-size: large;
-    margin: 0.9rem;
-    color: bisque;
+.sidebar a,
+.editProfileBtn {
+  font-family: "Roboto", sans-serif;
+  font-size: large;
+  margin: 0.9rem;
+  color: bisque;
 }
 
 .chunk {
-    padding: 3px 3rem;
-    background: #414141;
-    box-shadow: 0px 6px 4px rgba(23, 23, 23, 0.35);
-    border-radius: 10px;
+  padding: 3px 3rem;
+  background: #414141;
+  box-shadow: 0px 6px 4px rgba(23, 23, 23, 0.35);
+  border-radius: 10px;
 }
 
 .photo {
-    width: 150px;
-    height: 150px;
-    border-radius: 50%;
-    object-fit: cover;
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  object-fit: cover;
 }
 
 .accountName {
-    font-size: small;
-    color: darkgray;
-    margin-top: -3px;
+  font-size: small;
+  color: darkgray;
+  margin-top: -3px;
 }
 
 .bio {
-    white-space: pre-line;
-    font-family: 'Ubuntu', sans-serif;
+  white-space: pre-line;
+  font-family: "Ubuntu", sans-serif;
 }
 
 .editProfileBtn {
-    border: none;
-    background-color: transparent;
+  border: none;
+  background-color: transparent;
 }
 
 .toggle-sidebar-btn {
-    top: 10px;
-    left: 10px;
+  top: 10px;
+  left: 10px;
 }

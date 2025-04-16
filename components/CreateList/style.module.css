@@ -1,42 +1,42 @@
 .component {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    gap: 1rem;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 1rem;
 }
 
 .createListForm,
 .addItems {
-    flex: 1;
-    min-width: 300px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
+  flex: 1;
+  min-width: 300px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .label {
-    color: white;
-    font-size: medium;
-    font-family: "Roboto", sans-serif;
+  color: white;
+  font-size: medium;
+  font-family: "Roboto", sans-serif;
 }
 
 .titlefield {
-    padding: 5px;
+  padding: 5px;
 }
 
 .descfield {
-    color: white;
-    background-color: #303030;
-    border: 2px solid rgba(128, 128, 128, 0.39);
-    padding: 5px;
-    resize: none;
+  color: white;
+  background-color: #303030;
+  border: 2px solid rgba(128, 128, 128, 0.39);
+  padding: 5px;
+  resize: none;
 }
 
 .descfield:focus {
-    outline: none;
-    border-color: black;
+  outline: none;
+  border-color: black;
 }
 
 .divider {
-    margin: 4px 0;
+  margin: 4px 0;
 }

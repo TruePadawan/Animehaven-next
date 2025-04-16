@@ -1,53 +1,54 @@
 .home-main {
-    overflow-x: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
+  overflow-x: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
 .darker-section {
-    background-color: #282828;
+  background-color: #282828;
 }
 
 .anime-list {
-    --scrollbar-thumb-background-color: #252525;
-    --scrollbar-track-background-color: #4f4f4f;
-    --scrollbar-width: 13px;
-    --scrollbar-border-radius: 10px;
+  --scrollbar-thumb-background-color: #252525;
+  --scrollbar-track-background-color: #4f4f4f;
+  --scrollbar-width: 13px;
+  --scrollbar-border-radius: 10px;
 
-    display: flex;
-    gap: 1rem;
-    margin: 0;
-    padding: 0 0 5px 0;
-    overflow-x: scroll;
-    scrollbar-color: var(--scrollbar-thumb-background-color) var(--scrollbar-track-background-color);
-    scrollbar-width: var(--scrollbar-width);
+  display: flex;
+  gap: 1rem;
+  margin: 0;
+  padding: 0 0 5px 0;
+  overflow-x: scroll;
+  scrollbar-color: var(--scrollbar-thumb-background-color)
+    var(--scrollbar-track-background-color);
+  scrollbar-width: var(--scrollbar-width);
 }
 
 .anime-list::-webkit-scrollbar {
-    height: var(--scrollbar-width);
+  height: var(--scrollbar-width);
 }
 
 .anime-list::-webkit-scrollbar-track {
-    background-color: var(--scrollbar-track-background-color);
-    border-radius: var(--scrollbar-border-radius);
-    box-shadow: inset 0 0 5px rgb(58, 58, 58);
+  background-color: var(--scrollbar-track-background-color);
+  border-radius: var(--scrollbar-border-radius);
+  box-shadow: inset 0 0 5px rgb(58, 58, 58);
 }
 
 .anime-list::-webkit-scrollbar-thumb {
-    --border-width: 4px;
-    --border-color: rgb(158, 158, 158);
+  --border-width: 4px;
+  --border-color: rgb(158, 158, 158);
 
-    border-radius: var(--scrollbar-border-radius);
-    background-color: var(--scrollbar-thumb-background-color);
-    border-left: var(--border-width) solid var(--border-color);
-    border-right: var(--border-width) solid var(--border-color);
+  border-radius: var(--scrollbar-border-radius);
+  background-color: var(--scrollbar-thumb-background-color);
+  border-left: var(--border-width) solid var(--border-color);
+  border-right: var(--border-width) solid var(--border-color);
 }
 
 .anime-list::-webkit-scrollbar-thumb:hover {
-    --hover-border-width: 12px;
+  --hover-border-width: 12px;
 
-    background-color: #252525d0;
-    border-left-width: var(--hover-border-width);
-    border-right-width: var(--hover-border-width);
+  background-color: #252525d0;
+  border-left-width: var(--hover-border-width);
+  border-right-width: var(--hover-border-width);
 }

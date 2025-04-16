@@ -1,37 +1,37 @@
-import {ReactNode} from "react";
+import { ReactNode } from "react";
 
 export interface ProfileSectionContainerProps {
-    title: string;
-    children: ReactNode;
+  title: string;
+  children: ReactNode;
 }
 
 export interface UserDiscussionsProps {
-    accountName: string;
+  accountName: string;
 }
 
 export interface UserListsProps {
-    accountName: string;
+  accountName: string;
 }
 
 export interface UserSavedListsProps {
-    accountName: string;
+  accountName: string;
 }
 
 export interface UserItemsProps {
-    accountName: string;
-    title: string;
-    status: string;
+  accountName: string;
+  title: string;
+  status: string;
 }
 
 export interface UserRecommendedItemsProps {
-    accountName: string;
+  accountName: string;
 }
 
 export interface UserReviewsProps {
-    accountName: string;
+  accountName: string;
 }
 
 export interface EditProfileProps {
-    open: boolean;
-    closeDialog: VoidFunction;
+  open: boolean;
+  closeDialog: VoidFunction;
 }

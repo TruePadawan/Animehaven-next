@@ -1,7 +1,8 @@
-import {Tables} from "../../../database.types";
+import { Tables } from "../../../database.types";
 
-type AnnouncementItemData = Tables<"discussions">
+type AnnouncementItemData = Tables<"discussions">;
 
-export interface AnnouncementItemProps extends Pick<AnnouncementItemData, "id" | "title" | "body"> {
-    isDataLoaded: boolean
+export interface AnnouncementItemProps
+  extends Pick<AnnouncementItemData, "id" | "title" | "body"> {
+  isDataLoaded: boolean;
 }

@@ -3,13 +3,13 @@ import { UserLists } from "../../../components/Profile/ProfileSections/ProfileSe
 import { useRouter } from "next/router";
 
 export default function Profile() {
-	const router = useRouter();
-	const { accountName } = router.query;
-	return (
-		<ProfileLayout router={router}>
-			{typeof accountName === "string" && (
-				<UserLists accountName={accountName} />
-			)}
-		</ProfileLayout>
-	);
+  const router = useRouter();
+  const { accountName } = router.query;
+  return (
+    <ProfileLayout router={router}>
+      {typeof accountName === "string" && (
+        <UserLists accountName={accountName} />
+      )}
+    </ProfileLayout>
+  );
 }

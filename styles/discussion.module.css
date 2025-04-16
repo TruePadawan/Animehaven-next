@@ -1,31 +1,31 @@
 .container {
-    max-width: 900px;
+  max-width: 900px;
 }
 
 .title {
-    margin: 0;
-    font-family: 'Ubuntu', sans-serif;
+  margin: 0;
+  font-family: "Ubuntu", sans-serif;
 }
 
 .creator {
-    width: max-content;
-    font-family: 'Baloo Tamma 2', cursive;
-    font-size: 14px;
-    color: #B5B5B5;
+  width: max-content;
+  font-family: "Baloo Tamma 2", cursive;
+  font-size: 14px;
+  color: #b5b5b5;
 }
 
 .creator a {
-    font-weight: 500;
-    color: #80884E;
+  font-weight: 500;
+  color: #80884e;
 }
 
 .creator a:hover {
-    color: #9da75f;
+  color: #9da75f;
 }
 
 .body {
-    color: gainsboro;
-    margin-top: 1rem;
-    margin-bottom: 2rem;
-    max-width: 800px;
+  color: gainsboro;
+  margin-top: 1rem;
+  margin-bottom: 2rem;
+  max-width: 800px;
 }

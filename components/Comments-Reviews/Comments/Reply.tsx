@@ -1,29 +1,30 @@
 import Link from "next/link";
-import {Fragment} from "react";
+import { Fragment } from "react";
 import styles from "../Comments-Reviews.module.css";
-import {ReplyProps} from "./types/Reply.types";
+import { ReplyProps } from "./types/Reply.types";
 
 const Reply = (props: ReplyProps) => {
-    return (
-        <div className={styles["referenced-comment"]}>
-            {props.isDeleted && (
-                <span
-                    className={`${styles["referenced-comment-text"]} text-center w-100`}>
-					Comment no longer exists
-				</span>
-            )}
-            {!props.isDeleted && (
-                <Fragment>
-                    <Link className={styles["creator-name"]} href={props.profileLink}>
-                        {props.creatorName}
-                    </Link>
-                    <span className={styles["referenced-comment-text"]}>
-						{props.commentText}
-					</span>
-                </Fragment>
-            )}
-        </div>
-    );
+  return (
+    <div className={styles["referenced-comment"]}>
+      {props.isDeleted && (
+        <span
+          className={`${styles["referenced-comment-text"]} text-center w-100`}
+        >
+          Comment no longer exists
+        </span>
+      )}
+      {!props.isDeleted && (
+        <Fragment>
+          <Link className={styles["creator-name"]} href={props.profileLink}>
+            {props.creatorName}
+          </Link>
+          <span className={styles["referenced-comment-text"]}>
+            {props.commentText}
+          </span>
+        </Fragment>
+      )}
+    </div>
+  );
 };
 
 export default Reply;

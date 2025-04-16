@@ -1,188 +1,194 @@
 .component {
-    overflow: hidden;
-    min-height: 10rem;
-    max-width: 800px;
-    margin-bottom: 2rem;
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
+  overflow: hidden;
+  min-height: 10rem;
+  max-width: 800px;
+  margin-bottom: 2rem;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .interface {
-    --bg-color: #303030;
-    height: max-content;
-    display: flex;
-    gap: 6px;
-    align-items: flex-start;
-    margin-bottom: 10px;
+  --bg-color: #303030;
+  height: max-content;
+  display: flex;
+  gap: 6px;
+  align-items: flex-start;
+  margin-bottom: 10px;
 }
 
-.inputfield, .sendBtn {
-    background-color: var(--bg-color);
+.inputfield,
+.sendBtn {
+  background-color: var(--bg-color);
 }
 
-.inputfield, .sendBtn, .comments, .review {
-    box-shadow: 1px 1px 2px rgba(31, 31, 31, 0.733);
+.inputfield,
+.sendBtn,
+.comments,
+.review {
+  box-shadow: 1px 1px 2px rgba(31, 31, 31, 0.733);
 }
 
 .inputfield {
-    border-radius: 6px;
-    border: 2px solid rgba(128, 128, 128, 0.39);
-    padding: 5px;
-    font-size: 0.8rem;
-    resize: none;
-    height: max-content;
-    color: white;
-    flex-grow: 1;
+  border-radius: 6px;
+  border: 2px solid rgba(128, 128, 128, 0.39);
+  padding: 5px;
+  font-size: 0.8rem;
+  resize: none;
+  height: max-content;
+  color: white;
+  flex-grow: 1;
 }
 
 .sendBtn {
-    --dimension: 40px;
-    border: none;
-    border-radius: 50%;
-    width: var(--dimension);
-    height: var(--dimension);
-    color: lightgray;
+  --dimension: 40px;
+  border: none;
+  border-radius: 50%;
+  width: var(--dimension);
+  height: var(--dimension);
+  color: lightgray;
 }
 
 .sendBtn:hover:not(:disabled) {
-    background-color: gray;
+  background-color: gray;
 }
 
 .sendBtn:disabled {
-    cursor: not-allowed;
+  cursor: not-allowed;
 }
 
 .sendBtn:active:not(:disabled) {
-    background-color: rgb(102, 101, 101);
+  background-color: rgb(102, 101, 101);
 }
 
 .inputfield:focus {
-    outline: none;
-    border-color: black;
+  outline: none;
+  border-color: black;
 }
 
 .items {
-    padding: 4px;
-    box-shadow: -1px -1px 4px rgba(31, 31, 31, 0.733);
-    border-radius: 8px;
-    flex-grow: 1;
-    background-color: #3D3D3D;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
+  padding: 4px;
+  box-shadow: -1px -1px 4px rgba(31, 31, 31, 0.733);
+  border-radius: 8px;
+  flex-grow: 1;
+  background-color: #3d3d3d;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
-.comment, .review {
-    position: relative;
-    z-index: 2;
-    border-radius: 8px;
-    display: flex;
-    gap: 8px;
-    white-space: pre-line;
-    background: rgb(75, 75, 75);
-    font-family: "Roboto", sans-serif;
-    font-size: 0.8rem;
-    padding: 5px;
+.comment,
+.review {
+  position: relative;
+  z-index: 2;
+  border-radius: 8px;
+  display: flex;
+  gap: 8px;
+  white-space: pre-line;
+  background: rgb(75, 75, 75);
+  font-family: "Roboto", sans-serif;
+  font-size: 0.8rem;
+  padding: 5px;
 }
 
 .review.own {
-    background: rgb(109, 109, 109);
+  background: rgb(109, 109, 109);
 }
 
 .userPhoto {
-    --img-size: 40px;
-    border-radius: 50%;
-    width: var(--img-size);
-    height: var(--img-size);
+  --img-size: 40px;
+  border-radius: 50%;
+  width: var(--img-size);
+  height: var(--img-size);
 }
 
-.commentText, .reviewText {
-    margin: 0;
-    white-space: pre-line;
+.commentText,
+.reviewText {
+  margin: 0;
+  white-space: pre-line;
 }
 
 .reviewText {
-    margin-top: 4px;
+  margin-top: 4px;
 }
 
 .user {
-    margin-top: -2px;
-    color: cornsilk;
-    font-size: 1rem;
-    width: max-content;
-    font-weight: 500;
+  margin-top: -2px;
+  color: cornsilk;
+  font-size: 1rem;
+  width: max-content;
+  font-weight: 500;
 }
 
 .user:hover {
-    color: gray;
+  color: gray;
 }
 
 .upvote {
-    display: flex;
-    align-items: center;
+  display: flex;
+  align-items: center;
 }
 
 .upvote span {
-    font-size: 1rem;
-    margin: 0;
+  font-size: 1rem;
+  margin: 0;
 }
 
 .comment-input-container {
-    width: 100%;
-    height: max-content;
-    display: flex;
-    flex-direction: column;
+  width: 100%;
+  height: max-content;
+  display: flex;
+  flex-direction: column;
 }
 
 .reply-info {
-    padding: 4px;
-    border-radius: 4px 4px 0 0;
-    background-color: rgb(78, 78, 78);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  padding: 4px;
+  border-radius: 4px 4px 0 0;
+  background-color: rgb(78, 78, 78);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .inputfield.updating {
-    border-radius: 0 0 6px 6px;
+  border-radius: 0 0 6px 6px;
 }
 
 .referenced-comment-accountname {
-    color: lightblue;
-    font-weight: 500;
+  color: lightblue;
+  font-weight: 500;
 }
 
 .referenced-comment {
-    display: flex;
-    gap: 5px;
-    position: relative;
-    z-index: 1;
-    top: 4px;
-    align-items: flex-start;
-    border-radius: 8px 8px 0 0;
-    padding: 1px 4px;
-    margin-left: 5px;
-    background-color: #303030;
-    font-family: "Rubik", sans-serif;
+  display: flex;
+  gap: 5px;
+  position: relative;
+  z-index: 1;
+  top: 4px;
+  align-items: flex-start;
+  border-radius: 8px 8px 0 0;
+  padding: 1px 4px;
+  margin-left: 5px;
+  background-color: #303030;
+  font-family: "Rubik", sans-serif;
 }
 
 .referenced-comment * {
-    font-family: inherit;
-    font-size: 12px;
+  font-family: inherit;
+  font-size: 12px;
 }
 
 .referenced-comment .creator-name {
-    color: rgb(175, 175, 175);
-    white-space: nowrap;
+  color: rgb(175, 175, 175);
+  white-space: nowrap;
 }
 
 .referenced-comment .referenced-comment-text {
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    overflow: hidden;
-    color: gainsboro;
-    font-size: 13px;
-    position: relative;
-    bottom: 1px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  color: gainsboro;
+  font-size: 13px;
+  position: relative;
+  bottom: 1px;
 }

@@ -1,103 +1,102 @@
 .sectionHead {
-    margin-bottom: 0;
-    font-family: 'Ubuntu', sans-serif;
-    font-weight: 400;
-    font-size: 1.6rem;
-    border-bottom: 1px solid gainsboro;
+  margin-bottom: 0;
+  font-family: "Ubuntu", sans-serif;
+  font-weight: 400;
+  font-size: 1.6rem;
+  border-bottom: 1px solid gainsboro;
 }
 
 .recommendedItems {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(322px, 1fr));
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(322px, 1fr));
 }
 
 .formLabel {
-    font-family: 'Josefin Sans', sans-serif;
-    font-size: 1.1rem;
+  font-family: "Josefin Sans", sans-serif;
+  font-size: 1.1rem;
 }
 
-
 .editProfileForm {
-    border-radius: 12px;
-    background-color: #242424;
-    padding: 1.2rem;
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
+  border-radius: 12px;
+  background-color: #242424;
+  padding: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
 
 .editProfileForm button[type="submit"] {
-    align-self: flex-end;
+  align-self: flex-end;
 }
 
 .editProfileForm input {
-    max-width: 250px;
+  max-width: 250px;
 }
 
 .editProfileForm textarea {
-    max-width: 300px;
-    min-height: 130px;
+  max-width: 300px;
+  min-height: 130px;
 }
 
 .editProfileForm input,
 .editProfileForm textarea {
-    flex-grow: 1;
-    font-family: 'Josefin Sans', sans-serif;
-    font-size: 0.9rem;
-    background-color: rgba(254, 254, 254, 0.12);
-    color: #FEFEFE;
-    border-radius: 14px;
-    border: 2px solid transparent;
-    padding: 8px 10px;
+  flex-grow: 1;
+  font-family: "Josefin Sans", sans-serif;
+  font-size: 0.9rem;
+  background-color: rgba(254, 254, 254, 0.12);
+  color: #fefefe;
+  border-radius: 14px;
+  border: 2px solid transparent;
+  padding: 8px 10px;
 }
 
 .editFormBtn {
-    background-color: white;
-    border-radius: 14px;
-    border: none;
-    padding: 3px 1.2rem;
+  background-color: white;
+  border-radius: 14px;
+  border: none;
+  padding: 3px 1.2rem;
 }
 
 .editProfileForm input:focus,
 .editProfileForm textarea:focus {
-    outline: none;
-    border-color: black;
+  outline: none;
+  border-color: black;
 }
 
 .editFormBtn[type="button"] {
-    border: 1px solid white;
-    color: antiquewhite;
-    background-color: transparent;
+  border: 1px solid white;
+  color: antiquewhite;
+  background-color: transparent;
 }
 
 .editFormBtn:disabled {
-    color: grey;
+  color: grey;
 }
 
 .updateProfilePic {
-    margin-left: 1rem;
-    position: relative;
-    width: 100px;
-    height: 100px;
+  margin-left: 1rem;
+  position: relative;
+  width: 100px;
+  height: 100px;
 }
 
 .updateProfilePic img {
-    filter: contrast(60%);
-    border-radius: 50%;
-    width: 100px;
-    height: 100px;
-    object-fit: cover;
+  filter: contrast(60%);
+  border-radius: 50%;
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
 }
 
 .discussions {
-    padding: 1%;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
+  padding: 1%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
 }
 
 @media screen and (max-width: 1024px) {
-    .discussions {
-        grid-template-columns: 1fr;
-    }
+  .discussions {
+    grid-template-columns: 1fr;
+  }
 }

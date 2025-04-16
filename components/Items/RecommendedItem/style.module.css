@@ -1,20 +1,20 @@
 .item {
-    background-color: rgba(39, 39, 39, 0.705);
-    max-width: 140px;
-    border-radius: 4px;
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
+  background-color: rgba(39, 39, 39, 0.705);
+  max-width: 140px;
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
 }
 
 .item img {
-    align-self: center;
-    border-radius: 6px;
-    max-height: 170px;
-    height: auto;
+  align-self: center;
+  border-radius: 6px;
+  max-height: 170px;
+  height: auto;
 }
 
 .title {
-    text-align: center;
-    font-size: 0.8rem;
+  text-align: center;
+  font-size: 0.8rem;
 }

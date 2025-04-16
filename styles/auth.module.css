@@ -1,37 +1,37 @@
 .auth-container {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-top: 2rem;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 2rem;
 }
 
 .auth-form {
-    width: 100%;
-    max-width: 500px;
-    font-family: 'Rubik', sans-serif;
-    padding: 1rem;
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
+  width: 100%;
+  max-width: 500px;
+  font-family: "Rubik", sans-serif;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
 }
 
 .auth-form-link {
-    color: burlywood;
+  color: burlywood;
 }
 
 .text-field input {
-    color: whitesmoke;
+  color: whitesmoke;
 }
 
 .text-field label {
-    color: gray;
+  color: gray;
 }
 
 .auth-complete-form {
-    max-width: 600px;
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
+  max-width: 600px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }

@@ -1,73 +1,76 @@
 .anime-item {
-    background-color: #222222;
-    border-radius: 8px 8px 0px 0px;
-    padding: 8px;
-    cursor: pointer;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    width: 220px;
-    height: 350px;
+  background-color: #222222;
+  border-radius: 8px 8px 0px 0px;
+  padding: 8px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 220px;
+  height: 350px;
 }
 
 .anime-item:hover {
-    filter: drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.25));
+  filter: drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.25));
 }
 
-.anime-item:hover, .popover:hover {
-    color: whitesmoke;
+.anime-item:hover,
+.popover:hover {
+  color: whitesmoke;
 }
 
 .anime-item:active {
-    filter: none;
+  filter: none;
 }
 
-.anime-item img, .popoverItemImg {
-    border-radius: inherit;
-    max-width: 100%;
-    max-height: 300px;
-    flex-grow: 1;
+.anime-item img,
+.popoverItemImg {
+  border-radius: inherit;
+  max-width: 100%;
+  max-height: 300px;
+  flex-grow: 1;
 }
 
 .title {
-    margin-top: auto;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    font-size: 0.8rem;
+  margin-top: auto;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 0.8rem;
 }
 
 .popover {
-    background-color: #222222;
-    color: white;
-    padding: 8px;
-    width: 220px;
-    border-radius: 8px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
+  background-color: #222222;
+  color: white;
+  padding: 8px;
+  width: 220px;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
 }
 
 .score {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 1.1rem;
 }
 
 .score img {
-    margin-bottom: 2px;
+  margin-bottom: 2px;
 }
 
 @media screen and (max-width: 1200px) {
-    .anime-item {
-        min-width: 170px;
-        width: 170px;
-        height: 300px;
-    }
+  .anime-item {
+    min-width: 170px;
+    width: 170px;
+    height: 300px;
+  }
 
-    .anime-item img, .popoverItemImg {
-        max-height: 250px;
-    }
+  .anime-item img,
+  .popoverItemImg {
+    max-height: 250px;
+  }
 }
