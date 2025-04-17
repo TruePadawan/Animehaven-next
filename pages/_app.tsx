@@ -8,6 +8,7 @@ import { createBrowserSupabaseClient } from "@supabase/auth-helpers-nextjs";
 import { SessionContextProvider } from "@supabase/auth-helpers-react";
 import { NextPage } from "next";
 import { AppProps } from "next/app";
+import { NotificationContextProvider } from "../context/notifications/NotificationContext";
 
 export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
   getLayout?: (page: ReactElement) => ReactNode;
@@ -30,10 +31,12 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
         supabaseClient={supabaseClient}
         initialSession={pageProps.initialSession}
       >
-        <UserAuthContextProvider>
-          {getLayout(<Component {...pageProps} />)}
-          <Analytics />
-        </UserAuthContextProvider>
+        <NotificationContextProvider>
+          <UserAuthContextProvider>
+            {getLayout(<Component {...pageProps} />)}
+            <Analytics />
+          </UserAuthContextProvider>
+        </NotificationContextProvider>
       </SessionContextProvider>
     </Fragment>
   );
