@@ -45,9 +45,9 @@ export function getRandomInt(min: number, max: number) {
 
 export function createProfile(
   supabase: SupabaseClient<Database>,
-  accountData: TablesInsert<"profiles">,
+  payload: TablesInsert<"profiles">,
 ) {
-  return supabase.from("profiles").insert(accountData);
+  return supabase.from("profiles").insert(payload).throwOnError();
 }
 
 export async function hasProfile(

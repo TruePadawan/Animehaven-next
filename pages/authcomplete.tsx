@@ -1,6 +1,6 @@
 import { Button, TextField } from "@mui/material";
 import Head from "next/head";
-import React, { Fragment, useEffect, useState } from "react";
+import React, { Fragment, useContext, useEffect, useState } from "react";
 import useInput from "../hooks/use-input";
 import styles from "../styles/auth.module.css";
 import { useRouter } from "next/router";
@@ -9,7 +9,8 @@ import { createServerSupabaseClient } from "@supabase/auth-helpers-nextjs";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import { GetServerSidePropsContext } from "next";
 import { Database } from "../database.types";
-import { HasErrorMessage } from "../utilities/global.types";
+import { NotificationContext } from "../context/notifications/NotificationContext";
+import { PostgrestError } from "@supabase/supabase-js";
 
 interface PageProps {
   userData: {
@@ -23,6 +24,7 @@ interface PageProps {
 const AuthComplete = ({ userData }: PageProps) => {
   const supabase = useSupabaseClient<Database>();
   const router = useRouter();
+  const { showNotification } = useContext(NotificationContext);
   const accountNameInput = useInput(validateAccountName, {
     customTransformation: accountNameTransformation,
     defaultValue: generateAccountNameFromEmail(userData.email),
@@ -57,11 +59,6 @@ const AuthComplete = ({ userData }: PageProps) => {
     return value.trim().length > 0;
   }
 
-  // TODO: This should be a proper notification
-  function handleError(errorText: string, error: HasErrorMessage) {
-    alert(`${errorText} - ${error.message || error.error_description}`);
-  }
-
   function disableButtons() {
     setCreateProfileBtnDisabled(true);
     setCancelAuthBtnDisabled(true);
@@ -74,42 +71,55 @@ const AuthComplete = ({ userData }: PageProps) => {
 
   async function formSubmitHandler(event: React.FormEvent) {
     event.preventDefault();
+
     if (!accountNameInput.isValid || accountNameInput.hasError) {
-      alert("Account name is invalid");
-      return;
+      return showNotification("FAILED TO CREATE PROFILE", {
+        severity: "error",
+        error: new Error("Account name is invalid"),
+      });
     } else if (!displayNameInput.isValid || displayNameInput.hasError) {
-      alert("Display name is invalid");
+      return showNotification("FAILED TO CREATE PROFILE", {
+        severity: "error",
+        error: new Error("Display name is invalid"),
+      });
     }
 
     try {
       disableButtons();
       const profileExists = await hasProfile(supabase, userData.profile_id);
-      if (profileExists) throw new Error("Profile already exists");
+      if (profileExists) {
+        return showNotification("You have an existing profile already");
+      }
 
-      const profileData = {
+      await createProfile(supabase, {
         id: userData.profile_id,
         account_name: accountNameInput.value,
         display_name: displayNameInput.value,
         email: userData.email,
         avatar_url: userData.avatar_url,
-      };
+      });
 
-      await createProfile(supabase, profileData);
       await router.push(`/users/${accountNameInput.value}`);
       router.reload();
     } catch (error) {
-      handleError("Failed to create profile", error as HasErrorMessage);
+      showNotification("FAILED TO CREATE PROFILE", {
+        severity: "error",
+        error: error as PostgrestError,
+      });
       enableButtons();
     }
   }
 
   async function cancelAuthentication() {
     disableButtons();
-    try {
-      await supabase.auth.signOut();
+    const { error } = await supabase.auth.signOut();
+    if (error === null) {
       router.reload();
-    } catch (error) {
-      handleError("Error occurred while signing out", error as HasErrorMessage);
+    } else {
+      showNotification("An error occurred while signing out", {
+        severity: "error",
+        error: error,
+      });
       enableButtons();
     }
   }
