@@ -206,7 +206,7 @@ export type DatabaseGenerated = {
         Row: {
           account_name: string;
           avatar_url: string;
-          bio: string | null;
+          bio: string;
           created_at: string;
           display_name: string;
           email: string;
@@ -219,7 +219,7 @@ export type DatabaseGenerated = {
         Insert: {
           account_name: string;
           avatar_url?: string;
-          bio?: string | null;
+          bio?: string;
           created_at?: string;
           display_name?: string;
           email: string;
@@ -232,7 +232,7 @@ export type DatabaseGenerated = {
         Update: {
           account_name?: string;
           avatar_url?: string;
-          bio?: string | null;
+          bio?: string;
           created_at?: string;
           display_name?: string;
           email?: string;
@@ -338,7 +338,7 @@ export type DatabaseGenerated = {
         Returns: {
           account_name: string;
           avatar_url: string;
-          bio: string | null;
+          bio: string;
           created_at: string;
           display_name: string;
           email: string;
