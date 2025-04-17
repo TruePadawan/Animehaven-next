@@ -1,12 +1,6 @@
 import { Button, TextField } from "@mui/material";
 import Head from "next/head";
-import React, {
-  Fragment,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import React, { Fragment, useEffect, useState } from "react";
 import useInput from "../hooks/use-input";
 import styles from "../styles/auth.module.css";
 import { useRouter } from "next/router";
@@ -16,20 +10,6 @@ import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import { GetServerSidePropsContext } from "next";
 import { Database } from "../database.types";
 import { HasErrorMessage } from "../utilities/global.types";
-
-function accountNameTransformation(text: string) {
-  return text.replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
-}
-
-function generateAccountNameFromEmail(email: string) {
-  const emailSubstrings = email.split("@");
-  if (emailSubstrings.length > 0) {
-    const emailName = emailSubstrings.at(0);
-    return `${emailName}${Date.now()}`;
-  } else {
-    return `${email}${Date.now()}`;
-  }
-}
 
 interface PageProps {
   userData: {
@@ -43,34 +23,39 @@ interface PageProps {
 const AuthComplete = ({ userData }: PageProps) => {
   const supabase = useSupabaseClient<Database>();
   const router = useRouter();
-  const processAccountNameValidation = useCallback(async (value: string) => {
-    if (value.length >= 3) {
-      const { data, error } = await supabase
-        .from("profiles")
-        .select()
-        .eq("account_name", value);
-      if (error) return false;
-      return data.length === 0;
-    }
-    return false;
-  }, []);
-  const {
-    value: accountName,
-    isValid: accountNameIsValid,
-    hasError: accountNameHasError,
-    changeHandler: accountNameChangeHandler,
-  } = useInput(processAccountNameValidation, {
+  const accountNameInput = useInput(validateAccountName, {
     customTransformation: accountNameTransformation,
     defaultValue: generateAccountNameFromEmail(userData.email),
   });
-  const [createProfileBtnDisabled, setCreateProfileBtnDisabled] =
-    useState(!accountNameIsValid);
+  const displayNameInput = useInput(validateDisplayName, {
+    defaultValue: userData.display_name,
+  });
+  const [createProfileBtnDisabled, setCreateProfileBtnDisabled] = useState(
+    !accountNameInput.isValid || !displayNameInput.isValid,
+  );
   const [cancelAuthBtnDisabled, setCancelAuthBtnDisabled] = useState(false);
-  const displayNameRef = useRef<HTMLInputElement>();
 
   useEffect(() => {
-    setCreateProfileBtnDisabled(!accountNameIsValid);
-  }, [accountNameIsValid]);
+    setCreateProfileBtnDisabled(
+      !accountNameInput.isValid || !displayNameInput.isValid,
+    );
+  }, [accountNameInput.isValid, displayNameInput.isValid]);
+
+  async function validateAccountName(value: string) {
+    if (value.trim().length >= 3) {
+      const { count, error } = await supabase
+        .from("profiles")
+        .select("*", { head: true, count: "exact" })
+        .eq("account_name", value.trim());
+      if (error) return false;
+      return count === 0;
+    }
+    return false;
+  }
+
+  async function validateDisplayName(value: string) {
+    return value.trim().length > 0;
+  }
 
   // TODO: This should be a proper notification
   function handleError(errorText: string, error: HasErrorMessage) {
@@ -89,10 +74,13 @@ const AuthComplete = ({ userData }: PageProps) => {
 
   async function formSubmitHandler(event: React.FormEvent) {
     event.preventDefault();
-    if (!accountNameIsValid || accountNameHasError) {
+    if (!accountNameInput.isValid || accountNameInput.hasError) {
       alert("Account name is invalid");
       return;
+    } else if (!displayNameInput.isValid || displayNameInput.hasError) {
+      alert("Display name is invalid");
     }
+
     try {
       disableButtons();
       const profileExists = await hasProfile(supabase, userData.profile_id);
@@ -100,15 +88,14 @@ const AuthComplete = ({ userData }: PageProps) => {
 
       const profileData = {
         id: userData.profile_id,
-        account_name: accountName,
-        display_name: displayNameRef.current?.value ?? userData.display_name,
+        account_name: accountNameInput.value,
+        display_name: displayNameInput.value,
         email: userData.email,
-        avatar_url: "",
+        avatar_url: userData.avatar_url,
       };
-      if (userData?.avatar_url) {
-        profileData.avatar_url = userData.avatar_url;
-      }
+
       await createProfile(supabase, profileData);
+      await router.push(`/users/${accountNameInput.value}`);
       router.reload();
     } catch (error) {
       handleError("Failed to create profile", error as HasErrorMessage);
@@ -143,8 +130,8 @@ const AuthComplete = ({ userData }: PageProps) => {
             variant="filled"
             label="Account Name"
             type="text"
-            value={accountName}
-            onChange={accountNameChangeHandler}
+            value={accountNameInput.value}
+            onChange={accountNameInput.changeHandler}
             spellCheck={false}
             inputProps={{ minLength: 3 }}
             required
@@ -154,14 +141,17 @@ const AuthComplete = ({ userData }: PageProps) => {
             variant="filled"
             label="Display Name"
             type="text"
-            defaultValue={userData.display_name}
-            inputRef={displayNameRef}
+            value={displayNameInput.value}
+            onChange={displayNameInput.changeHandler}
             spellCheck={false}
             inputProps={{ minLength: 3 }}
             required
           />
-          {accountNameHasError && (
+          {accountNameInput.hasError && (
             <span className="form-helper-text">Account Name is Taken!</span>
+          )}
+          {displayNameInput.hasError && (
+            <span className="form-helper-text">Display name is not valid</span>
           )}
           <Button
             variant="contained"
@@ -198,7 +188,7 @@ export const getServerSideProps = async (
   if (!session)
     return {
       redirect: {
-        destination: "/signup",
+        destination: "/search",
         permanent: false,
       },
     };
@@ -221,9 +211,23 @@ export const getServerSideProps = async (
   } else {
     return {
       redirect: {
-        destination: "/",
+        destination: "/search",
         permanent: false,
       },
     };
   }
 };
+
+function accountNameTransformation(text: string) {
+  return text.replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
+}
+
+function generateAccountNameFromEmail(email: string) {
+  const emailSubstrings = email.split("@");
+  if (emailSubstrings.length > 0) {
+    const emailName = emailSubstrings.at(0);
+    return `${emailName}${Date.now()}`;
+  } else {
+    return `${email}${Date.now()}`;
+  }
+}

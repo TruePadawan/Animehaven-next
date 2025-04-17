@@ -1,22 +1,26 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 
-type ValidateFn = (value: string) => Promise<boolean>;
 type UseInputOptions = {
   defaultValue?: string;
   customTransformation?: (value: string) => string;
 };
-const useInput = (validate: ValidateFn, options?: UseInputOptions) => {
+const useInput = (
+  validate: (value: string) => Promise<boolean>,
+  options?: UseInputOptions,
+) => {
   const [inputValue, setInputValue] = useState(options?.defaultValue ?? "");
   const [inputIsValid, setInputIsValid] = useState(false);
   const [inputHasError, setInputHasError] = useState(false);
   const [checkingValidity, setCheckingValidity] = useState(false);
   const [inputWasTouched, setInputWasTouched] = useState(false);
 
+  const cachedValidator = useCallback(validate, []);
+
   useEffect(() => {
     setInputIsValid(false);
     setCheckingValidity(true);
     const timeoutID = setTimeout(() => {
-      validate(inputValue)
+      cachedValidator(inputValue)
         .then((isValid) => {
           setInputIsValid(isValid);
           setCheckingValidity(false);
@@ -26,7 +30,7 @@ const useInput = (validate: ValidateFn, options?: UseInputOptions) => {
         });
     }, 600);
     return () => clearTimeout(timeoutID);
-  }, [inputValue, validate]);
+  }, [inputValue, cachedValidator]);
 
   useEffect(() => {
     if (!inputIsValid && inputWasTouched && !checkingValidity) {
