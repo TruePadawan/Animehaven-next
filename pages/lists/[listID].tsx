@@ -16,7 +16,7 @@ import {
   setRecentItem,
 } from "../../utilities/app-utilities";
 import { getAnimeById } from "../../utilities/mal-api";
-import { UserAuthContext } from "../../context/UserAuthContext";
+import { UserAuthContext } from "../../context/authentication/UserAuthContext";
 import { useRouter } from "next/router";
 import HeaderLayout from "../../components/HeaderLayout/HeaderLayout";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";

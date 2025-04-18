@@ -1,21 +1,22 @@
-import { useState, createContext, useEffect } from "react";
+import { createContext, useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import {
   Session,
   useSupabaseClient,
   useUser,
 } from "@supabase/auth-helpers-react";
-import { hasProfile } from "../utilities/app-utilities";
-import { UserAuthContextProviderProps, UserAuthContextType } from "./types";
-import { Database } from "../database.types";
+import { hasProfile } from "../../utilities/app-utilities";
+import {
+  UserAuthContextProviderProps,
+  UserAuthContextType,
+} from "./UserAuthContext.types";
+import { Database } from "../../database.types";
 import { PostgrestError } from "@supabase/supabase-js";
-import { getRedirectUrl } from "./utilities";
 
 export const UserAuthContext = createContext<UserAuthContextType>({
   handleGoogleAuth: () => Promise.resolve(),
 });
 
-// TODO: UserAuthContext and its related code should be moved under an auth folder
 export const UserAuthContextProvider = (
   props: UserAuthContextProviderProps,
 ) => {
@@ -73,3 +74,15 @@ export const UserAuthContextProvider = (
     </UserAuthContext.Provider>
   );
 };
+
+export function getRedirectUrl() {
+  const baseUrl =
+    process.env.NEXT_PUBLIC_SITE_URL ?? process.env.NEXT_PUBLIC_VERCEL_URL;
+  if (baseUrl === undefined) {
+    throw new Error(
+      "Missing baseUrl. Did you forget to set NEXT_PUBLIC_SITE_URL or NEXT_PUBLIC_VERCEL_URL?",
+    );
+  }
+  let url = baseUrl.includes("http") ? baseUrl : `https://${baseUrl}`;
+  return url.charAt(url.length - 1) === "/" ? url : `${url}/`;
+}

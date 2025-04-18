@@ -11,7 +11,7 @@ import {
 } from "@mui/material";
 import React from "react";
 import { ArrowDropDown as ArrowDropDownIcon } from "@mui/icons-material";
-import { UserAuthContext } from "../../context/UserAuthContext";
+import { UserAuthContext } from "../../context/authentication/UserAuthContext";
 
 export default function OAuthButton() {
   const [menuIsOpen, setMenuIsOpen] = React.useState(false);

@@ -12,7 +12,7 @@ import {
   getProfileData,
   setRecentItem,
 } from "../../utilities/app-utilities";
-import { UserAuthContext } from "../../context/UserAuthContext";
+import { UserAuthContext } from "../../context/authentication/UserAuthContext";
 import { useRouter } from "next/router";
 import EditIcon from "@mui/icons-material/Edit";
 import HeaderLayout from "../../components/HeaderLayout/HeaderLayout";

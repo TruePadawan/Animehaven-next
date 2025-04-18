@@ -11,7 +11,7 @@ import React, {
 import Input from "../../components/Input/Input";
 import TextArea from "../../components/Input/TextArea";
 import Select from "../../components/Select/Select";
-import { UserAuthContext } from "../../context/UserAuthContext";
+import { UserAuthContext } from "../../context/authentication/UserAuthContext";
 import styles from "../../styles/create-discussion.module.css";
 import Loading from "../../components/Loading/Loading";
 import HeaderLayout from "../../components/HeaderLayout/HeaderLayout";

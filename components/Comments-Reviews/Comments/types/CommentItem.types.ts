@@ -1,6 +1,6 @@
 import { Tables } from "../../../../database.types";
 import { TriggerAlert } from "../../../../utilities/global.types";
-import { UserAuthContextType } from "../../../../context/types";
+import { UserAuthContextType } from "../../../../context/authentication/UserAuthContext.types";
 
 export interface CommentItemProps {
   commentData: Tables<"comments">;

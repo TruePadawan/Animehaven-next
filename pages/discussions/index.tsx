@@ -20,7 +20,7 @@ import CheckboxList from "../../components/CheckboxList/CheckboxList";
 import SearchInput from "../../components/Input/SearchInput/SearchInput";
 import BodyLayout from "../../components/BodyLayout/BodyLayout";
 import Select from "../../components/Select/Select";
-import { UserAuthContext } from "../../context/UserAuthContext";
+import { UserAuthContext } from "../../context/authentication/UserAuthContext";
 import { getDiscussionsByTags } from "../../utilities/app-utilities";
 import DiscussionItem from "../../components/Items/DiscussionItem/DiscussionItem";
 import Loading from "../../components/Loading/Loading";

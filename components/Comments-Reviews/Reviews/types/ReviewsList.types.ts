@@ -1,4 +1,4 @@
-import { UserAuthContextType } from "../../../../context/types";
+import { UserAuthContextType } from "../../../../context/authentication/UserAuthContext.types";
 import { NotificationContextType } from "../../../../context/notifications/NotificationContext.types";
 
 export interface ReviewsListProps {

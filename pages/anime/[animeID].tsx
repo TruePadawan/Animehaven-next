@@ -9,7 +9,7 @@ import React, {
   useState,
 } from "react";
 import { getAnimeById } from "../../utilities/mal-api";
-import { UserAuthContext } from "../../context/UserAuthContext";
+import { UserAuthContext } from "../../context/authentication/UserAuthContext";
 import Select from "../../components/Select/Select";
 import {
   getProfileData,
@@ -126,9 +126,8 @@ const AnimeDetails: NextPageWithLayout = () => {
 
   // Update Anime watch status
   useEffect(() => {
-    if (!profileID) {
-      return showNotification("You are not signed in", { severity: "warning" });
-    }
+    if (!profileID) return;
+
     if (!VALID_WATCH_STATUS.includes(watchStatus)) {
       return showNotification("Failed to update item watch status", {
         severity: "error",

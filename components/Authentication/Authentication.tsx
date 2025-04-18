@@ -1,6 +1,6 @@
 import { Alert, Snackbar, SnackbarOrigin } from "@mui/material";
 import { Fragment, useContext, useState } from "react";
-import { UserAuthContext } from "../../context/UserAuthContext";
+import { UserAuthContext } from "../../context/authentication/UserAuthContext";
 import ProfileMenuButton from "./ProfileMenuButton";
 import { HasErrorMessage, ResetAlert } from "../../utilities/global.types";
 import OAuthButton from "./OAuthButton";

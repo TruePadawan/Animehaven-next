@@ -16,7 +16,7 @@ import {
   getErrorMessage,
   numberToString,
 } from "../../../utilities/app-utilities";
-import { UserAuthContext } from "../../../context/UserAuthContext";
+import { UserAuthContext } from "../../../context/authentication/UserAuthContext";
 import CommentIcon from "@mui/icons-material/Comment";
 import ShareButton from "../../ShareButton/ShareButton";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";

@@ -22,7 +22,7 @@ import Select from "../../components/Select/Select";
 import Checkbox from "../../components/Checkbox/Checkbox";
 import SearchInput from "../../components/Input/SearchInput/SearchInput";
 import ListItem from "../../components/Items/ListItem/ListItem";
-import { UserAuthContext } from "../../context/UserAuthContext";
+import { UserAuthContext } from "../../context/authentication/UserAuthContext";
 import CreateList from "../../components/CreateList/CreateList";
 import Loading from "../../components/Loading/Loading";
 import Head from "next/head";

@@ -1,4 +1,4 @@
-import { UserAuthContextProvider } from "../context/UserAuthContext";
+import { UserAuthContextProvider } from "../context/authentication/UserAuthContext";
 import { Analytics } from "@vercel/analytics/react";
 import "../styles/global.css";
 import { Fragment, ReactElement, ReactNode } from "react";

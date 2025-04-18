@@ -8,7 +8,7 @@ import {
 } from "react";
 import styles from "./style.module.css";
 import Link from "next/link";
-import { UserAuthContext } from "../../../context/UserAuthContext";
+import { UserAuthContext } from "../../../context/authentication/UserAuthContext";
 import { Alert, Button, Skeleton, Snackbar } from "@mui/material";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import {

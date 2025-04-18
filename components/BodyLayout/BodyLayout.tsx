@@ -1,7 +1,7 @@
 import Section from "../Section/Section";
 import styles from "./styles.module.css";
 import { useContext } from "react";
-import { UserAuthContext } from "../../context/UserAuthContext";
+import { UserAuthContext } from "../../context/authentication/UserAuthContext";
 import { Box, useMediaQuery } from "@mui/material";
 import Announcements from "./Announcements";
 import Recent from "./Recent";

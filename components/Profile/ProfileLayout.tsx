@@ -5,7 +5,7 @@ import ViewSidebarIcon from "@mui/icons-material/ViewSidebar";
 import Head from "next/head";
 import { EditProfile } from "./ProfileSections/ProfileSections";
 import { getProfileData, getProfileID } from "../../utilities/app-utilities";
-import { UserAuthContext } from "../../context/UserAuthContext";
+import { UserAuthContext } from "../../context/authentication/UserAuthContext";
 import styles from "./profile-layout.module.css";
 import Loading from "../Loading/Loading";
 import NoAccount from "../NoAccount/NoAccount";
