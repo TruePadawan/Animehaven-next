@@ -7,7 +7,7 @@ export interface NotificationContextType {
 }
 
 export interface ShowNotificationOptions {
-  severity: AlertProps["severity"];
+  severity?: AlertProps["severity"];
   error?: HasErrorMessage;
 }
 

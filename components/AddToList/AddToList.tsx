@@ -8,7 +8,14 @@ import {
   ListItemText,
   useMediaQuery,
 } from "@mui/material";
-import { ChangeEvent, FormEvent, Fragment, useEffect, useState } from "react";
+import {
+  ChangeEvent,
+  FormEvent,
+  Fragment,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import LockIcon from "@mui/icons-material/Lock";
 import LockOpenIcon from "@mui/icons-material/LockOpen";
 import { useTheme } from "@mui/material/styles";
@@ -17,22 +24,26 @@ import styles from "./styles.module.css";
 import Loading from "../Loading/Loading";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import {
+  AddToListAnimeListItemProps,
   AddToListProps,
-  AnimeListItemProps,
   StrippedAnimeListItemData,
 } from "./AddToList.types";
 import { Database } from "../../database.types";
 import { PostgrestError } from "@supabase/supabase-js";
+import { NotificationContext } from "../../context/notifications/NotificationContext";
 
 const AddToList = (props: AddToListProps) => {
-  const { itemData, profileID, triggerAlert } = props;
+  const { itemData, profileID } = props;
   const supabase = useSupabaseClient<Database>();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [searchText, setSearchText] = useState("");
-  const [items, setItems] = useState<Array<StrippedAnimeListItemData>>([]);
+  const [ownAnimeLists, setOwnAnimeLists] = useState<
+    Array<StrippedAnimeListItemData>
+  >([]);
   const [queryOngoing, setQueryOngoing] = useState(false);
   const theme = useTheme();
   const fullScreenBreakpoints = useMediaQuery(theme.breakpoints.down(480));
+  const { showNotification } = useContext(NotificationContext);
 
   useEffect(() => {
     if (!dialogOpen) return;
@@ -42,8 +53,13 @@ const AddToList = (props: AddToListProps) => {
       .select("id,title,is_public")
       .eq("creator_id", profileID)
       .then(({ data: lists, error }) => {
-        if (error) throw error;
-        setItems(lists);
+        if (error) {
+          return showNotification(
+            "An error occurred while getting your anime lists",
+            { severity: "error", error },
+          );
+        }
+        setOwnAnimeLists(lists);
         setQueryOngoing(false);
       });
   }, [profileID, dialogOpen, supabase]);
@@ -61,18 +77,15 @@ const AddToList = (props: AddToListProps) => {
 
     setQueryOngoing(true);
     try {
-      const { data: searchResults, error } = await supabase
+      const { data: searchResults } = await supabase
         .rpc("search_list", { phrase: searchText, profile_id: profileID })
-        .select("id,title,is_public");
-      if (error) {
-        return triggerAlert("Error while trying to search", {
-          severity: "error",
-          error: error as PostgrestError,
-        });
+        .select("id,title,is_public")
+        .throwOnError();
+      if (searchResults !== null) {
+        setOwnAnimeLists(searchResults);
       }
-      setItems(searchResults);
     } catch (error) {
-      triggerAlert("Error while trying to search", {
+      showNotification("Error while trying to search", {
         severity: "error",
         error: error as PostgrestError,
       });
@@ -80,15 +93,15 @@ const AddToList = (props: AddToListProps) => {
     setQueryOngoing(false);
   };
 
-  const transformedItems = items.map((item) => (
-    <AnimeListItem
+  const transformedItems = ownAnimeLists.map((item) => (
+    <AddToListAnimeListItem
       key={item.id}
       id={item.id}
       itemData={itemData}
       title={item.title}
-      triggerAlert={triggerAlert}
       isPrivate={!item.is_public}
       closeDialog={closeDialog}
+      showNotification={showNotification}
     />
   ));
   return (
@@ -135,47 +148,41 @@ const AddToList = (props: AddToListProps) => {
   );
 };
 
-const AnimeListItem = (props: AnimeListItemProps) => {
-  const {
-    id,
-    itemData,
-    title,
-    triggerAlert,
-    closeDialog,
-    isPrivate = false,
-  } = props;
+const AddToListAnimeListItem = (props: AddToListAnimeListItemProps) => {
+  const { id, itemData, title, closeDialog, isPrivate, showNotification } =
+    props;
   const supabase = useSupabaseClient<Database>();
+
   const addAnimeToList = async () => {
     try {
-      const { data, error } = await supabase
+      const { data } = await supabase
         .from("anime_lists")
         .select("items")
         .eq("id", id)
+        .throwOnError()
         .limit(1)
         .single();
-      if (error) {
-        return triggerAlert("Failed to add anime to list", {
-          severity: "error",
-          error: error as PostgrestError,
-        });
-      }
 
-      const { items } = data;
-      const itemInList = items.some((item) => item.id === itemData.id);
-      if (!itemInList) {
-        items.push(itemData);
-        await supabase
-          .from("anime_lists")
-          .update({ items })
-          .eq("id", id)
-          .throwOnError();
-        triggerAlert("Anime added successfully!", { severity: "success" });
-      } else {
-        triggerAlert("Anime already in List!");
+      if (data !== null) {
+        const { items } = data;
+        const itemInList = items.some((item) => item.id === itemData.id);
+        if (!itemInList) {
+          items.push(itemData);
+          await supabase
+            .from("anime_lists")
+            .update({ items })
+            .eq("id", id)
+            .throwOnError();
+          showNotification("Anime added successfully!", {
+            severity: "success",
+          });
+        } else {
+          showNotification("Anime already in List!");
+        }
       }
       closeDialog();
     } catch (error) {
-      triggerAlert("Failed to add anime to list", {
+      showNotification("Failed to add anime to list", {
         severity: "error",
         error: error as PostgrestError,
       });

@@ -1,14 +1,14 @@
 import { Fragment, useEffect, useState } from "react";
 import Link from "next/link";
-import { IconButton, Rating, Skeleton, MenuItem } from "@mui/material";
+import { IconButton, MenuItem, Rating, Skeleton } from "@mui/material";
 import ThumbUpOffAltIcon from "@mui/icons-material/ThumbUpOffAlt";
 import ThumbUpAltIcon from "@mui/icons-material/ThumbUpAlt";
 import DeleteIcon from "@mui/icons-material/Delete";
 import {
   deleteReview,
-  toggleUpvoteForReview,
   getProfileData,
   getReviewUpvoteList,
+  toggleUpvoteForReview,
 } from "../../../utilities/app-utilities";
 import styles from "../Comments-Reviews.module.css";
 import Image from "next/image";
@@ -18,10 +18,11 @@ import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import { ReviewItemProps } from "./types/ReviewItem.types";
 import { Database } from "../../../database.types";
 import { DEFAULT_AVATAR_URL } from "../../../utilities/global-constants";
+import { HasErrorMessage } from "../../../utilities/global.types";
 
 // Rename to AnimeReviewItem
 const ReviewItem = (props: ReviewItemProps) => {
-  const { reviewData, profileID, editReview, handleError } = props;
+  const { reviewData, profileID, editReview, showNotification } = props;
   const supabase = useSupabaseClient<Database>();
   const [profileData, setProfileData] = useState({
     avatar_url: DEFAULT_AVATAR_URL,
@@ -61,9 +62,12 @@ const ReviewItem = (props: ReviewItemProps) => {
         setLoading(false);
       })
       .catch((error) => {
-        handleError("Failed to load review", error);
+        showNotification("Failed to load review", {
+          severity: "error",
+          error: error as HasErrorMessage,
+        });
       });
-  }, [reviewData, handleError, supabase]);
+  }, [reviewData, showNotification, supabase]);
 
   const onUpvoteButtonClicked = async () => {
     if (ownReview || profileID === undefined) return;
@@ -90,7 +94,10 @@ const ReviewItem = (props: ReviewItemProps) => {
         });
       }
     } catch (error) {
-      handleError("Failed to complete action", error);
+      showNotification("Failed to toggle upvote", {
+        severity: "error",
+        error: error as HasErrorMessage,
+      });
     }
   };
 
@@ -107,7 +114,10 @@ const ReviewItem = (props: ReviewItemProps) => {
         });
       }
     } catch (error) {
-      handleError("Failed to delete review", error);
+      showNotification("Failed to delete review", {
+        severity: "error",
+        error: error as HasErrorMessage,
+      });
     }
   };
 

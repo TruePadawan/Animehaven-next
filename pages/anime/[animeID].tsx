@@ -1,10 +1,9 @@
 import BodyLayout from "../../components/BodyLayout/BodyLayout";
 import StarIcon from "@mui/icons-material/Star";
-import { Box, Chip, Snackbar, Alert, SnackbarOrigin } from "@mui/material";
+import { Box, Chip } from "@mui/material";
 import React, {
   Fragment,
   ReactElement,
-  useCallback,
   useContext,
   useEffect,
   useState,
@@ -13,11 +12,10 @@ import { getAnimeById } from "../../utilities/mal-api";
 import { UserAuthContext } from "../../context/UserAuthContext";
 import Select from "../../components/Select/Select";
 import {
+  getProfileData,
+  getRelevantAnimeData,
   getUserItemRecommendations,
   setRecentItem,
-  getProfileData,
-  getErrorMessage,
-  getRelevantAnimeData,
 } from "../../utilities/app-utilities";
 import styles from "../../styles/anime.module.css";
 import CommentsList from "../../components/Comments-Reviews/Comments/CommentsList";
@@ -29,24 +27,16 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import HeaderLayout from "../../components/HeaderLayout/HeaderLayout";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
-import {
-  DEFAULT_SNACKBAR_STATE,
-  VALID_WATCH_STATUS,
-} from "../../utilities/global-constants";
+import { VALID_WATCH_STATUS } from "../../utilities/global-constants";
 import { Database } from "../../database.types";
-import {
-  AnimeItemData,
-  ResetAlert,
-  TriggerAlert,
-  WatchStatus,
-} from "../../utilities/global.types";
+import { AnimeItemData, WatchStatus } from "../../utilities/global.types";
 import { NextPageWithLayout } from "../_app";
 import { PostgrestError } from "@supabase/supabase-js";
+import { NotificationContext } from "../../context/notifications/NotificationContext";
 
 const AnimeDetails: NextPageWithLayout = () => {
   const supabase = useSupabaseClient<Database>();
   const { profileID } = useContext(UserAuthContext);
-  const [snackbarData, setSnackbarData] = useState(DEFAULT_SNACKBAR_STATE);
   const [watchStatus, setWatchStatus] = useState<WatchStatus>("NOT_WATCHED");
   const [anime, setAnime] = useState<AnimeItemData>();
   const [recommendationStatus, setRecommendationStatus] =
@@ -56,26 +46,8 @@ const AnimeDetails: NextPageWithLayout = () => {
   const [categoryVal, setCategoryVal] = useState("COMMENTS");
   const [errorText, setErrorText] = useState("");
   const router = useRouter();
+  const { showNotification } = useContext(NotificationContext);
   const animeID = router.query?.animeID as string;
-
-  // ALLOW SNACKBAR STATE TO BE CUSTOMIZED
-  const triggerAlert: TriggerAlert = useCallback((text, options) => {
-    const alertSeverity = options?.severity;
-    setSnackbarData({
-      open: true,
-      severity: alertSeverity || "info",
-      text:
-        alertSeverity === "error"
-          ? `${text} - ${getErrorMessage(options?.error)}`
-          : text,
-    });
-  }, []);
-
-  const resetSnackbar: ResetAlert = (event, reason) => {
-    if (reason !== "clickaway") {
-      setSnackbarData(DEFAULT_SNACKBAR_STATE);
-    }
-  };
 
   // LOAD DATA FOR ITEM AND RENDER IT IN UI
   useEffect(() => {
@@ -106,7 +78,7 @@ const AnimeDetails: NextPageWithLayout = () => {
           setWatchStatusElDisabled(false);
         })
         .catch((error) => {
-          triggerAlert("Failed to load anime watch status", {
+          showNotification("Failed to load anime watch status", {
             severity: "error",
             error,
           });
@@ -126,13 +98,13 @@ const AnimeDetails: NextPageWithLayout = () => {
           }
         })
         .catch((error) => {
-          triggerAlert("Failed to load anime recommendation status", {
+          showNotification("Failed to load anime recommendation status", {
             severity: "error",
             error,
           });
         });
     }
-  }, [profileID, router, triggerAlert, supabase]);
+  }, [profileID, router, showNotification, supabase]);
 
   // IF THERE IS A SIGNED-IN USER AND ANIME HAS BEEN CONFIRMED TO EXIST - UPDATE THEIR RECENTLY VIEWED ANIMES
   useEffect(() => {
@@ -144,16 +116,21 @@ const AnimeDetails: NextPageWithLayout = () => {
         photoURL: anime.imageURL,
         synopsis: anime.synopsis,
       }).catch((error) => {
-        triggerAlert("Error", { severity: "error", error });
+        showNotification("Failed to update your recently viewed animes", {
+          severity: "error",
+          error,
+        });
       });
     }
-  }, [profileID, router, triggerAlert, anime]);
+  }, [profileID, router, showNotification, anime]);
 
   // Update Anime watch status
   useEffect(() => {
-    if (!profileID) return;
+    if (!profileID) {
+      return showNotification("You are not signed in", { severity: "warning" });
+    }
     if (!VALID_WATCH_STATUS.includes(watchStatus)) {
-      return triggerAlert("Failed to update item watch status", {
+      return showNotification("Failed to update item watch status", {
         severity: "error",
         error: {
           message: "Invalid watch status",
@@ -162,47 +139,44 @@ const AnimeDetails: NextPageWithLayout = () => {
     }
 
     setWatchStatusElDisabled(true);
-    try {
-      getProfileData(supabase, profileID).then(({ items_watch_status }) => {
+    getProfileData(supabase, profileID)
+      .then(({ items_watch_status }) => {
         items_watch_status[animeID] = watchStatus;
         supabase
           .from("profiles")
           .update({ items_watch_status })
           .eq("id", profileID)
+          .throwOnError()
           .then((response) => {
             if (response.error) {
-              triggerAlert("Failed to update item watch status", {
-                severity: "error",
-                error: response.error as PostgrestError,
-              });
             } else {
-              setWatchStatusElDisabled(false);
             }
           });
+      })
+      .catch((error: PostgrestError) => {
+        showNotification("Failed to update item watch status", {
+          severity: "error",
+          error: error,
+        });
+      })
+      .finally(() => {
+        setWatchStatusElDisabled(false);
       });
-    } catch (error) {
-      triggerAlert("Failed to update item watch status", {
-        severity: "error",
-        error: error as PostgrestError,
-      });
-    }
-    setWatchStatusElDisabled(false);
   }, [watchStatus, profileID]);
 
   // RECOMMEND ITEM OR REMOVE RECOMMENDATION
   const recommendItem = async () => {
     if (!profileID) return;
 
-    const { data: rows } = await getUserItemRecommendations(
+    // TODO: Replace this DB query with a row count since we are not using the actual row data
+    const { data: rows, error } = await getUserItemRecommendations(
       supabase,
       profileID,
     );
-    if (rows === null) {
-      return triggerAlert("Failed to modify anime recommendation", {
+    if (error !== null) {
+      return showNotification("Failed to modify anime recommendation", {
         severity: "error",
-        error: {
-          message: "Couldn't retrieve user's existing anime recommendations",
-        },
+        error,
       });
     }
 
@@ -215,7 +189,7 @@ const AnimeDetails: NextPageWithLayout = () => {
           .insert({ item_id: animeID, recommended_by: profileID });
         setRecommendationStatus("recommended");
       } catch (error) {
-        triggerAlert("Failed to recommend item", {
+        showNotification("Failed to recommend item", {
           severity: "error",
           error: error as PostgrestError,
         });
@@ -230,7 +204,7 @@ const AnimeDetails: NextPageWithLayout = () => {
           .throwOnError();
         setRecommendationStatus("not_recommended");
       } catch (error) {
-        triggerAlert("Failed to remove recommendation", {
+        showNotification("Failed to remove recommendation", {
           severity: "error",
           error: error as PostgrestError,
         });
@@ -266,10 +240,6 @@ const AnimeDetails: NextPageWithLayout = () => {
     );
   }
 
-  const alertAnchorOrigin: SnackbarOrigin = {
-    vertical: "bottom",
-    horizontal: "left",
-  };
   anime.synopsis = anime.synopsis.replace(" [Written by MAL Rewrite]", "");
   return (
     <Fragment>
@@ -307,7 +277,6 @@ const AnimeDetails: NextPageWithLayout = () => {
               <AddToList
                 profileID={profileID}
                 itemData={{ id: +animeID, title: anime.title }}
-                triggerAlert={triggerAlert}
               />
             )}
           </span>
@@ -327,7 +296,7 @@ const AnimeDetails: NextPageWithLayout = () => {
           <ReviewsList
             profileID={profileID}
             animeID={animeID}
-            triggerAlert={triggerAlert}
+            showNotification={showNotification}
           />
         )}
       </Box>
@@ -391,16 +360,6 @@ const AnimeDetails: NextPageWithLayout = () => {
           </li>
         </ul>
       </div>
-      <Snackbar
-        open={snackbarData.open}
-        autoHideDuration={6000}
-        onClose={resetSnackbar}
-        anchorOrigin={alertAnchorOrigin}
-      >
-        <Alert severity={snackbarData.severity} sx={{ width: "100%" }}>
-          {snackbarData.text}
-        </Alert>
-      </Snackbar>
     </Fragment>
   );
 };

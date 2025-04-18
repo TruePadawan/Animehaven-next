@@ -3,7 +3,6 @@ import {
   FormEvent,
   Fragment,
   SyntheticEvent,
-  useCallback,
   useEffect,
   useMemo,
   useRef,
@@ -24,10 +23,11 @@ import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import { ReviewsListProps } from "./types/ReviewsList.types";
 import { Database, Tables } from "../../../database.types";
 import { PostgrestError } from "@supabase/supabase-js";
+import { HasErrorMessage } from "../../../utilities/global.types";
 
 const REVIEWS_PER_REQUESTS = 10;
 const ReviewsList = (props: ReviewsListProps) => {
-  const { profileID, animeID, triggerAlert } = props;
+  const { profileID, animeID, showNotification } = props;
   const supabase = useSupabaseClient<Database>();
   const [reviewText, setReviewText] = useState("");
   const [reviewListData, setReviewListData] = useState<
@@ -38,13 +38,6 @@ const ReviewsList = (props: ReviewsListProps) => {
   const [loadingReviews, setLoadingReviews] = useState(false);
   const totalReviewsCount = useRef(0);
 
-  const handleError = useCallback(
-    (errorText: string, error: any) => {
-      triggerAlert(errorText, { severity: "error", error });
-    },
-    [triggerAlert],
-  );
-
   useEffect(() => {
     // IF USER IS SIGNED IN, CHECK IF USER HAS REVIEW THE ANIME AND SHOW THEIRS AT THE TOP
     getReviewsData(supabase, animeID, 10, profileID)
@@ -53,10 +46,13 @@ const ReviewsList = (props: ReviewsListProps) => {
         setReviewListData(data);
       })
       .catch((error) => {
-        handleError("Failed to retrieve reviews", error);
+        showNotification("Failed to get your reviews", {
+          severity: "error",
+          error: error as PostgrestError,
+        });
         setReviewListData([]);
       });
-  }, [animeID, profileID, handleError, supabase]);
+  }, [animeID, profileID, supabase]);
 
   function updateRating(event: SyntheticEvent, value: number | null) {
     if (value !== null) {
@@ -69,7 +65,7 @@ const ReviewsList = (props: ReviewsListProps) => {
 
   async function addReview(onReviewAdded: VoidFunction) {
     if (profileID === undefined) {
-      return;
+      return showNotification("You are not signed in", { severity: "warning" });
     }
 
     try {
@@ -88,30 +84,38 @@ const ReviewsList = (props: ReviewsListProps) => {
       setReviewListData(response.data);
       onReviewAdded();
     } catch (error) {
-      handleError("Failed to add review", error);
+      showNotification("Failed to add review", {
+        severity: "error",
+        error: error as HasErrorMessage,
+      });
     }
   }
 
   async function updateReview(onReviewUpdated: VoidFunction) {
     try {
-      const { data: updatedData, error } = await supabase
+      const { data: updatedReview } = await supabase
         .from("item_reviews")
         .update({
           review: reviewText,
           rating,
         })
+        .throwOnError()
         .eq("item_id", animeID)
         .eq("creator_id", profileID)
         .select();
-      if (error) throw error;
 
-      setReviewListData((snapshot) => {
-        snapshot[0] = updatedData[0];
-        return [...snapshot];
-      });
-      onReviewUpdated();
+      if (updatedReview !== null) {
+        setReviewListData((snapshot) => {
+          snapshot[0] = updatedReview[0];
+          return [...snapshot];
+        });
+        onReviewUpdated();
+      }
     } catch (error) {
-      handleError("Failed to update review", error);
+      showNotification("Failed to update review", {
+        severity: "error",
+        error: error as HasErrorMessage,
+      });
     }
   }
 
@@ -143,11 +147,11 @@ const ReviewsList = (props: ReviewsListProps) => {
   }
 
   function onShareSuccess() {
-    triggerAlert("Link Copied!", { severity: "success" });
+    showNotification("Link Copied!", { severity: "success" });
   }
 
   function onShareFailed() {
-    triggerAlert("Failed to Copy Link!", { severity: "warning" });
+    showNotification("Failed to Copy Link!", { severity: "warning" });
   }
 
   async function loadMoreReviewsClickHandler() {
@@ -167,7 +171,7 @@ const ReviewsList = (props: ReviewsListProps) => {
         return [...snapshot, ...data];
       });
     } catch (error) {
-      triggerAlert("Failed to load more reviews", {
+      showNotification("Failed to load more reviews", {
         severity: "error",
         error: error as PostgrestError,
       });
@@ -187,11 +191,11 @@ const ReviewsList = (props: ReviewsListProps) => {
           reviewData={review}
           profileID={profileID}
           editReview={editReview}
-          handleError={handleError}
+          showNotification={showNotification}
         />
       );
     });
-  }, [reviewListData, handleError, profileID]);
+  }, [reviewListData, profileID]);
 
   return (
     <div className={styles.component}>
