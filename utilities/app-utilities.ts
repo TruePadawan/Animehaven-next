@@ -464,7 +464,7 @@ export async function setRecentItem(
   item: any,
 ) {
   const recentItems = await getRecentItems(supabase, type, profileId);
-  let itemAlreadyExists = false;
+  let itemAlreadyExists: Boolean;
   if (type === "animes") {
     itemAlreadyExists = recentItems.some(
       (r_item: { id: any }) => r_item.id === item.id,
