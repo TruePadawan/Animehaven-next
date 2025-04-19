@@ -239,7 +239,7 @@ const AnimeDetails: NextPageWithLayout = () => {
     );
   }
 
-  anime.synopsis = anime.synopsis.replace(" [Written by MAL Rewrite]", "");
+  anime.synopsis = anime.synopsis.replace("[Written by MAL Rewrite]", "");
   return (
     <Fragment>
       <Head>
@@ -279,7 +279,7 @@ const AnimeDetails: NextPageWithLayout = () => {
               />
             )}
           </span>
-          <p className={styles.overview}>{anime.overview}</p>
+          <p className={styles.overview}>{anime.synopsis}</p>
         </section>
         <Select
           aria-label="Show comments or reviews"

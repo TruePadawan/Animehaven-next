@@ -1,28 +1,14 @@
-import {
-  Fragment,
-  SyntheticEvent,
-  useCallback,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
+import { Fragment, useContext, useEffect, useState } from "react";
 import styles from "./style.module.css";
 import Link from "next/link";
 import { UserAuthContext } from "../../../context/authentication/UserAuthContext";
-import { Alert, Button, Skeleton, Snackbar } from "@mui/material";
+import { Button, Skeleton } from "@mui/material";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
-import {
-  getErrorMessage,
-  getProfileData,
-} from "../../../utilities/app-utilities";
+import { getProfileData } from "../../../utilities/app-utilities";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import { Database, Tables } from "../../../database.types";
-import {
-  SnackbarState,
-  TriggerAlertOptions,
-} from "../../../utilities/global.types";
 import { PostgrestError } from "@supabase/supabase-js";
-import { DEFAULT_SNACKBAR_STATE } from "../../../utilities/global-constants";
+import { NotificationContext } from "../../../context/notifications/NotificationContext";
 
 interface ListItemProps {
   listId: number;
@@ -39,43 +25,26 @@ export default function ListItem({ listId, skeleton = false }: ListItemProps) {
   const [creatorID, setCreatorID] = useState("");
   const [saveDisabled, setSaveDisabled] = useState(true);
   const [undoSaveDisabled, setUndoSaveDisabled] = useState(true);
-  const [snackbarData, setSnackbarData] = useState<SnackbarState>(
-    DEFAULT_SNACKBAR_STATE,
-  );
   const [isSaved, setIsSaved] = useState(false);
-
-  const triggerAlert = useCallback(
-    (text: string, options?: TriggerAlertOptions) => {
-      const alertSeverity = options?.severity;
-      setSnackbarData({
-        open: true,
-        severity: alertSeverity || "info",
-        text:
-          alertSeverity === "error"
-            ? `${text} - ${getErrorMessage(options?.error)}`
-            : text,
-      });
-    },
-    [],
-  );
+  const { showNotification } = useContext(NotificationContext);
 
   useEffect(() => {
-    if (listId === undefined) {
-      return;
-    }
+    if (listId === undefined) return;
     supabase
       .from("anime_lists")
       .select()
       .eq("id", listId)
-      // .throwOnError()
       .limit(1)
       .single()
       .then((result) => {
         if (result.error) {
-          return triggerAlert(`Error while loading list with id ${listId}`, {
-            error: result.error as PostgrestError,
-            severity: "error",
-          });
+          return showNotification(
+            `Error while loading list with id ${listId}`,
+            {
+              error: result.error as PostgrestError,
+              severity: "error",
+            },
+          );
         }
         const { title, description, creator_id } = result.data;
         setListTitle(title);
@@ -124,12 +93,12 @@ export default function ListItem({ listId, skeleton = false }: ListItemProps) {
           setIsSaved(true);
           setSaveDisabled(false);
           setUndoSaveDisabled(false);
-          triggerAlert("List saved successfully", { severity: "success" });
+          showNotification("List saved successfully", { severity: "success" });
         } else {
-          triggerAlert("List is already saved", { severity: "info" });
+          showNotification("List is already saved", { severity: "info" });
         }
       } catch (error) {
-        triggerAlert("Error while saving list", {
+        showNotification("Error while saving list", {
           error: error as PostgrestError,
           severity: "error",
         });
@@ -157,28 +126,20 @@ export default function ListItem({ listId, skeleton = false }: ListItemProps) {
           setIsSaved(false);
           setSaveDisabled(false);
           setUndoSaveDisabled(false);
-          triggerAlert("List removed", { severity: "success" });
+          showNotification("List removed", { severity: "success" });
         } else {
-          triggerAlert("Error while removing list", {
+          showNotification("Error while removing list", {
             error: new Error("List isn't saved"),
             severity: "error",
           });
         }
       } catch (error) {
-        triggerAlert("Error while removing list", {
+        showNotification("Error while removing list", {
           severity: "error",
           error: error as PostgrestError,
         });
         setUndoSaveDisabled(false);
       }
-    }
-  };
-
-  const closeSnackbar = (e: SyntheticEvent | Event, reason: string) => {
-    if (reason !== "clickaway") {
-      setSnackbarData((snapshot) => {
-        return { ...snapshot, open: false };
-      });
     }
   };
 
@@ -192,13 +153,6 @@ export default function ListItem({ listId, skeleton = false }: ListItemProps) {
 
   return (
     <Fragment>
-      <Snackbar
-        open={snackbarData.open}
-        onClose={closeSnackbar}
-        autoHideDuration={4500}
-      >
-        <Alert severity={snackbarData.severity}>{snackbarData.text}</Alert>
-      </Snackbar>
       {!loading && (
         <div className={styles["list-item"]}>
           <div className="d-flex justify-content-between align-items-start">

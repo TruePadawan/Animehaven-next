@@ -3,8 +3,8 @@ import ReplyIcon from "@mui/icons-material/Reply";
 import Link from "next/link";
 import { Fragment, useEffect, useState } from "react";
 import {
-  getProfileData,
   getCommentData,
+  getProfileData,
   toggleUpvoteForComment,
 } from "../../../utilities/app-utilities";
 import Reply from "./Reply";
@@ -31,7 +31,7 @@ import { RealtimeChannel } from "@supabase/realtime-js";
 
 const CommentItem = (props: CommentItemProps) => {
   const supabase = useSupabaseClient<Database>();
-  const { commentData, setReplyData, triggerAlert, profileID } = props;
+  const { commentData, setReplyData, showNotification, profileID } = props;
   const [commentCreatorData, setCommentCreatorData] =
     useState<CommentCreatorData>({
       avatar_url: "",
@@ -68,32 +68,32 @@ const CommentItem = (props: CommentItemProps) => {
         const isReply = parent_comment_id !== null;
         if (isReply) {
           try {
-            const { data: parentCommentData, error } = await getCommentData(
+            const { data: parentCommentData } = await getCommentData(
               supabase,
               parent_comment_id,
             );
-            if (error) throw error;
-
-            const { text, creator_id: parentCommentCreatorID } =
-              parentCommentData;
-            const profileDataForParentCommentCreator = await getProfileData(
-              supabase,
-              parentCommentCreatorID,
-            );
-            const { display_name, account_name } =
-              profileDataForParentCommentCreator;
-            setParentCommentData({
-              id: parent_comment_id,
-              text,
-              creator_display_name: display_name,
-              creator_account_name: account_name,
-            });
+            if (parentCommentData !== null) {
+              const { text, creator_id: parentCommentCreatorID } =
+                parentCommentData;
+              const profileDataForParentCommentCreator = await getProfileData(
+                supabase,
+                parentCommentCreatorID,
+              );
+              const { display_name, account_name } =
+                profileDataForParentCommentCreator;
+              setParentCommentData({
+                id: parent_comment_id,
+                text,
+                creator_display_name: display_name,
+                creator_account_name: account_name,
+              });
+            }
           } catch (error) {
             const postgrestError = error as PostgrestError;
             if (postgrestError.code === "PGRST116") {
               setParentCommentIsDeleted(true);
             } else {
-              triggerAlert("Failed to load data for referenced comment", {
+              showNotification("Failed to load data for referenced comment", {
                 severity: "error",
                 error: postgrestError,
               });
@@ -102,12 +102,12 @@ const CommentItem = (props: CommentItemProps) => {
         }
       })
       .catch((error) => {
-        triggerAlert("Failed to load comment data", {
+        showNotification("Failed to load comment data", {
           severity: "error",
           error,
         });
       });
-  }, [commentData, supabase, triggerAlert]);
+  }, [commentData, supabase, showNotification]);
 
   // LISTEN FOR WHEN PARENT COMMENT IS UPDATED OR DELETED
   useEffect(() => {
@@ -168,7 +168,7 @@ const CommentItem = (props: CommentItemProps) => {
         .eq("id", commentData.id)
         .throwOnError();
     } catch (error) {
-      triggerAlert("Failed to delete comment", {
+      showNotification("Failed to delete comment", {
         severity: "error",
         error: error as PostgrestError,
       });
@@ -186,20 +186,22 @@ const CommentItem = (props: CommentItemProps) => {
 
     const { id: commentID, creator_id } = commentData;
     try {
-      const { data: response, error } = await supabase
+      const { data: response } = await supabase
         .from("profiles")
         .select("account_name")
         .eq("id", creator_id)
+        .throwOnError()
         .limit(1)
         .single();
-      if (error) throw error;
 
-      setReplyData({
-        parentCommentID: commentID,
-        accountName: response.account_name,
-      });
+      if (response !== null) {
+        setReplyData({
+          parentCommentID: commentID,
+          accountName: response.account_name,
+        });
+      }
     } catch (error) {
-      triggerAlert(
+      showNotification(
         "Error while trying to get data on account associated with comment",
         { severity: "error", error: error as PostgrestError },
       );
@@ -217,7 +219,7 @@ const CommentItem = (props: CommentItemProps) => {
     try {
       await toggleUpvoteForComment(supabase, commentData.id, profileID);
     } catch (error) {
-      triggerAlert("Failed to complete action", {
+      showNotification("Failed to toggle upvote", {
         severity: "error",
         error: error as PostgrestError,
       });
@@ -354,7 +356,7 @@ const CommentItem = (props: CommentItemProps) => {
                 <EditCommentItem
                   initialText={commentData.text}
                   commentId={commentData.id}
-                  triggerAlert={triggerAlert}
+                  showNotification={showNotification}
                   onCommentEdited={() => setCommentState("DEFAULT")}
                   onCancelEditing={() => setCommentState("DEFAULT")}
                 />

@@ -1,6 +1,5 @@
 import React, {
   Fragment,
-  useCallback,
   useContext,
   useEffect,
   useMemo,
@@ -10,10 +9,9 @@ import React, {
 import CommentItem from "./CommentItem";
 import CommentBox from "./CommentBox";
 import styles from "../Comments-Reviews.module.css";
-import { Alert, Button, Snackbar, SnackbarOrigin } from "@mui/material";
+import { Button, SnackbarOrigin } from "@mui/material";
 import {
   getCommentsData,
-  getErrorMessage,
   numberToString,
 } from "../../../utilities/app-utilities";
 import { UserAuthContext } from "../../../context/authentication/UserAuthContext";
@@ -27,12 +25,8 @@ import {
   RealtimePostgresUpdateCommentPayload,
 } from "./types/CommentsList.types";
 import { Database, Tables } from "../../../database.types";
-import {
-  SnackbarState,
-  TriggerAlertOptions,
-} from "../../../utilities/global.types";
 import { PostgrestError } from "@supabase/supabase-js";
-import { DEFAULT_SNACKBAR_STATE } from "../../../utilities/global-constants";
+import { NotificationContext } from "../../../context/notifications/NotificationContext";
 
 const COMMENTS_PER_REQUEST = 10;
 const CommentsList = ({ id, className = "" }: CommentsListProps) => {
@@ -40,38 +34,12 @@ const CommentsList = ({ id, className = "" }: CommentsListProps) => {
   const { profileID } = useContext(UserAuthContext);
   const [commentsData, setCommentsData] = useState<Tables<"comments">[]>([]);
   const [loadingComments, setLoadingComments] = useState(false);
-  const [snackbarData, setSnackbarData] = useState<SnackbarState>(
-    DEFAULT_SNACKBAR_STATE,
-  );
   const [replyData, setReplyData] = useState({
     parentCommentID: "",
     accountName: "",
   });
+  const { showNotification } = useContext(NotificationContext);
   const totalCommentsCount = useRef(0);
-
-  const triggerAlert = useCallback(
-    (text: string, options?: TriggerAlertOptions) => {
-      const alertSeverity = options?.severity;
-      setSnackbarData({
-        open: true,
-        severity: alertSeverity || "info",
-        text:
-          alertSeverity === "error"
-            ? `${text} - ${getErrorMessage(options?.error)}`
-            : text,
-      });
-    },
-    [],
-  );
-
-  function resetSnackbar(
-    _event: React.SyntheticEvent<any> | Event,
-    reason: string,
-  ) {
-    if (reason !== "clickaway") {
-      setSnackbarData(DEFAULT_SNACKBAR_STATE);
-    }
-  }
 
   // LOAD COMMENTS ASSOCIATED WITH INSTANCE ID
   useEffect(() => {
@@ -81,10 +49,13 @@ const CommentsList = ({ id, className = "" }: CommentsListProps) => {
         setCommentsData(data);
       })
       .catch((error) => {
-        triggerAlert("Failed to load comments", { severity: "error", error });
+        showNotification("Failed to load comments", {
+          severity: "error",
+          error,
+        });
         setCommentsData([]);
       });
-  }, [id, supabase, triggerAlert]);
+  }, [id, supabase, showNotification]);
 
   // LISTEN FOR NEW COMMENTS AND UPDATES TO COMMENTS
   useEffect(() => {
@@ -169,11 +140,11 @@ const CommentsList = ({ id, className = "" }: CommentsListProps) => {
   }
 
   function onShareSuccess() {
-    triggerAlert("Link Copied!", { severity: "success" });
+    showNotification("Link Copied!", { severity: "success" });
   }
 
   function onShareFailed() {
-    triggerAlert("Failed to Copy Link!", { severity: "warning" });
+    showNotification("Failed to Copy Link!", { severity: "warning" });
   }
 
   async function loadMoreCommentsClickHandler() {
@@ -191,7 +162,7 @@ const CommentsList = ({ id, className = "" }: CommentsListProps) => {
           return [...snapshot, ...data];
         });
       } catch (error) {
-        triggerAlert("Failed to load more comments", {
+        showNotification("Failed to load more comments", {
           severity: "error",
           error: error as PostgrestError,
         });
@@ -212,17 +183,13 @@ const CommentsList = ({ id, className = "" }: CommentsListProps) => {
           key={commentData.id}
           setReplyData={setReplyData}
           commentData={commentData}
-          triggerAlert={triggerAlert}
+          showNotification={showNotification}
           profileID={profileID}
         />
       );
     });
-  }, [commentsData, triggerAlert, profileID]);
+  }, [commentsData, showNotification, profileID]);
 
-  const alertAnchorOrigin: SnackbarOrigin = {
-    vertical: "bottom",
-    horizontal: "left",
-  };
   const componentClassName = `${styles.component} ${className}`;
   return (
     <div className={componentClassName}>
@@ -235,7 +202,7 @@ const CommentsList = ({ id, className = "" }: CommentsListProps) => {
             replyData={replyData}
             cancelReply={resetReplyData}
             onReplyPosted={resetReplyData}
-            triggerAlert={triggerAlert}
+            showNotification={showNotification}
           />
         </Fragment>
       )}
@@ -270,16 +237,6 @@ const CommentsList = ({ id, className = "" }: CommentsListProps) => {
           </Fragment>
         )}
       </div>
-      <Snackbar
-        open={snackbarData.open}
-        autoHideDuration={6000}
-        onClose={resetSnackbar}
-        anchorOrigin={alertAnchorOrigin}
-      >
-        <Alert severity={snackbarData.severity} sx={{ width: "100%" }}>
-          {snackbarData.text}
-        </Alert>
-      </Snackbar>
     </div>
   );
 };

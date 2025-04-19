@@ -57,7 +57,7 @@ const CommentBox = (props: CommentBoxProps) => {
   const formSubmitHandler = async (event: FormEvent) => {
     event.preventDefault();
     if (commentText.trim().length === 0) {
-      props.triggerAlert("Comment must have 1 or more characters", {
+      props.showNotification("Comment must have 1 or more characters", {
         severity: "warning",
       });
       setCommentText("");
@@ -70,7 +70,7 @@ const CommentBox = (props: CommentBoxProps) => {
         await postReply(commentText);
         setCommentText("");
       } catch (error) {
-        props.triggerAlert("Failed to post reply to comment", {
+        props.showNotification("Failed to post reply to comment", {
           severity: "error",
           error: error as PostgrestError,
         });
@@ -80,7 +80,7 @@ const CommentBox = (props: CommentBoxProps) => {
         await postComment(commentText);
         setCommentText("");
       } catch (error) {
-        props.triggerAlert("Failed to post comment", {
+        props.showNotification("Failed to post comment", {
           severity: "error",
           error: error as PostgrestError,
         });

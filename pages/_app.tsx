@@ -9,6 +9,7 @@ import { SessionContextProvider } from "@supabase/auth-helpers-react";
 import { NextPage } from "next";
 import { AppProps } from "next/app";
 import { NotificationContextProvider } from "../context/notifications/NotificationContext";
+import { Database } from "../database.types";
 
 export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
   getLayout?: (page: ReactElement) => ReactNode;
@@ -19,7 +20,9 @@ type AppPropsWithLayout = AppProps & {
 };
 
 function MyApp({ Component, pageProps }: AppPropsWithLayout) {
-  const [supabaseClient] = useState(() => createBrowserSupabaseClient());
+  const [supabaseClient] = useState(() =>
+    createBrowserSupabaseClient<Database>(),
+  );
   const getLayout = Component.getLayout ?? ((page) => page);
   return (
     <Fragment>

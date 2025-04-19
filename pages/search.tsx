@@ -3,6 +3,7 @@ import {
   Fragment,
   ReactElement,
   useCallback,
+  useContext,
   useEffect,
   useMemo,
   useState,
@@ -12,20 +13,16 @@ import AnimeSearchResultItem from "../components/Items/AnimeSearchResultItem/Ani
 import UserSearchResultItem from "../components/Items/UserSearchResultItem/UserSearchResultItem";
 import Loading from "../components/Loading/Loading";
 import { searchAnime } from "../utilities/mal-api";
-import { Alert, Box, Snackbar, SnackbarOrigin } from "@mui/material";
+import { Box } from "@mui/material";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import {
-  getErrorMessage,
-  getRelevantAnimeData,
-} from "../utilities/app-utilities";
+import { getRelevantAnimeData } from "../utilities/app-utilities";
 import HeaderLayout from "../components/HeaderLayout/HeaderLayout";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
-import { DEFAULT_SNACKBAR_STATE } from "../utilities/global-constants";
 import { Database, Tables } from "../database.types";
 import { Anime } from "@tutkli/jikan-ts";
-import { ResetAlert, TriggerAlert } from "../utilities/global.types";
 import { PostgrestError } from "@supabase/supabase-js";
+import { NotificationContext } from "../context/notifications/NotificationContext";
 
 export default function Search() {
   const supabase = useSupabaseClient<Database>();
@@ -34,9 +31,9 @@ export default function Search() {
     Tables<"profiles">[]
   >([]);
   const [loading, setLoading] = useState(false);
-  const [snackbarData, setSnackbarData] = useState(DEFAULT_SNACKBAR_STATE);
   const searchCategories = useMemo(() => ["Anime", "User"], []);
   const router = useRouter();
+  const { showNotification } = useContext(NotificationContext);
   const queryParams = router.query;
   const searchText = queryParams.text;
   const searchCategory = queryParams.cat;
@@ -49,7 +46,7 @@ export default function Search() {
           const animes = await searchAnime(searchText);
           setAnimeSearchResult(animes);
         } catch (error) {
-          triggerAlert("Search failed!", {
+          showNotification("Search failed!", {
             severity: "error",
             error: error as PostgrestError,
           });
@@ -59,7 +56,7 @@ export default function Search() {
           phrase: searchText,
         });
         if (result.error !== null) {
-          triggerAlert("Search failed!", { severity: "error" });
+          showNotification("Search failed!", { severity: "error" });
         } else {
           // @ts-ignore, fix for wrong type set by Supabase
           setUserSearchResult(result.data);
@@ -67,7 +64,7 @@ export default function Search() {
       }
       setLoading(false);
     },
-    [],
+    [showNotification],
   );
 
   // LOOK FOR SEARCH PARAMS IN PAGE URL
@@ -77,25 +74,6 @@ export default function Search() {
     }
   }, [searchText, searchCategory, searchFunc]);
 
-  const triggerAlert: TriggerAlert = (text, options) => {
-    const alertSeverity = options?.severity || "info";
-    const alertText =
-      alertSeverity === "error"
-        ? `${text} - ${getErrorMessage(options?.error)}`
-        : text;
-    setSnackbarData({ text: alertText, open: true, severity: alertSeverity });
-  };
-
-  const resetAlert: ResetAlert = (e, reason) => {
-    if (reason !== "clickaway") {
-      setSnackbarData(DEFAULT_SNACKBAR_STATE);
-    }
-  };
-
-  const alertAnchorOrigin: SnackbarOrigin = {
-    vertical: "top",
-    horizontal: "center",
-  };
   return (
     <Fragment>
       <Head>
@@ -159,16 +137,6 @@ export default function Search() {
           </ul>
         )}
       </Box>
-      <Snackbar
-        open={snackbarData.open}
-        autoHideDuration={5000}
-        anchorOrigin={alertAnchorOrigin}
-        onClose={resetAlert}
-      >
-        <Alert severity={snackbarData.severity} sx={{ width: "100%" }}>
-          {snackbarData.text}
-        </Alert>
-      </Snackbar>
     </Fragment>
   );
 }

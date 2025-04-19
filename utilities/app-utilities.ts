@@ -37,12 +37,6 @@ export function getRelevantAnimeData(anime: Anime) {
   };
 }
 
-export function getRandomInt(min: number, max: number) {
-  min = Math.ceil(min);
-  max = Math.floor(max);
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-
 export function createProfile(
   supabase: SupabaseClient<Database>,
   payload: TablesInsert<"profiles">,
@@ -98,6 +92,7 @@ export async function getCommentData(
     .from("comments")
     .select("*")
     .eq("id", commentId)
+    .throwOnError()
     .limit(1)
     .single();
 }

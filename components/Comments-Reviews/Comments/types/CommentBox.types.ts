@@ -1,4 +1,4 @@
-import { TriggerAlertOptions } from "../../../../utilities/global.types";
+import { NotificationContextType } from "../../../../context/notifications/NotificationContext.types";
 
 export interface CommentBoxProps {
   instanceID: string;
@@ -10,6 +10,6 @@ export interface CommentBoxProps {
   };
   cancelReply: () => void;
   onReplyPosted: () => void;
-  triggerAlert: (text: string, options?: TriggerAlertOptions) => void;
+  showNotification: NotificationContextType["showNotification"];
   onCommentPosted?: () => void;
 }

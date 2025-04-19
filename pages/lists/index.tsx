@@ -9,10 +9,7 @@ import React, {
 import { Masonry } from "@mui/lab";
 import Add from "@mui/icons-material/Add";
 import {
-  Alert,
   Button as MUIButton,
-  Snackbar,
-  SnackbarOrigin,
   SwipeableDrawer,
   useMediaQuery,
 } from "@mui/material";
@@ -30,30 +27,13 @@ import CheckboxList from "../../components/CheckboxList/CheckboxList";
 import HeaderLayout from "../../components/HeaderLayout/HeaderLayout";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import { LIST_GENRES } from "../../utilities/global-constants";
-import { Tables } from "../../database.types";
+import { Database, Tables } from "../../database.types";
 import { ListGenres } from "../../components/CreateList/CreateList.types";
-import { HasErrorMessage, ResetAlert } from "../../utilities/global.types";
-import { PostgrestError } from "@supabase/supabase-js";
-
-const applyGenreFilter = (
-  lists: Tables<"anime_lists">[],
-  acceptedGenres: ListGenres,
-) => {
-  return lists.filter((list) => {
-    let accepted = false;
-    const { genres } = list;
-    for (const genre in genres) {
-      if (genres[genre] && acceptedGenres[genre]) {
-        accepted = true;
-        break;
-      }
-    }
-    return accepted;
-  });
-};
+import { NotificationContext } from "../../context/notifications/NotificationContext";
+import { HasErrorMessage } from "../../utilities/global.types";
 
 const Lists = () => {
-  const supabase = useSupabaseClient();
+  const supabase = useSupabaseClient<Database>();
   const { profileID } = useContext(UserAuthContext);
   const [showCreateListDialog, setShowCreateListDialog] = useState(false);
   const [lists, setLists] = useState<Tables<"anime_lists">[]>([]);
@@ -61,28 +41,15 @@ const Lists = () => {
   const [queryOngoing, setQueryOngoing] = useState(false);
   const [searchText, setSearchText] = useState("");
   const [acceptedGenres, setAcceptedGenres] = useState(() => {
-    let genres: ListGenres = {};
+    const genres: ListGenres = {};
     LIST_GENRES.forEach((genre) => {
       genres[genre.toUpperCase()] = true;
     });
     return genres;
   });
-  const [error, setError] = useState({ occurred: false, text: "" });
   const [filterDrawerIsOpen, setFilterDrawerIsOpen] = useState(false);
   const matchesSmallDevice = useMediaQuery("(max-width: 600px)");
-
-  const handleError = (text: string, error: HasErrorMessage) => {
-    setError({
-      occurred: true,
-      text: `${text} - ${error.message || error.error_description}`,
-    });
-  };
-
-  const resetError: ResetAlert = (event, reason) => {
-    if (reason !== "clickaway") {
-      setError({ occurred: false, text: "" });
-    }
-  };
+  const { showNotification } = useContext(NotificationContext);
 
   // SHOW PUBLIC LISTS OR USER OWN LISTS
   useEffect(() => {
@@ -94,7 +61,10 @@ const Lists = () => {
         .order("created_at", { ascending: false })
         .then(({ data, error }) => {
           if (error) {
-            handleError("Failed to retrieve public lists", error);
+            showNotification("Failed to retrieve public lists", {
+              severity: "error",
+              error,
+            });
             setLists([]);
             setQueryOngoing(false);
           } else {
@@ -109,10 +79,12 @@ const Lists = () => {
         .select("*")
         .eq("creator_id", profileID)
         .order("created_at", { ascending: false })
-        .throwOnError()
         .then(({ data, error }) => {
           if (error) {
-            handleError("Failed to retrieve user lists", error);
+            showNotification("Failed to retrieve user lists", {
+              severity: "error",
+              error,
+            });
             setLists([]);
             setQueryOngoing(false);
           } else {
@@ -141,30 +113,38 @@ const Lists = () => {
     setQueryOngoing(true);
     try {
       if (listFilter === "all") {
-        const { data: searchResults, error } = await supabase.rpc(
-          "search_list",
-          { phrase: searchText },
-        );
-        if (error) throw error;
-        const filteredSearchResults = applyGenreFilter(
-          searchResults as Tables<"anime_lists">[],
-          acceptedGenres,
-        );
-        setLists(filteredSearchResults);
+        const { data: searchResults } = await supabase
+          .rpc("search_list", { phrase: searchText })
+          .throwOnError();
+
+        if (searchResults !== null) {
+          const filteredSearchResults = applyGenreFilter(
+            // @ts-ignore, supabase gives the wrong type
+            searchResults as Tables<"anime_lists">[],
+            acceptedGenres,
+          );
+          setLists(filteredSearchResults);
+        }
       } else if (listFilter === "your_lists" && profileID !== undefined) {
-        let { data: searchResults, error } = await supabase.rpc("search_list", {
+        const { data: searchResults } = await supabase.rpc("search_list", {
           phrase: searchText,
           profile_id: profileID,
         });
-        if (error) throw error;
-        const filteredSearchResults = applyGenreFilter(
-          searchResults as Tables<"anime_lists">[],
-          acceptedGenres,
-        );
-        setLists(filteredSearchResults);
+
+        if (searchResults !== null) {
+          const filteredSearchResults = applyGenreFilter(
+            // @ts-ignore
+            searchResults as Tables<"anime_lists">[],
+            acceptedGenres,
+          );
+          setLists(filteredSearchResults);
+        }
       }
     } catch (error) {
-      handleError("Error while trying to search", error as PostgrestError);
+      showNotification("Error while trying to search", {
+        severity: "error",
+        error: error as HasErrorMessage,
+      });
     }
     setQueryOngoing(false);
   };
@@ -191,11 +171,6 @@ const Lists = () => {
 
   const toggleFilterDrawer = (open: boolean) => {
     setFilterDrawerIsOpen(open);
-  };
-
-  const alertAnchorOrigin: SnackbarOrigin = {
-    vertical: "top",
-    horizontal: "center",
   };
 
   return (
@@ -307,16 +282,6 @@ const Lists = () => {
           )}
         </div>
       </div>
-      <Snackbar
-        open={error.occurred}
-        autoHideDuration={6000}
-        onClose={resetError}
-        anchorOrigin={alertAnchorOrigin}
-      >
-        <Alert severity="error" sx={{ width: "100%" }}>
-          {error.text}
-        </Alert>
-      </Snackbar>
     </Fragment>
   );
 };
@@ -331,4 +296,21 @@ Lists.getLayout = (page: ReactElement) => {
       </BodyLayout>
     </HeaderLayout>
   );
+};
+
+const applyGenreFilter = (
+  lists: Tables<"anime_lists">[],
+  acceptedGenres: ListGenres,
+) => {
+  return lists.filter((list) => {
+    let accepted = false;
+    const { genres } = list;
+    for (const genre in genres) {
+      if (genres[genre] && acceptedGenres[genre]) {
+        accepted = true;
+        break;
+      }
+    }
+    return accepted;
+  });
 };

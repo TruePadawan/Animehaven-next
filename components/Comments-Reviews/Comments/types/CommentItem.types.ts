@@ -1,10 +1,10 @@
 import { Tables } from "../../../../database.types";
-import { TriggerAlert } from "../../../../utilities/global.types";
 import { UserAuthContextType } from "../../../../context/authentication/UserAuthContext.types";
+import { NotificationContextType } from "../../../../context/notifications/NotificationContext.types";
 
 export interface CommentItemProps {
   commentData: Tables<"comments">;
-  triggerAlert: TriggerAlert;
+  showNotification: NotificationContextType["showNotification"];
   profileID: UserAuthContextType["profileID"];
   setReplyData: (replyData: {
     parentCommentID: string;

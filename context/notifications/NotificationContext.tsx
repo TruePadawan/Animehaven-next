@@ -1,9 +1,16 @@
-import { Alert, Slide, SlideProps, Snackbar, SnackbarCloseReason, SnackbarOrigin } from "@mui/material";
+import {
+  Alert,
+  Slide,
+  SlideProps,
+  Snackbar,
+  SnackbarCloseReason,
+  SnackbarOrigin,
+} from "@mui/material";
 import React, { createContext, Fragment, useState } from "react";
 import {
   NotificationContextProviderProps,
   NotificationContextType,
-  NotificationState
+  NotificationState,
 } from "./NotificationContext.types";
 import { getErrorMessage } from "../../utilities/app-utilities";
 

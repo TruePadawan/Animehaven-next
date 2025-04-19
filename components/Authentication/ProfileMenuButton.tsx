@@ -1,10 +1,10 @@
-import React, { Fragment, useEffect, useState } from "react";
+import React, { Fragment, useContext, useEffect, useState } from "react";
 import {
-  Menu,
-  MenuItem,
-  IconButton,
   Avatar,
   CircularProgress,
+  IconButton,
+  Menu,
+  MenuItem,
 } from "@mui/material";
 import Link from "next/link";
 import { getProfileData } from "../../utilities/app-utilities";
@@ -14,6 +14,8 @@ import { ProfileMenuButtonProps } from "./types/ProfileMenuButton.types";
 import { Database } from "../../database.types";
 import { PostgrestError } from "@supabase/supabase-js";
 import { DEFAULT_AVATAR_URL } from "../../utilities/global-constants";
+import { NotificationContext } from "../../context/notifications/NotificationContext";
+import { useRouter } from "next/router";
 
 const ProfileMenuButton = (props: ProfileMenuButtonProps) => {
   const supabase = useSupabaseClient<Database>();
@@ -21,8 +23,10 @@ const ProfileMenuButton = (props: ProfileMenuButtonProps) => {
   const [menuAnchorEl, setMenuAnchorEl] = useState<Element | null>(null);
   const [photoSrc, setPhotoSrc] = useState(DEFAULT_AVATAR_URL);
   const [loading, setLoading] = useState(true);
+  const { showNotification } = useContext(NotificationContext);
+  const router = useRouter();
   const isMenuOpen = Boolean(menuAnchorEl);
-  const { profileID, errorHandler } = props;
+  const { profileID } = props;
 
   useEffect(() => {
     getProfileData(supabase, profileID).then(({ account_name, avatar_url }) => {
@@ -46,10 +50,13 @@ const ProfileMenuButton = (props: ProfileMenuButtonProps) => {
       .signOut()
       .then(() => {
         setLoading(false);
-        window.location.reload();
+        router.reload();
       })
       .catch((error) => {
-        errorHandler("Failed to sign out!", error as PostgrestError);
+        showNotification("Failed to sign out!", {
+          severity: "error",
+          error: error as PostgrestError,
+        });
       });
   };
 
@@ -80,10 +87,12 @@ const ProfileMenuButton = (props: ProfileMenuButtonProps) => {
             anchorEl={menuAnchorEl}
             open={isMenuOpen}
             onClick={closeMenu}
-            PaperProps={{
-              sx: {
-                backgroundColor: "#121212",
-                color: "white",
+            slotProps={{
+              paper: {
+                sx: {
+                  backgroundColor: "#121212",
+                  color: "white",
+                },
               },
             }}
           >

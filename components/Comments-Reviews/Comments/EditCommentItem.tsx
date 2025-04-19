@@ -14,7 +14,7 @@ const EditCommentItem = (props: EditCommentItemProps) => {
     event.preventDefault();
 
     if (commentText.trim().length === 0) {
-      props.triggerAlert("Comment must have 1 or more characters", {
+      props.showNotification("Comment must have 1 or more characters", {
         severity: "warning",
       });
     } else {
@@ -25,7 +25,7 @@ const EditCommentItem = (props: EditCommentItemProps) => {
           .eq("id", props.commentId);
         props.onCommentEdited();
       } catch (error) {
-        props.triggerAlert("Failed to edit comment", {
+        props.showNotification("Failed to edit comment", {
           severity: "error",
           error: error as PostgrestError,
         });

@@ -1,8 +1,8 @@
-import { TriggerAlert } from "../../../../utilities/global.types";
+import { NotificationContextType } from "../../../../context/notifications/NotificationContext.types";
 
 export interface EditCommentItemProps {
   initialText: string;
-  triggerAlert: TriggerAlert;
+  showNotification: NotificationContextType["showNotification"];
   commentId: string;
   onCommentEdited: VoidFunction;
   onCancelEditing: VoidFunction;

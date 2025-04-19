@@ -1,5 +1,4 @@
 import {
-  Alert,
   Box,
   Button,
   Checkbox,
@@ -13,8 +12,6 @@ import {
   FormHelperText,
   Radio,
   RadioGroup,
-  Snackbar,
-  SnackbarOrigin,
   TextareaAutosize,
 } from "@mui/material";
 import {
@@ -22,6 +19,7 @@ import {
   FormEvent,
   Fragment,
   ReactElement,
+  useContext,
   useEffect,
   useMemo,
   useState,
@@ -32,24 +30,14 @@ import Input from "../Input/Input";
 import SearchInput from "../Input/SearchInput/SearchInput";
 import Loading from "../Loading/Loading";
 import styles from "./style.module.css";
-import {
-  getErrorMessage,
-  getRelevantAnimeData,
-} from "../../utilities/app-utilities";
+import { getRelevantAnimeData } from "../../utilities/app-utilities";
 import { useRouter } from "next/router";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import { Database } from "../../database.types";
 import { CreateListProps, ListGenres } from "./CreateList.types";
-import {
-  ResetAlert,
-  SnackbarState,
-  TriggerAlert,
-} from "../../utilities/global.types";
 import { PostgrestError } from "@supabase/supabase-js";
-import {
-  DEFAULT_SNACKBAR_STATE,
-  LIST_GENRES,
-} from "../../utilities/global-constants";
+import { LIST_GENRES } from "../../utilities/global-constants";
+import { NotificationContext } from "../../context/notifications/NotificationContext";
 
 // Consider renaming this to ManageAnimeList or most likely splitting the component into 2 separate ones
 const CreateList = (props: CreateListProps) => {
@@ -93,10 +81,8 @@ const CreateList = (props: CreateListProps) => {
   const [searchText, setSearchText] = useState("");
   const [searchResults, setSearchResults] = useState<ReactElement[]>([]);
   const [isSearchOngoing, setIsSearchOngoing] = useState(false);
-  const [snackbarData, setSnackbarData] = useState<SnackbarState>(
-    DEFAULT_SNACKBAR_STATE,
-  );
   const router = useRouter();
+  const { showNotification } = useContext(NotificationContext);
 
   // KEEP TRACK OF WHETHER THERE IS AT LEAST ONE GENRE SELECTED
   useEffect(() => {
@@ -108,21 +94,6 @@ const CreateList = (props: CreateListProps) => {
     }
     setError(selectedGenres.length === 0);
   }, [listGenres, props.open]);
-
-  const triggerAlert: TriggerAlert = (text, options) => {
-    const alertSeverity = options?.severity || "info";
-    const alertText =
-      alertSeverity === "error"
-        ? `${text} - ${getErrorMessage(options?.error)}`
-        : text;
-    setSnackbarData({ text: alertText, open: true, severity: alertSeverity });
-  };
-
-  const resetAlert: ResetAlert = (e, reason) => {
-    if (reason !== "clickaway") {
-      setSnackbarData(DEFAULT_SNACKBAR_STATE);
-    }
-  };
 
   const cleanup = () => {
     const isEditingAnimeList = props.defaultValues !== undefined;
@@ -202,18 +173,10 @@ const CreateList = (props: CreateListProps) => {
     e.preventDefault();
     try {
       if (error) {
-        return triggerAlert("Failed to create list", {
+        return showNotification("Failed to create list", {
           severity: "error",
           error: {
             message: "No genre selected",
-          },
-        });
-      }
-      if (props.profileId === null) {
-        return triggerAlert("Failed to create list", {
-          severity: "error",
-          error: {
-            message: "No user signed in",
           },
         });
       }
@@ -230,13 +193,11 @@ const CreateList = (props: CreateListProps) => {
         })
         .throwOnError();
       cleanup();
-      setSnackbarData({
-        text: "List successfully created!",
-        open: true,
+      showNotification("List successfully created!", {
         severity: "success",
       });
     } catch (error) {
-      triggerAlert("Failed to create list", {
+      showNotification("Failed to create list", {
         severity: "error",
         error: error as PostgrestError,
       });
@@ -247,23 +208,16 @@ const CreateList = (props: CreateListProps) => {
     e.preventDefault();
     try {
       if (error) {
-        return triggerAlert("Failed to update list", {
+        return showNotification("Failed to update list", {
           severity: "error",
           error: {
             message: "No genre selected",
           },
         });
       }
-      if (props.profileId === null) {
-        return triggerAlert("Failed to update list", {
-          severity: "error",
-          error: {
-            message: "No user signed in",
-          },
-        });
-      }
+
       if (props.defaultValues?.id === undefined) {
-        return triggerAlert("Failed to update list", {
+        return showNotification("Failed to update list", {
           severity: "error",
           error: {
             message:
@@ -284,9 +238,9 @@ const CreateList = (props: CreateListProps) => {
         })
         .eq("id", props.defaultValues.id)
         .throwOnError();
-      window.location.reload();
+      router.reload();
     } catch (error) {
-      triggerAlert("Failed to update list", {
+      showNotification("Failed to update list", {
         severity: "error",
         error: error as PostgrestError,
       });
@@ -296,7 +250,7 @@ const CreateList = (props: CreateListProps) => {
   const deleteList = async () => {
     try {
       if (props.defaultValues?.id === undefined) {
-        return triggerAlert("Failed to delete list", {
+        return showNotification("Failed to delete list", {
           severity: "error",
           error: {
             message:
@@ -311,7 +265,7 @@ const CreateList = (props: CreateListProps) => {
         .throwOnError();
       await router.replace("/lists");
     } catch (error) {
-      triggerAlert("Failed to delete list", {
+      showNotification("Failed to delete list", {
         severity: "error",
         error: error as PostgrestError,
       });
@@ -348,10 +302,6 @@ const CreateList = (props: CreateListProps) => {
     });
   }, [items]);
 
-  const alertAnchorOrigin: SnackbarOrigin = {
-    vertical: "top",
-    horizontal: "center",
-  };
   const isEditingAnimeList = props.defaultValues !== undefined;
   return (
     <Fragment>
@@ -495,16 +445,6 @@ const CreateList = (props: CreateListProps) => {
           </Box>
         </DialogContent>
       </Dialog>
-      <Snackbar
-        open={snackbarData.open}
-        autoHideDuration={5000}
-        anchorOrigin={alertAnchorOrigin}
-        onClose={resetAlert}
-      >
-        <Alert severity={snackbarData.severity} sx={{ width: "100%" }}>
-          {snackbarData.text}
-        </Alert>
-      </Snackbar>
     </Fragment>
   );
 };
