@@ -9,7 +9,7 @@ import React, {
 import CommentItem from "./CommentItem";
 import CommentBox from "./CommentBox";
 import styles from "../Comments-Reviews.module.css";
-import { Button, SnackbarOrigin } from "@mui/material";
+import { Button } from "@mui/material";
 import {
   getCommentsData,
   numberToString,
