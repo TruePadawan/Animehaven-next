@@ -52,7 +52,7 @@ const AnimeDetails: NextPageWithLayout = () => {
   // LOAD DATA FOR ITEM AND RENDER IT IN UI
   useEffect(() => {
     if (animeID) {
-      getAnimeById(animeID)
+      getAnimeById(+animeID)
         .then((anime) => {
           setAnime(getRelevantAnimeData(anime));
         })

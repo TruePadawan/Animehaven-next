@@ -190,7 +190,7 @@ const Item = ({ itemID, itemTitle, index }: ItemProps) => {
     // LAZY REQEUST DUE TO RATE LIMITING
     const timeout = index > 0 ? index * 500 : 0;
     setTimeout(() => {
-      getAnimeById(itemID.toString())
+      getAnimeById(itemID)
         .then((data) => {
           const { overview, imageURL } = getRelevantAnimeData(data);
           setItemData({

@@ -1,4 +1,9 @@
-import { Anime } from "@tutkli/jikan-ts";
+import {
+  Anime,
+  AnimeClient,
+  AnimeSearchParams,
+  RandomClient,
+} from "@tutkli/jikan-ts";
 import { ALLOWED_ANIME_TYPES, FLAGGED_ANIME_GENRES } from "./global-constants";
 
 const isNSFW = (anime: Anime) => {
@@ -21,25 +26,13 @@ const isFlagged = (anime: Anime) => {
 };
 
 export const getRandomAnime = async (): Promise<Anime> => {
-  const URL = "https://api.jikan.moe/v4/random/anime";
-  let response = await fetch(URL);
-  let anime = await (await response.json()).data;
+  const randomClient = new RandomClient();
+  let { data: anime } = await randomClient.getRandomAnime();
   while (isFlagged(anime)) {
-    response = await fetch(URL);
-    anime = await (await response.json()).data;
+    const response = await randomClient.getRandomAnime();
+    anime = response.data;
   }
   return anime;
-};
-
-export const getAnimes = async (
-  subCategory: string,
-  limit = 20,
-): Promise<Anime[]> => {
-  const URL = `https://api.jikan.moe/v4/top/anime?filter=${subCategory}&limit=${limit}`;
-  const response = await fetch(URL);
-  return await (
-    await response.json()
-  ).data;
 };
 
 export const getRandomAnimes = async (number = 1): Promise<Anime[]> => {
@@ -54,32 +47,54 @@ export const getRandomAnimes = async (number = 1): Promise<Anime[]> => {
   return animes;
 };
 
-export const searchAnime = async (title: string, limit = 20) => {
-  if (!title) throw new Error("Invalid Params");
-  const URL = `https://api.jikan.moe/v4/anime?q=${title}&limit=${limit}&sfw=true`;
-  const response = await fetch(URL);
-  const list: Anime[] = await (await response.json()).data;
-  return list.filter((anime) => !isFlagged(anime));
+export const getAnimes = async (
+  searchParams: AnimeSearchParams,
+): Promise<Anime[]> => {
+  const animeClient = new AnimeClient();
+  const response = await animeClient.getAnimeSearch(searchParams);
+  const animes = response.data;
+  const uniqueAnimes: Anime[] = [];
+  animes.forEach((anime) => {
+    if (
+      !uniqueAnimes.some((uniqueAnime) => uniqueAnime.mal_id === anime.mal_id)
+    ) {
+      uniqueAnimes.push(anime);
+    }
+  });
+  return uniqueAnimes;
 };
 
-// TODO: id should be a string
-export const getAnimeById = async (id: string): Promise<Anime> => {
-  const URL = `https://api.jikan.moe/v4/anime/${id}`;
-  const response = await fetch(URL);
+export const searchAnime = async (title: string, limit = 20) => {
+  const animeClient = new AnimeClient();
+  const response = await animeClient.getAnimeSearch({
+    q: title,
+    order_by: "popularity",
+    limit,
+  });
+  return response.data.filter((anime) => !isFlagged(anime));
+};
 
-  if (response.status === 404) {
-    throw new Error(`Anime with ID ${id} not found!`);
-  }
-  // IF API REQUEST LIMIT HITS, KEEP RECURSIVELY SENDING UNTIL IT PROCEEDS
-  if (response.status === 429) {
-    return await getAnimeById(id);
-  } else if (response.status !== 200) {
-    throw new Error(response.statusText);
-  }
+export const getAnimeById = async (id: number): Promise<Anime> => {
+  const animeClient = new AnimeClient();
+  const response = await animeClient.getAnimeById(id);
 
-  const data = await (await response.json()).data;
-  if (data === undefined) {
-    throw new Error("Failed to find resource!");
-  }
-  return data;
+  // const URL = `https://api.jikan.moe/v4/anime/${id}`;
+  // const response = await fetch(URL);
+
+  // if (response.status === 404) {
+  //   throw new Error(`Anime with ID ${id} not found!`);
+  // }
+  // // IF API REQUEST LIMIT HITS, KEEP RECURSIVELY SENDING UNTIL IT PROCEEDS
+  // if (response.status === 429) {
+  //   return await getAnimeById(id);
+  // } else if (response.status !== 200) {
+  //   throw new Error(response.statusText);
+  // }
+  //
+  // const data = await (await response.json()).data;
+  // if (data === undefined) {
+  //   throw new Error("Failed to find resource!");
+  // }
+  // return data;
+  return response.data;
 };

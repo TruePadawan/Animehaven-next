@@ -9,8 +9,6 @@ import Head from "next/head";
 import HeaderLayout from "../components/HeaderLayout/HeaderLayout";
 import { Anime } from "@tutkli/jikan-ts";
 
-const DEFAULT_N_LOADED_ITEMS = 10;
-
 interface HomeProps {
   animes: {
     randomAnimes: Anime[];
@@ -88,16 +86,25 @@ const Home = (props: HomeProps) => {
 };
 
 export async function getStaticProps() {
-  const randomAnimes = await getRandomAnimes(DEFAULT_N_LOADED_ITEMS);
-  const airingAnimes = await getAnimes("airing", DEFAULT_N_LOADED_ITEMS + 5);
-  const upcomingAnimes = await getAnimes(
-    "upcoming",
-    DEFAULT_N_LOADED_ITEMS + 5,
-  );
-  const popularAnimes = await getAnimes(
-    "bypopularity",
-    DEFAULT_N_LOADED_ITEMS + 5,
-  );
+  const ANIME_LIMIT = 20;
+  const randomAnimes = await getRandomAnimes(ANIME_LIMIT);
+  const airingAnimes = await getAnimes({
+    sfw: true,
+    status: "airing",
+    limit: ANIME_LIMIT,
+    order_by: "popularity",
+  });
+  const upcomingAnimes = await getAnimes({
+    sfw: true,
+    status: "upcoming",
+    limit: ANIME_LIMIT,
+    order_by: "popularity",
+  });
+  const popularAnimes = await getAnimes({
+    sfw: true,
+    order_by: "popularity",
+    limit: ANIME_LIMIT,
+  });
 
   return {
     props: {

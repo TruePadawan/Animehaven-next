@@ -18,7 +18,7 @@ const RecommendedItem = ({ itemId, index }: RecommendedItemProps) => {
     // LAZY REQEUST DUE TO RATE LIMITING
     const timeout = index > 0 ? index * 700 : 0;
     const getData = async () => {
-      const data = await getAnimeById(itemId);
+      const data = await getAnimeById(+itemId);
       const { title, imageURL } = getRelevantAnimeData(data);
       setItemData({
         title,
