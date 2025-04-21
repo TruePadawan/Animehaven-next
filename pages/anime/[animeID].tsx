@@ -13,8 +13,8 @@ import { UserAuthContext } from "../../context/authentication/UserAuthContext";
 import Select from "../../components/Select/Select";
 import {
   getProfileData,
-  getRelevantAnimeData,
   getUserItemRecommendations,
+  parseAnime,
   setRecentItem,
 } from "../../utilities/app-utilities";
 import styles from "../../styles/anime.module.css";
@@ -29,7 +29,7 @@ import HeaderLayout from "../../components/HeaderLayout/HeaderLayout";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import { VALID_WATCH_STATUS } from "../../utilities/global-constants";
 import { Database } from "../../database.types";
-import { AnimeItemData, WatchStatus } from "../../utilities/global.types";
+import { ParsedAnime, WatchStatus } from "../../utilities/global.types";
 import { NextPageWithLayout } from "../_app";
 import { PostgrestError } from "@supabase/supabase-js";
 import { NotificationContext } from "../../context/notifications/NotificationContext";
@@ -38,7 +38,7 @@ const AnimeDetails: NextPageWithLayout = () => {
   const supabase = useSupabaseClient<Database>();
   const { profileID } = useContext(UserAuthContext);
   const [watchStatus, setWatchStatus] = useState<WatchStatus>("NOT_WATCHED");
-  const [anime, setAnime] = useState<AnimeItemData>();
+  const [anime, setAnime] = useState<ParsedAnime>();
   const [recommendationStatus, setRecommendationStatus] =
     useState("not_recommended");
   const [recommendBtnDisabled, setRecommendBtnDisabled] = useState(false);
@@ -54,7 +54,7 @@ const AnimeDetails: NextPageWithLayout = () => {
     if (animeID) {
       getAnimeById(+animeID)
         .then((anime) => {
-          setAnime(getRelevantAnimeData(anime));
+          setAnime(parseAnime(anime));
         })
         .catch((error) => {
           setErrorText(error.message);
@@ -68,7 +68,7 @@ const AnimeDetails: NextPageWithLayout = () => {
       const animeID = router.query?.animeID as string;
       setWatchStatusElDisabled(true);
       setRecommendBtnDisabled(true);
-      // LOAD ANIME WATCH STATUS FOR SIGNED IN USER
+      // LOAD ANIME WATCH STATUS FOR SIGNED-IN USER
       getProfileData(supabase, profileID)
         .then(({ items_watch_status }) => {
           const animeIDs = Object.keys(items_watch_status);
@@ -252,7 +252,7 @@ const AnimeDetails: NextPageWithLayout = () => {
           content={`https://animehaven.vercel.app/item/${animeID}`}
         />
         <meta name="twitter:title" content={`Animehaven | ${anime.title}`} />
-        <meta name="twitter:description" content={anime.overview} />
+        <meta name="twitter:description" content={anime.synopsis} />
       </Head>
       <Box
         className={`d-flex flex-column mt-5 gap-3 ${styles["main-section-container"]}`}

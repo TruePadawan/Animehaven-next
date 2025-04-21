@@ -5,58 +5,43 @@ import { Fragment } from "react";
 import { v4 as uuid } from "uuid";
 import StarIcon from "@mui/icons-material/Star";
 import styles from "./style.module.css";
-import { AnimeItemData } from "../../../utilities/global.types";
+import { Anime } from "@tutkli/jikan-ts";
+import { parseAnime } from "../../../utilities/app-utilities";
 
 interface ItemPopperProps {
   optimize?: boolean;
   onClose: VoidFunction;
   anchorEl: HTMLElement | null;
-  data: AnimeItemData & {
-    alt: string;
-  };
+  anime: Anime;
 }
 
 const ItemPopper = (props: ItemPopperProps) => {
-  const { data } = props;
+  const { anime } = props;
+  const parsedAnime = parseAnime(anime);
   const open = Boolean(props.anchorEl);
-  const genres = data.genres.map((genre) => {
-    return (
-      <Chip
-        key={uuid()}
-        variant="outlined"
-        label={genre.name}
-        sx={{
-          borderColor: "#616161",
-          color: "#B15500",
-          fontSize: "10px",
-          fontWeight: "bold",
-        }}
-      />
-    );
-  });
-  if (genres.length > 3) genres.length = 3;
-  const popperStyles = {
-    "& > div": {
-      backgroundColor: "transparent",
-    },
-  };
+  parsedAnime.genres = parsedAnime.genres.slice(3);
+
   return (
     <Popper
       anchorEl={props.anchorEl}
       open={open}
       disablePortal={true}
       placement="left"
-      sx={popperStyles}
+      sx={{
+        "& > div": {
+          backgroundColor: "transparent",
+        },
+      }}
     >
       <Link
         className={styles.popover}
         onMouseLeave={props.onClose}
-        href={`/anime/${data.id}`}
+        href={`/anime/${parsedAnime.mal_id}`}
       >
         {props.optimize ? (
           <Image
-            src={data.imageURL}
-            alt={data.title}
+            src={parsedAnime.imageURL}
+            alt={parsedAnime.title}
             className={styles.popoverItemImg}
             width={200}
             height={300}
@@ -64,25 +49,25 @@ const ItemPopper = (props: ItemPopperProps) => {
         ) : (
           <img
             className={styles.popoverItemImg}
-            src={data.imageURL}
-            alt={data.title}
+            src={parsedAnime.imageURL}
+            alt={parsedAnime.title}
             loading="lazy"
           />
         )}
 
         <div className="d-flex flex-column align-self-stretch gap-1">
-          <span className={styles.title}>{data.title}</span>
+          <span className={styles.title}>{parsedAnime.title}</span>
           <div className="d-flex justify-content-between">
             <span className={styles.score}>
-              {data.score && (
+              {parsedAnime.score && (
                 <Fragment>
                   <StarIcon sx={{ color: "goldenrod", marginBottom: "2px" }} />
-                  <small>{data.score}</small>
+                  <small>{parsedAnime.score}</small>
                 </Fragment>
               )}
             </span>
             <Chip
-              label={data.type}
+              label={parsedAnime.type}
               sx={{
                 color: "white",
                 backgroundColor: "#616161",
@@ -90,8 +75,24 @@ const ItemPopper = (props: ItemPopperProps) => {
               }}
             />
           </div>
-          {genres.length > 0 && (
-            <div className="d-flex gap-1 flex-wrap">{genres}</div>
+          {parsedAnime.genres.length > 0 && (
+            <div className="d-flex gap-1 flex-wrap">
+              {parsedAnime.genres.map((genre) => {
+                return (
+                  <Chip
+                    key={uuid()}
+                    variant="outlined"
+                    label={genre.name}
+                    sx={{
+                      borderColor: "#616161",
+                      color: "#B15500",
+                      fontSize: "10px",
+                      fontWeight: "bold",
+                    }}
+                  />
+                );
+              })}
+            </div>
           )}
         </div>
       </Link>

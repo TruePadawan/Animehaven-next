@@ -16,7 +16,7 @@ import { searchAnime } from "../utilities/mal-api";
 import { Box } from "@mui/material";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import { getRelevantAnimeData } from "../utilities/app-utilities";
+import { parseAnime } from "../utilities/app-utilities";
 import HeaderLayout from "../components/HeaderLayout/HeaderLayout";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import { Database, Tables } from "../database.types";
@@ -110,11 +110,11 @@ export default function Search() {
           <ul className="d-flex flex-wrap gap-2 py-2 align-self-start">
             {searchCategory?.toString().toUpperCase() === "ANIME" &&
               animeSearchResult.map((anime) => {
-                const { id, title, imageURL } = getRelevantAnimeData(anime);
+                const { mal_id, title, imageURL } = parseAnime(anime);
                 return (
                   <AnimeSearchResultItem
-                    key={id}
-                    linkTo={`/anime/${id}`}
+                    key={mal_id}
+                    linkTo={`/anime/${mal_id}`}
                     title={title}
                     photoURL={imageURL}
                   />

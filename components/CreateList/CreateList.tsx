@@ -30,7 +30,7 @@ import Input from "../Input/Input";
 import SearchInput from "../Input/SearchInput/SearchInput";
 import Loading from "../Loading/Loading";
 import styles from "./style.module.css";
-import { getRelevantAnimeData } from "../../utilities/app-utilities";
+import { parseAnime } from "../../utilities/app-utilities";
 import { useRouter } from "next/router";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import { Database } from "../../database.types";
@@ -154,12 +154,12 @@ const CreateList = (props: CreateListProps) => {
     setIsSearchOngoing(true);
     const rawAnimesData = await searchAnime(searchText, 10);
     const transformed_list = rawAnimesData.map((animeData) => {
-      const { id, title } = getRelevantAnimeData(animeData);
+      const { mal_id, title } = parseAnime(animeData);
       return (
         <Chip
-          key={id}
+          key={mal_id}
           label={title}
-          onClick={addItem.bind(this, id, title)}
+          onClick={() => addItem(mal_id, title)}
           variant="outlined"
           color="info"
         />
