@@ -23,28 +23,28 @@ const Home = (props: HomeProps) => {
     const animes = props.animes.randomAnimes;
     const transformedData = animes.map((anime) => parseAnime(anime));
     return transformedData.map((animeData) => (
-      <AnimeItem key={animeData.id} data={animeData} />
+      <AnimeItem key={animeData.mal_id} anime={animeData} />
     ));
   })();
   const airingAnimes = (() => {
     const animes = props.animes.airingAnimes;
     const transformedData = animes.map((anime) => parseAnime(anime));
     return transformedData.map((animeData) => (
-      <AnimeItem key={animeData.id} data={animeData} />
+      <AnimeItem key={animeData.mal_id} anime={animeData} />
     ));
   })();
   const upcomingAnimes = (() => {
     const animes = props.animes.upcomingAnimes;
     const transformedData = animes.map((anime) => parseAnime(anime));
     return transformedData.map((animeData) => (
-      <AnimeItem key={animeData.id} data={animeData} />
+      <AnimeItem key={animeData.mal_id} anime={animeData} />
     ));
   })();
   const popularAnimes = (() => {
     const animes = props.animes.popularAnimes;
     const transformedData = animes.map((anime) => parseAnime(anime));
     return transformedData.map((animeData) => (
-      <AnimeItem key={animeData.id} data={animeData} />
+      <AnimeItem key={animeData.mal_id} anime={animeData} />
     ));
   })();
 
