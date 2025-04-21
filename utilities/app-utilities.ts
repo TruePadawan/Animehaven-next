@@ -4,36 +4,17 @@ import { SupabaseClient } from "@supabase/supabase-js";
 import { Database, Tables, TablesInsert } from "../database.types";
 import { Anime } from "@tutkli/jikan-ts";
 
-export function getRelevantAnimeData(anime: Anime) {
-  const id = anime["mal_id"];
-  const title = anime.title_english ?? anime.title;
+export function parseAnime(anime: Anime) {
   const imageURL =
     anime.images.webp === undefined
       ? anime.images.jpg["image_url"]
       : anime.images.webp["image_url"];
-  const type = anime.type;
-  const score = anime.score;
-  const genres = anime.genres;
-  const overview = anime.synopsis ?? "";
-  const synopsis = anime.synopsis ?? "";
-  const rank = anime.rank;
-  const status = anime.status;
-  const episodes = anime.episodes;
-  const studios = anime.studios;
 
   return {
-    id,
-    title,
+    ...anime,
+    title: anime.title_english ?? anime.title,
     imageURL,
-    type,
-    score,
-    genres,
-    overview,
-    synopsis,
-    rank,
-    status,
-    episodes,
-    studios,
+    synopsis: anime.synopsis ?? "",
   };
 }
 

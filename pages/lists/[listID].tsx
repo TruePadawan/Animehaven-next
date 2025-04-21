@@ -12,7 +12,7 @@ import BodyLayout from "../../components/BodyLayout/BodyLayout";
 import {
   getErrorMessage,
   getListByID,
-  getRelevantAnimeData,
+  parseAnime,
   setRecentItem,
 } from "../../utilities/app-utilities";
 import { getAnimeById } from "../../utilities/mal-api";
@@ -36,7 +36,6 @@ const List = () => {
   const [loading, setLoading] = useState(true);
   const [showCreateListDialog, setShowCreateListDialog] = useState(false);
   const [listData, setListData] = useState<ListData>();
-  // const [, setEditAllowed] = useState(false);
   const [error, setError] = useState(initialErrorState);
 
   // REQUEST FOR AND LOAD LIST DATA TO UI
@@ -178,11 +177,12 @@ interface ItemProps {
   itemTitle: string;
   index: number;
 }
+
 const Item = ({ itemID, itemTitle, index }: ItemProps) => {
   const [loading, setLoading] = useState(true);
   const [itemData, setItemData] = useState({
     title: "",
-    overview: "",
+    synopsis: "",
     imageURL: "",
   });
 
@@ -192,10 +192,10 @@ const Item = ({ itemID, itemTitle, index }: ItemProps) => {
     setTimeout(() => {
       getAnimeById(itemID)
         .then((data) => {
-          const { overview, imageURL } = getRelevantAnimeData(data);
+          const { synopsis, imageURL } = parseAnime(data);
           setItemData({
             title: itemTitle,
-            overview,
+            synopsis,
             imageURL,
           });
           setLoading(false);
@@ -204,7 +204,7 @@ const Item = ({ itemID, itemTitle, index }: ItemProps) => {
     }, timeout);
   }, [itemID, itemTitle, index]);
 
-  const { title, overview, imageURL } = itemData;
+  const { title, synopsis, imageURL } = itemData;
   return (
     <li className={`p-1 d-flex gap-1 ${styles.item}`}>
       {loading && (
@@ -225,8 +225,8 @@ const Item = ({ itemID, itemTitle, index }: ItemProps) => {
             <Link href={`/anime/${itemID}`} className={styles["item-title"]}>
               {title}
             </Link>
-            <p className={styles["item-overview"]} title={overview}>
-              {overview}
+            <p className={styles["item-synopsis"]} title={synopsis}>
+              {synopsis}
             </p>
           </div>
         </Fragment>

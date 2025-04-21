@@ -7,15 +7,15 @@ import {
   Skeleton,
   Typography,
 } from "@mui/material";
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useContext, useEffect, useState } from "react";
 import { getAnimeById } from "../../../utilities/mal-api";
-import { getRelevantAnimeData } from "../../../utilities/app-utilities";
+import { parseAnime } from "../../../utilities/app-utilities";
 import Link from "next/link";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import styles from "./style.module.css";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import { Database } from "../../../database.types";
-import { AnimeItemData } from "../../../utilities/global.types";
+import { NotificationContext } from "../../../context/notifications/NotificationContext";
 
 interface ReviewItemProps {
   itemId: string;
@@ -44,6 +44,7 @@ export default function ProfileReviewItem({
     title: "",
   });
   const [modalOpen, setModalOpen] = useState(false);
+  const { showNotification } = useContext(NotificationContext);
 
   const openModal = () => setModalOpen(true);
   const closeModal = () => setModalOpen(false);
@@ -61,14 +62,14 @@ export default function ProfileReviewItem({
         .single()
         .then((result) => {
           if (result.error) {
-            // TODO: trigger an error notification
-            return;
+            return showNotification(`Failed to load review with id ${itemId}`, {
+              severity: "error",
+              error: result.error,
+            });
           }
           const { rating, review } = result.data;
-          // TODO: this 'any' should be replaced with a proper type when jikan-ts is added to the project
           getAnimeById(+itemId).then((anime) => {
-            const { title, imageURL }: AnimeItemData =
-              getRelevantAnimeData(anime);
+            const { title, imageURL } = parseAnime(anime);
             setItemData({
               rating,
               review,

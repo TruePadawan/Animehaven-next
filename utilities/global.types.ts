@@ -1,10 +1,10 @@
-import { getRelevantAnimeData } from "./app-utilities";
+import { parseAnime } from "./app-utilities";
 
 export interface HasErrorMessage {
   message?: string;
   error_description?: string;
 }
 
-export type AnimeItemData = ReturnType<typeof getRelevantAnimeData>;
+export type ParsedAnime = ReturnType<typeof parseAnime>;
 
 export type WatchStatus = "NOT_WATCHED" | "WATCHING" | "WATCHED";
