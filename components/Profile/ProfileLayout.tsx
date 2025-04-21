@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState, Fragment } from "react";
+import React, { Fragment, useContext, useEffect, useState } from "react";
 import Link from "next/link";
 import { IconButton, SwipeableDrawer, useMediaQuery } from "@mui/material";
 import ViewSidebarIcon from "@mui/icons-material/ViewSidebar";
@@ -35,6 +35,7 @@ export default function ProfileLayout(props: ProfileLayoutProps) {
   const [isAccountEditable, setIsAccountEditable] = useState(false);
   const [editProfileDialog, setShowEditProfileDialog] = useState(false);
   const [sidebarIsOpen, setSidebarIsOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
   const matchesSmallDevice = useMediaQuery("(max-width: 768px)");
   const { router } = props;
 
@@ -42,13 +43,14 @@ export default function ProfileLayout(props: ProfileLayoutProps) {
   useEffect(() => {
     if (router.isReady && typeof router.query.accountName === "string") {
       const { accountName } = router.query;
-
+      setLoading(true);
       getProfileID(supabase, accountName).then((id) => {
         if (id === undefined) {
           setProfileData({
             ...defaultProfileDataState,
             accountName: accountName as string,
           });
+          setLoading(false);
         } else {
           getProfileData(supabase, id).then(
             ({ avatar_url, display_name, bio }) => {
@@ -61,6 +63,7 @@ export default function ProfileLayout(props: ProfileLayoutProps) {
                   bio: bio ?? "",
                 },
               });
+              setLoading(false);
             },
           );
         }
@@ -68,7 +71,7 @@ export default function ProfileLayout(props: ProfileLayoutProps) {
     }
   }, [router, supabase]);
 
-  // PROFILE CAN'T BE EDITED IF NO USER SIGNED IN OR PROFILE ISN'T SAME AS CURRENLTY SIGNED IN
+  // PROFILE CAN'T BE EDITED IF NO USER SIGNED IN OR PROFILE ISN'T SAME AS CURRENTLY SIGNED IN
   useEffect(() => {
     const { profileExists, accountName } = profileData;
     if (!profileExists) return;
@@ -87,7 +90,6 @@ export default function ProfileLayout(props: ProfileLayoutProps) {
   }
 
   const { profileExists } = profileData;
-  const loading = profileExists === null;
   if (loading) {
     return <Loading />;
   }
