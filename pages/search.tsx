@@ -58,7 +58,6 @@ export default function Search() {
         if (result.error !== null) {
           showNotification("Search failed!", { severity: "error" });
         } else {
-          // @ts-ignore, fix for wrong type set by Supabase
           setUserSearchResult(result.data);
         }
       }
