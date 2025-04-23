@@ -292,6 +292,9 @@ export async function getDiscussionByAccountName(
     throw new Error(`Invalid argument passed - ${accountName}`);
   }
   const id = await getProfileID(supabase, accountName);
+  if (id === undefined) {
+    throw new Error(`No account with account name ${accountName}`);
+  }
   const { data, error } = await supabase
     .from("discussions")
     .select("*")
