@@ -143,22 +143,23 @@ export function UserLists({ accountName }: UserListsProps) {
 
 export function UserSavedLists({ accountName }: UserSavedListsProps) {
   const [loading, setLoading] = useState(false);
-  const [items, setItems] = useState<ReactElement[]>([]);
+  const [items, setItems] = useState<Tables<"anime_lists">[]>([]);
   const supabase = useSupabaseClient<Database>();
 
   useEffect(() => {
     setLoading(true);
     supabase
       .rpc("get_saved_lists", { acct_name: accountName })
+      .overrideTypes<
+        Array<Tables<"anime_lists">>,
+        {
+          merge: false;
+        }
+      >()
       .then(({ data, error }) => {
         if (error) throw error;
         if (data === null) throw new Error("Could not retrieve saved lists");
-        // data = data as Tables<"anime_lists">[];
-        const transformed = data.map((list) => {
-          // @ts-ignore, due to supabase specifying a wrong return type
-          return <ListItem key={list.id} listId={list.id} />;
-        });
-        setItems(transformed);
+        setItems(data);
         setLoading(false);
       });
   }, [accountName, supabase]);
@@ -172,7 +173,9 @@ export function UserSavedLists({ accountName }: UserSavedListsProps) {
           spacing={1}
           sx={{ marginTop: "10px" }}
         >
-          {items}
+          {items.map((list) => {
+            return <ListItem key={list.id} listId={list.id} />;
+          })}
         </Masonry>
       )}
     </ProfileSectionContainer>
@@ -193,9 +196,7 @@ export function UserItems({ title, status, accountName }: UserItemsProps) {
         }
         getProfileData(supabase, profileID).then(({ items_watch_status }) => {
           const items = [];
-          // @ts-ignore
           for (const itemID in items_watch_status) {
-            // @ts-ignore
             if (items_watch_status[itemID] === status) {
               items.push(
                 <RecommendedItem

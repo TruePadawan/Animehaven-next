@@ -115,26 +115,38 @@ const Lists = () => {
       if (listFilter === "all") {
         const { data: searchResults } = await supabase
           .rpc("search_list", { phrase: searchText })
+          .overrideTypes<
+            Array<Tables<"anime_lists">>,
+            {
+              merge: false;
+            }
+          >()
           .throwOnError();
 
         if (searchResults !== null) {
           const filteredSearchResults = applyGenreFilter(
-            // @ts-ignore, supabase gives the wrong type
-            searchResults as Tables<"anime_lists">[],
+            searchResults,
             acceptedGenres,
           );
           setLists(filteredSearchResults);
         }
       } else if (listFilter === "your_lists" && profileID !== undefined) {
-        const { data: searchResults } = await supabase.rpc("search_list", {
-          phrase: searchText,
-          profile_id: profileID,
-        });
+        const { data: searchResults } = await supabase
+          .rpc("search_list", {
+            phrase: searchText,
+            profile_id: profileID,
+          })
+          .overrideTypes<
+            Array<Tables<"anime_lists">>,
+            {
+              merge: false;
+            }
+          >()
+          .throwOnError();
 
         if (searchResults !== null) {
           const filteredSearchResults = applyGenreFilter(
-            // @ts-ignore
-            searchResults as Tables<"anime_lists">[],
+            searchResults,
             acceptedGenres,
           );
           setLists(filteredSearchResults);
