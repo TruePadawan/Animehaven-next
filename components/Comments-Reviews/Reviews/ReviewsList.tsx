@@ -92,6 +92,9 @@ const ReviewsList = (props: ReviewsListProps) => {
   }
 
   async function updateReview(onReviewUpdated: VoidFunction) {
+    if (profileID === undefined) {
+      return showNotification("You are not signed in", { severity: "warning" });
+    }
     try {
       const { data: updatedReview } = await supabase
         .from("item_reviews")
@@ -120,14 +123,18 @@ const ReviewsList = (props: ReviewsListProps) => {
   }
 
   function editReview(text = "", ratingValue = 1) {
+    if (profileID === undefined) {
+      return showNotification("You are not signed in", { severity: "warning" });
+    }
     setReviewText(text);
     setRating(ratingValue);
   }
 
   async function formSubmitHandler(event: FormEvent) {
     event.preventDefault();
-    // THERE MUST BE A SIGNED-IN USER BEFORE REVIEW CAN BE POSTED OR UPDATED
-    if (profileID === undefined) return;
+    if (profileID === undefined) {
+      return showNotification("You are not signed in", { severity: "warning" });
+    }
     setDisableAddReviewBtn(true);
     // CHECK TO SEE IF THERE IS ALREADY A REVIEW BY THE USER AND UPDATE IT BECAUSE ONLY ONE REVIEW PER ITEM ELSE CREATE ONE
     const reviewData = await getReviewByUser(supabase, animeID, profileID);
