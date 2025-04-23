@@ -37,14 +37,14 @@ export default function Edit() {
   // TODO: use notification system to notify user of errors in this useEffect
   useEffect(() => {
     if (router.isReady && profileID) {
-      const discussionID = router.query?.id;
+      const discussionID = router.query?.id as string;
       if (discussionID === undefined) {
         router.replace("/discussions");
       } else {
         supabase
           .from("discussions")
           .select()
-          .eq("id", discussionID)
+          .eq("id", +discussionID)
           .then((response) => {
             const { data, error } = response;
             if (error) {
@@ -82,13 +82,13 @@ export default function Edit() {
   async function formSubmitHandler(event: React.FormEvent) {
     event.preventDefault();
 
-    if (profileID !== undefined) {
+    if (profileID !== undefined && discussionID !== undefined) {
       setUpdateBtnDisabled(true);
       try {
         await supabase
           .from("discussions")
           .update(discussionData)
-          .eq("id", discussionID)
+          .eq("id", +discussionID)
           .throwOnError();
         onDiscussionEdited();
       } catch (error) {
@@ -99,12 +99,12 @@ export default function Edit() {
   }
 
   async function onDeleteButtonClicked() {
-    if (profileID !== undefined) {
+    if (profileID !== undefined && discussionID !== undefined) {
       try {
         await supabase
           .from("discussions")
           .delete()
-          .eq("id", discussionID)
+          .eq("id", +discussionID)
           .throwOnError();
         router.replace("/discussions");
       } catch (error) {
