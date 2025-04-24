@@ -61,13 +61,13 @@ export default function ListItem({ listId, skeleton = false }: ListItemProps) {
           getProfileData(supabase, profileID).then(({ saved_lists }) => {
             if (
               creator_id !== profileID &&
-              saved_lists.includes(listId.toString()) === false
+              saved_lists.includes(listId) === false
             ) {
               setIsSaved(false);
               setSaveDisabled(false);
             } else if (
               creator_id !== profileID &&
-              saved_lists.includes(listId.toString()) === true
+              saved_lists.includes(listId) === true
             ) {
               setIsSaved(true);
               setUndoSaveDisabled(false);
@@ -82,8 +82,8 @@ export default function ListItem({ listId, skeleton = false }: ListItemProps) {
       setSaveDisabled(true);
       try {
         const { saved_lists } = await getProfileData(supabase, profileID);
-        if (saved_lists.includes(listId.toString()) === false) {
-          saved_lists.push(listId.toString());
+        if (saved_lists.includes(listId) === false) {
+          saved_lists.push(listId);
           await supabase
             .from("profiles")
             .update({ saved_lists })
@@ -115,8 +115,8 @@ export default function ListItem({ listId, skeleton = false }: ListItemProps) {
           supabase,
           profileID,
         );
-        if (saved_lists.includes(listId.toString())) {
-          saved_lists = saved_lists.filter((id) => id !== listId.toString());
+        if (saved_lists.includes(listId)) {
+          saved_lists = saved_lists.filter((id) => id !== listId);
           await supabase
             .from("profiles")
             .update({ saved_lists })

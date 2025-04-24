@@ -214,7 +214,7 @@ export type DatabaseGenerated = {
           id: string;
           items_watch_status: Json;
           roles: string[];
-          saved_lists: string[];
+          saved_lists: number[];
         };
         Insert: {
           account_name: string;
@@ -227,7 +227,7 @@ export type DatabaseGenerated = {
           id: string;
           items_watch_status?: Json;
           roles?: string[];
-          saved_lists?: string[];
+          saved_lists?: number[];
         };
         Update: {
           account_name?: string;
@@ -240,7 +240,7 @@ export type DatabaseGenerated = {
           id?: string;
           items_watch_status?: Json;
           roles?: string[];
-          saved_lists?: string[];
+          saved_lists?: number[];
         };
         Relationships: [];
       };
@@ -348,7 +348,7 @@ export type DatabaseGenerated = {
             [key: string]: "NOT_WATCHED" | "WATCHING" | "WATCHED";
           };
           roles: string[];
-          saved_lists: string[];
+          saved_lists: number[];
         }[];
       };
       toggle_comment_upvote: {
