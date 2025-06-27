@@ -36,7 +36,9 @@ export default function Edit() {
 
   // TODO: use notification system to notify user of errors in this useEffect
   useEffect(() => {
-    if (router.isReady && profileID) {
+    if (!profileID) {
+      router.replace("/discussions");
+    } else if (router.isReady && profileID) {
       const discussionID = router.query?.id as string;
       if (discussionID === undefined) {
         router.replace("/discussions");

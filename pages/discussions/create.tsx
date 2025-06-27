@@ -44,13 +44,14 @@ export default function Create() {
 
   useEffect(() => {
     if (profileID === undefined) {
+      router.replace("/discussions");
       setCreateBtnDisabled(true);
       setErrorText("You need to be signed in to create a discussion!");
     } else {
       setCreateBtnDisabled(false);
       setErrorText("");
     }
-  }, [profileID]);
+  }, [profileID, router]);
 
   function onDiscussionCreated() {
     window.localStorage.removeItem("discussion_title");
@@ -65,9 +66,8 @@ export default function Create() {
       setCreateBtnDisabled(true);
       const data = {
         ...discussionData,
-        creator_id: "",
+        creator_id: profileID,
       };
-      data.creator_id = profileID;
       try {
         if (!allowed_tags.includes(data.tag)) {
           setErrorText("Failed to create discussion - Invalid tag specified!");
