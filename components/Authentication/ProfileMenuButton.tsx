@@ -66,6 +66,7 @@ const ProfileMenuButton = (props: ProfileMenuButtonProps) => {
         <Fragment>
           <IconButton
             onClick={openMenu}
+            aria-label="profile menu button"
             aria-controls={isMenuOpen ? "account-menu" : undefined}
             aria-haspopup="true"
             aria-expanded={isMenuOpen ? "true" : undefined}
