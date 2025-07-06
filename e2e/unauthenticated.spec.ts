@@ -8,7 +8,7 @@ import { createSupabaseClient, createTestUser } from "./utils";
 test.use({ storageState: { cookies: [], origins: [] } });
 
 test("has sign in button", async ({ page }) => {
-  await page.goto("http://localhost:3000/search");
+  await page.goto("/search");
 
   await expect(
     page.getByRole("button", { name: "Sign in with Google" }),
@@ -16,7 +16,7 @@ test("has sign in button", async ({ page }) => {
 });
 
 test("has no recent items side-section", async ({ page }) => {
-  await page.goto("http://localhost:3000/search");
+  await page.goto("/search");
 
   await expect(
     page.getByRole("heading", { name: "Recent" }),
@@ -25,7 +25,7 @@ test("has no recent items side-section", async ({ page }) => {
 
 test.describe("anime details page", () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto("http://localhost:3000/anime/58514");
+    await page.goto("/anime/58514");
   });
 
   test("has no Add To List button", async ({ page }) => {
@@ -57,7 +57,7 @@ test.describe("discussions page", () => {
   test("has no 'Your Discussions' filter and 'New Discussions' button", async ({
     page,
   }) => {
-    await page.goto("http://localhost:3000/discussions");
+    await page.goto("/discussions");
 
     await expect
       .soft(page.getByRole("button", { name: "New Discussions" }))
@@ -70,11 +70,11 @@ test.describe("discussions page", () => {
   });
 
   test("cannot visit the /create and /edit route", async ({ page }) => {
-    await page.goto("http://localhost:3000/discussions/create");
-    await expect.soft(page).toHaveURL("http://localhost:3000/discussions");
+    await page.goto("/discussions/create");
+    await expect.soft(page).toHaveURL("/discussions");
 
-    await page.goto("http://localhost:3000/discussions/edit");
-    await expect(page).toHaveURL("http://localhost:3000/discussions");
+    await page.goto("/discussions/edit");
+    await expect(page).toHaveURL("/discussions");
   });
 
   test("cannot edit discussions or write comments", async ({ page }) => {
@@ -109,7 +109,7 @@ test.describe("discussions page", () => {
       .throwOnError();
     const discussionId = discussion.data.id;
 
-    await page.goto(`http://localhost:3000/discussions/${discussionId}`);
+    await page.goto(`/discussions/${discussionId}`);
 
     await expect
       .soft(page.getByRole("textbox", { name: "Comment" }))
@@ -125,7 +125,7 @@ test.describe("discussions page", () => {
 test("has no 'My Lists' option in the filters and 'New List' button", async ({
   page,
 }) => {
-  await page.goto("http://localhost:3000/lists");
+  await page.goto("/lists");
 
   await page.getByRole("combobox", { name: "Filter lists" }).click();
   await expect
@@ -178,7 +178,7 @@ test.describe("anime list page", () => {
   });
 
   test("cannot save lists", async ({ page }) => {
-    await page.goto("http://localhost:3000/lists");
+    await page.goto("/lists");
 
     await expect
       .soft(page.getByRole("link", { name: testUser.id }))
@@ -196,7 +196,7 @@ test.describe("anime list page", () => {
       .eq("creator_id", testUser.id)
       .single();
     const listId = data!.id;
-    await page.goto(`http://localhost:3000/lists/${listId}`);
+    await page.goto(`/lists/${listId}`);
 
     await expect
       .soft(page.getByRole("textbox", { name: "Comments" }))
@@ -224,7 +224,7 @@ test("cannot edit profiles", async ({ page }) => {
   await adminSupabase.from("profiles").insert(testUserProfile);
 
   await page.goto(
-    `http://localhost:3000/users/${testUserProfile.account_name}`,
+    `/users/${testUserProfile.account_name}`,
   );
 
   await expect.soft(page.getByText("Default User")).toBeVisible();

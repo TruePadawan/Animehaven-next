@@ -6,20 +6,20 @@ import { TablesInsert } from "../database.types";
 
 test.describe("Tests for authenticated users", () => {
   test("There is a profile menu button", async ({ page }) => {
-    await page.goto("http://localhost:3000/search");
+    await page.goto("/search");
     await expect(
       page.getByRole("button", { name: "profile menu button" }),
     ).toBeVisible();
   });
 
   test("There is a recent items side section", async ({ page }) => {
-    await page.goto("http://localhost:3000/search");
+    await page.goto("/search");
     await expect(page.getByRole("heading", { name: "Recent" })).toBeVisible();
   });
 
   test.describe("anime details page", () => {
     test.beforeEach(async ({ page }) => {
-      await page.goto("http://localhost:3000/anime/58514");
+      await page.goto("/anime/58514");
     });
 
     test("has Add To List button", async ({ page }) => {
@@ -53,7 +53,7 @@ test.describe("Tests for authenticated users", () => {
     test("has 'Your Discussions' filter and 'New Discussion' button", async ({
       page,
     }) => {
-      await page.goto("http://localhost:3000/discussions");
+      await page.goto("/discussions");
 
       await page
         .getByRole("combobox", { name: "Filter discussions" })
@@ -66,7 +66,7 @@ test.describe("Tests for authenticated users", () => {
 
     // TODO: should redirect to the discussion page after creation
     // test("can edit discussions or write comments", async ({ page }) => {
-    //   await page.goto("http://localhost:3000/discussions");
+    //   await page.goto("/discussions");
     //   await page.getByRole("button", { name: "New Discussion" }).click();
     //
     //   await page
@@ -92,7 +92,7 @@ test.describe("Tests for authenticated users", () => {
   test("has 'My Lists' option in the filters and 'New List' button", async ({
     page,
   }) => {
-    await page.goto("http://localhost:3000/lists");
+    await page.goto("/lists");
 
     await page
       .getByRole("combobox", { name: "Filter lists" })
@@ -144,7 +144,7 @@ test.describe("Tests for authenticated users", () => {
     });
 
     test("can create and edit lists", async ({ page }) => {
-      await page.goto("http://localhost:3000/lists");
+      await page.goto("/lists");
       await page.getByRole("button", { name: "New List" }).click();
       await page.getByRole("textbox", { name: "Title" }).fill("test list");
       await page
@@ -161,7 +161,7 @@ test.describe("Tests for authenticated users", () => {
     });
 
     // test("can save lists", async ({ page }) => {
-    //   await page.goto("http://localhost:3000/lists");
+    //   await page.goto("/lists");
     //
     //   await expect
     //     .soft(page.getByRole("link", { name: testUser.id }))
@@ -182,7 +182,7 @@ test.describe("Tests for authenticated users", () => {
         .eq("creator_id", testUser.id)
         .single();
       const listId = data!.id;
-      await page.goto(`http://localhost:3000/lists/${listId}`);
+      await page.goto(`/lists/${listId}`);
 
       await expect
         .soft(page.getByRole("textbox", { name: "Comment" }))
