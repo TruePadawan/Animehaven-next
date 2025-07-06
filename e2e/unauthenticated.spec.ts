@@ -4,6 +4,9 @@ import { ListGenres } from "../components/CreateList/CreateList.types";
 import { LIST_GENRES } from "../utilities/global-constants";
 import { createSupabaseClient, createTestUser } from "./utils";
 
+// Reset storage state for this file to avoid being authenticated
+test.use({ storageState: { cookies: [], origins: [] } });
+
 test("has sign in button", async ({ page }) => {
   await page.goto("http://localhost:3000/search");
 
@@ -16,7 +19,7 @@ test("has no recent items side-section", async ({ page }) => {
   await page.goto("http://localhost:3000/search");
 
   await expect(
-    page.getByRole("heading", { name: "Recent Items" }),
+    page.getByRole("heading", { name: "Recent" }),
   ).toBeHidden();
 });
 
@@ -180,7 +183,10 @@ test.describe("anime list page", () => {
     await expect
       .soft(page.getByRole("link", { name: testUser.id }))
       .toBeVisible();
-    await expect(page.getByRole("button", { name: "Save" })).toBeDisabled();
+    for (const btn of await page.getByRole("button", { name: "Save" }).all()) {
+      await expect(btn).toBeDisabled();
+    }
+    // await expect(page.getByRole("button", { name: "Save" })).toBeDisabled();
   });
 
   test("cannot write comments and edit lists", async ({ page }) => {
