@@ -21,8 +21,12 @@
 }
 
 .creator {
+  overflow: clip;
   font-size: small;
-  width: max-content;
+  max-width: 140px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   color: rgb(150, 115, 69);
 }
 
