@@ -307,6 +307,7 @@ const AnimeDetails: NextPageWithLayout = () => {
           <span className="d-flex gap-2">
             <select
               className={styles.watchStatus}
+              aria-label="Watch status"
               onChange={(e) => {
                 if (VALID_WATCH_STATUS.includes(e.target.value)) {
                   setWatchStatus(e.target.value as WatchStatus);
