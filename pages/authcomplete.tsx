@@ -17,7 +17,7 @@ interface PageProps {
     profile_id: string;
     email: string;
     display_name: string;
-    avatar_url?: string;
+    avatar_url: string | null;
   };
 }
 
@@ -96,7 +96,7 @@ const AuthComplete = ({ userData }: PageProps) => {
         account_name: accountNameInput.value,
         display_name: displayNameInput.value,
         email: userData.email,
-        avatar_url: userData.avatar_url,
+        avatar_url: userData.avatar_url ?? undefined,
       });
 
       await router.push(`/users/${accountNameInput.value}`);
@@ -208,7 +208,7 @@ export const getServerSideProps = async (
       profile_id: session.user.id,
       email: session.user.email,
       display_name: session.user.user_metadata?.full_name ?? "Default User",
-      avatar_url: undefined,
+      avatar_url: null,
     };
     if (session.user.user_metadata?.avatar_url) {
       userData.avatar_url = session.user.user_metadata.avatar_url;
