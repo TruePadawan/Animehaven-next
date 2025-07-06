@@ -32,19 +32,20 @@ export default defineConfig({
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: "on-first-retry",
-    baseURL: "https://localhost:3000",
+    baseURL: "http://localhost:3000",
   },
 
   /* Configure projects for major browsers */
   projects: [
-    { name: "setup", testMatch: /.*\.setup\.ts/ },
+    { name: "setup auth", testMatch: /auth\.setup\.ts/, teardown: "remove test accounts" },
+    { name: "remove test accounts", testMatch: /auth\.teardown\.ts/ },
     {
       name: "chromium",
       use: {
         ...devices["Desktop Chrome"],
         storageState: STORAGE_STATE,
       },
-      dependencies: ["setup"],
+      dependencies: ["setup auth"],
     },
     // {
     //   name: "firefox",

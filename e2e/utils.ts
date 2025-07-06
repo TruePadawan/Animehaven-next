@@ -33,7 +33,7 @@ export function createTestUser() {
   const USER_ID = crypto.randomUUID();
   return {
     id: USER_ID,
-    email: `user-${USER_ID}@test.com`,
+    email: `testuser-${USER_ID}@test.com`,
     password: "password123",
   };
 }
