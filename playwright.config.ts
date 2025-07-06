@@ -8,6 +8,7 @@ import dotenv from "dotenv";
 import path from "path";
 
 dotenv.config({ path: path.resolve(__dirname, ".env.local") });
+export const STORAGE_STATE = path.join(__dirname, 'playwright/.auth/user.json');
 
 /**
  * See https://playwright.dev/docs/test-configuration.
@@ -40,7 +41,7 @@ export default defineConfig({
       name: "chromium",
       use: {
         ...devices["Desktop Chrome"],
-        storageState: "playwright/.auth/user.json",
+        storageState: STORAGE_STATE,
       },
       dependencies: ["setup"],
     },
