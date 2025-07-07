@@ -1,0 +1,93 @@
+name: Test with Local Supabase Instance
+
+on:
+  pull_request:
+    branches:
+      - master
+  push:
+    branches:
+      - master
+
+jobs:
+  test:
+    runs-on: ubuntu-latest # Or your preferred runner with Docker
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js (or your chosen runtime, e.g., Python, Go)
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20' # Specify your project's Node.js version
+
+      - name: Install project dependencies
+        run: npm install # Replace with 'yarn install' or 'pnpm install' if you use them
+
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest # Or a specific version like '1.144.1'
+
+      - name: Start local Supabase services
+        id: start_supabase # Give this step an ID to reference its outputs
+        run: |
+          echo "Starting local Supabase services..."
+          # Run supabase start and capture its output
+          SUPABASE_START_OUTPUT=$(supabase start --debug)
+          echo "$SUPABASE_START_OUTPUT"
+
+          # Extract URL and keys from the output using grep and awk
+          # The 'tr -d '\r'' is important for removing carriage returns on some systems
+          LOCAL_SUPABASE_URL=$(echo "$SUPABASE_START_OUTPUT" | grep "API URL" | awk '{print $NF}' | tr -d '\r')
+          LOCAL_SUPABASE_ANON_KEY=$(echo "$SUPABASE_START_OUTPUT" | grep "anon key" | awk '{print $NF}' | tr -d '\r')
+          LOCAL_SUPABASE_SERVICE_ROLE_KEY=$(echo "$SUPABASE_START_OUTPUT" | grep "service_role key" | awk '{print $NF}' | tr -d '\r')
+          LOCAL_SUPABASE_DB_URL=$(echo "$SUPABASE_START_OUTPUT" | grep "DB URL" | awk '{print $NF}' | tr -d '\r') # Needed for db push/seed
+
+          # Set these values as step outputs for subsequent steps to use
+          echo "LOCAL_SUPABASE_URL=$LOCAL_SUPABASE_URL" >> "$GITHUB_OUTPUT"
+          echo "LOCAL_SUPABASE_ANON_KEY=$LOCAL_SUPABASE_ANON_KEY" >> "$GITHUB_OUTPUT"
+          echo "LOCAL_SUPABASE_SERVICE_ROLE_KEY=$LOCAL_SUPABASE_SERVICE_ROLE_KEY" >> "$GITHUB_OUTPUT"
+          echo "LOCAL_SUPABASE_DB_URL=$LOCAL_SUPABASE_DB_URL" >> "$GITHUB_OUTPUT"
+
+          echo "Detected Local Supabase URL: $LOCAL_SUPABASE_URL"
+          echo "Detected Local Supabase Anon Key: $LOCAL_SUPABASE_ANON_KEY"
+          # For security, avoid printing the service role key in logs unless debugging requires it
+          # echo "Detected Local Supabase Service Role Key: $LOCAL_SUPABASE_SERVICE_ROLE_KEY"
+          echo "Detected Local Supabase DB URL: $LOCAL_SUPABASE_DB_URL"
+
+
+      - name: Wait for local Supabase services to be fully ready (optional but recommended)
+        run: |
+          echo "Waiting for services to be ready..."
+          sleep 5 # Give services a moment to spin up. For more robust checks, you could curl the local API URL.
+
+      - name: Apply database migrations to the local instance
+        # Inject the dynamically obtained DB URL as an environment variable
+        env:
+          SUPABASE_DB_URL: ${{ steps.start_supabase.outputs.LOCAL_SUPABASE_DB_URL }}
+        run: |
+          echo "Applying migrations to local Supabase..."
+          supabase db push --local --db-url "$SUPABASE_DB_URL"
+          # If you have specific SQL scripts for test setup (e.g., creating test users/roles),
+          # you can execute them here using psql:
+          # psql "$SUPABASE_DB_URL" -f ./supabase/test_setup.sql
+
+      - name: Run tests with local Supabase credentials
+        # Inject the dynamically obtained URL and keys as environment variables for your tests
+        env:
+          SUPABASE_URL: ${{ steps.start_supabase.outputs.LOCAL_SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ steps.start_supabase.outputs.LOCAL_SUPABASE_ANON_KEY }}
+          # Only include the service role key if your tests specifically require it for privileged operations
+          SUPABASE_SERVICE_ROLE_KEY: ${{ steps.start_supabase.outputs.LOCAL_SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          echo "Executing tests..."
+          npx playwright test # Replace with your actual test command (e.g., 'jest', 'vitest run', 'pytest', etc.)
+
+      - name: Stop local Supabase services
+        # This step should always run, even if previous steps fail, to clean up Docker containers.
+        if: always()
+        run: |
+          echo "Stopping local Supabase services..."
+          # --no-backup prevents creating a backup, which is not needed for ephemeral test instances
+          supabase stop --no-backup
