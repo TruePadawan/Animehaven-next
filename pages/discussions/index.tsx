@@ -201,6 +201,7 @@ export default function Discussions() {
         </div>
         <div className="d-flex flex-column flex-grow-1">
           <SearchInput
+            searchFunc={() => {}}
             placeholder="Search Discussions"
             minLength={4}
             spellCheck={false}

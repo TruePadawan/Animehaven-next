@@ -1,39 +1,27 @@
-import SearchIcon from "@mui/icons-material/Search";
 import Input, { InputProps } from "../Input";
-import styles from "./style.module.css";
-import { FormEvent } from "react";
+import { useEffect } from "react";
 
 interface SearchInputProps extends InputProps {
-  searchFunc?: Function;
+  searchFunc: Function;
 }
 
-const SearchInput = ({
-  searchFunc,
-  className = "",
-  ...inputProps
-}: SearchInputProps) => {
-  const inputClassName = `flex-grow-1 ${className}`;
-
-  function formSubmitHandler(e: FormEvent) {
-    e.preventDefault();
-    if (searchFunc) searchFunc();
-  }
+const SearchInput = ({ searchFunc, ...inputProps }: SearchInputProps) => {
+  const { value, className = "" } = inputProps;
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      searchFunc();
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [value]);
 
   return (
-    <form className="input-group flex-nowrap" onSubmit={formSubmitHandler}>
-      <Input
-        {...inputProps}
-        className={inputClassName}
-        aria-label="Search"
-        title="Search"
-        required
-      />
-      <span className="input-group-text">
-        <button className={styles.btn} type="submit" title="search">
-          <SearchIcon />
-        </button>
-      </span>
-    </form>
+    <Input
+      {...inputProps}
+      className={`py-2 ${className}`}
+      aria-label="Search"
+      title="Search"
+      required
+    />
   );
 };
 
