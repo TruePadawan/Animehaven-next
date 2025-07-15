@@ -3,7 +3,6 @@ import React, {
   ReactElement,
   useContext,
   useEffect,
-  useMemo,
   useState,
 } from "react";
 import { Masonry } from "@mui/lab";
@@ -17,7 +16,6 @@ import BodyLayout from "../../components/BodyLayout/BodyLayout";
 import Button from "../../components/Button/Button";
 import Select from "../../components/Select/Select";
 import Checkbox from "../../components/Checkbox/Checkbox";
-import SearchInput from "../../components/Input/SearchInput/SearchInput";
 import ListItem from "../../components/Items/ListItem/ListItem";
 import { UserAuthContext } from "../../context/authentication/UserAuthContext";
 import CreateList from "../../components/CreateList/CreateList";
@@ -31,6 +29,7 @@ import { Database, Tables } from "../../database.types";
 import { ListGenres } from "../../components/CreateList/CreateList.types";
 import { NotificationContext } from "../../context/notifications/NotificationContext";
 import { HasErrorMessage } from "../../utilities/global.types";
+import Input from "../../components/Input/Input";
 
 const Lists = () => {
   const supabase = useSupabaseClient<Database>();
@@ -51,139 +50,80 @@ const Lists = () => {
   const matchesSmallDevice = useMediaQuery("(max-width: 600px)");
   const { showNotification } = useContext(NotificationContext);
 
-  // SHOW PUBLIC LISTS OR USER OWN LISTS
+  // Handle searching for lists and filtering the results
   useEffect(() => {
-    setQueryOngoing(true);
-    if (listFilter === "all") {
-      supabase
-        .from("anime_lists")
-        .select("*")
-        .order("created_at", { ascending: false })
-        .then(({ data, error }) => {
-          if (error) {
-            showNotification("Failed to retrieve public lists", {
-              severity: "error",
-              error,
-            });
-            setLists([]);
-            setQueryOngoing(false);
-          } else {
-            const filteredLists = applyGenreFilter(data, acceptedGenres);
-            setLists(filteredLists);
-            setQueryOngoing(false);
-          }
-        });
-    } else if (listFilter === "your_lists" && profileID !== undefined) {
-      supabase
-        .from("anime_lists")
-        .select("*")
-        .eq("creator_id", profileID)
-        .order("created_at", { ascending: false })
-        .then(({ data, error }) => {
-          if (error) {
-            showNotification("Failed to retrieve user lists", {
-              severity: "error",
-              error,
-            });
-            setLists([]);
-            setQueryOngoing(false);
-          } else {
-            const filteredLists = applyGenreFilter(data, acceptedGenres);
-            setLists(filteredLists);
-            setQueryOngoing(false);
-          }
-        });
-    }
-  }, [listFilter, profileID, acceptedGenres]);
+    const timeoutID = setTimeout(async () => {
+      setQueryOngoing(true);
+      try {
+        if (listFilter === "all") {
+          const { data: searchResults } = await supabase
+            .from("anime_lists")
+            .select()
+            .ilike("title", `%${searchText.trim()}%`)
+            .throwOnError();
 
-  const openCreateListDialog = () => setShowCreateListDialog(true);
-  const closeCreateListDialog = () => setShowCreateListDialog(false);
-  const onListFilterChanged = (e: React.ChangeEvent<HTMLSelectElement>) =>
-    setListFilter(e.target.value);
-  const updateSearchText = (e: React.ChangeEvent<HTMLInputElement>) =>
-    setSearchText(e.target.value);
+          if (searchResults !== null) {
+            const filteredSearchResults = applyGenreFilter(
+              searchResults,
+              acceptedGenres,
+            );
+            setLists(filteredSearchResults);
+          }
+        } else if (listFilter === "your_lists" && profileID !== undefined) {
+          const { data: searchResults } = await supabase
+            .from("anime_lists")
+            .select()
+            .eq("creator_id", profileID)
+            .ilike("title", `%${searchText.trim()}%`)
+            .throwOnError();
+
+          if (searchResults !== null) {
+            const filteredSearchResults = applyGenreFilter(
+              searchResults,
+              acceptedGenres,
+            );
+            setLists(filteredSearchResults);
+          }
+        }
+      } catch (error) {
+        showNotification("Error while trying to search", {
+          severity: "error",
+          error: error as HasErrorMessage,
+        });
+      }
+      setQueryOngoing(false);
+    }, 300);
+    return () => clearTimeout(timeoutID);
+  }, [profileID, listFilter, acceptedGenres, searchText]);
+
   const updateAcceptedGenres = (e: React.ChangeEvent<HTMLInputElement>) => {
     setAcceptedGenres((current) => {
       current[e.target.name] = e.target.checked;
       return { ...current };
     });
   };
-
-  const searchForLists = async () => {
-    setQueryOngoing(true);
-    try {
-      if (listFilter === "all") {
-        const { data: searchResults } = await supabase
-          .rpc("search_list", { phrase: searchText })
-          .overrideTypes<
-            Array<Tables<"anime_lists">>,
-            {
-              merge: false;
-            }
-          >()
-          .throwOnError();
-
-        if (searchResults !== null) {
-          const filteredSearchResults = applyGenreFilter(
-            searchResults,
-            acceptedGenres,
-          );
-          setLists(filteredSearchResults);
-        }
-      } else if (listFilter === "your_lists" && profileID !== undefined) {
-        const { data: searchResults } = await supabase
-          .rpc("search_list", {
-            phrase: searchText,
-            profile_id: profileID,
-          })
-          .overrideTypes<
-            Array<Tables<"anime_lists">>,
-            {
-              merge: false;
-            }
-          >()
-          .throwOnError();
-
-        if (searchResults !== null) {
-          const filteredSearchResults = applyGenreFilter(
-            searchResults,
-            acceptedGenres,
-          );
-          setLists(filteredSearchResults);
-        }
-      }
-    } catch (error) {
-      showNotification("Error while trying to search", {
-        severity: "error",
-        error: error as HasErrorMessage,
-      });
-    }
-    setQueryOngoing(false);
+  const onListFilterChanged = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setListFilter(e.target.value);
   };
-
-  const genreElements = useMemo(() => {
-    return LIST_GENRES.map((genre) => (
-      <li key={genre}>
-        <Checkbox
-          id={genre}
-          label={genre}
-          name={genre.toUpperCase()}
-          onChange={updateAcceptedGenres}
-          checked={acceptedGenres[genre.toUpperCase()]}
-        />
-      </li>
-    ));
-  }, [acceptedGenres]);
-
-  const transformedLists = useMemo(() => {
-    return lists.map((list) => {
-      return <ListItem key={list.id} listId={list.id} />;
-    });
-  }, [lists]);
-
   const toggleFilterDrawer = (open: boolean) => {
     setFilterDrawerIsOpen(open);
   };
+
+  const genreElements = LIST_GENRES.map((genre) => (
+    <li key={genre}>
+      <Checkbox
+        id={genre}
+        label={genre}
+        name={genre.toUpperCase()}
+        onChange={updateAcceptedGenres}
+        checked={acceptedGenres[genre.toUpperCase()]}
+      />
+    </li>
+  ));
+
+  const transformedLists = lists.map((list) => {
+    return <ListItem key={list.id} listId={list.id} />;
+  });
 
   return (
     <Fragment>
@@ -208,7 +148,7 @@ const Lists = () => {
       {profileID && (
         <CreateList
           open={showCreateListDialog}
-          onClose={closeCreateListDialog}
+          onClose={() => setShowCreateListDialog(false)}
           profileId={profileID}
         />
       )}
@@ -269,17 +209,16 @@ const Lists = () => {
               text="New List"
               className="ms-auto"
               icon={<Add />}
-              onClick={openCreateListDialog}
+              onClick={() => setShowCreateListDialog(true)}
             />
           )}
         </div>
         <div className="d-flex flex-column flex-grow-1">
-          <SearchInput
-            searchFunc={searchForLists}
+          <Input
+            className="py-2"
             placeholder="Search Lists"
             value={searchText}
-            onChange={updateSearchText}
-            minLength={4}
+            onChange={(e) => setSearchText(e.target.value)}
             spellCheck={false}
           />
           {queryOngoing && <Loading sx={{ marginTop: "10px" }} />}
