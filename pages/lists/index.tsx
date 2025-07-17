@@ -30,6 +30,7 @@ import { ListGenres } from "../../components/CreateList/CreateList.types";
 import { NotificationContext } from "../../context/notifications/NotificationContext";
 import { HasErrorMessage } from "../../utilities/global.types";
 import Input from "../../components/Input/Input";
+import SearchOffOutlinedIcon from "@mui/icons-material/SearchOffOutlined";
 
 const Lists = () => {
   const supabase = useSupabaseClient<Database>();
@@ -37,7 +38,7 @@ const Lists = () => {
   const [showCreateListDialog, setShowCreateListDialog] = useState(false);
   const [lists, setLists] = useState<Tables<"anime_lists">[]>([]);
   const [listFilter, setListFilter] = useState("all");
-  const [queryOngoing, setQueryOngoing] = useState(false);
+  const [searching, setSearching] = useState(false);
   const [searchText, setSearchText] = useState("");
   const [acceptedGenres, setAcceptedGenres] = useState(() => {
     const genres: ListGenres = {};
@@ -53,7 +54,7 @@ const Lists = () => {
   // Handle searching for lists and filtering the results
   useEffect(() => {
     const timeoutID = setTimeout(async () => {
-      setQueryOngoing(true);
+      setSearching(true);
       try {
         if (listFilter === "all") {
           const { data: searchResults } = await supabase
@@ -91,10 +92,10 @@ const Lists = () => {
           error: error as HasErrorMessage,
         });
       }
-      setQueryOngoing(false);
+      setSearching(false);
     }, 300);
     return () => clearTimeout(timeoutID);
-  }, [profileID, listFilter, acceptedGenres, searchText]);
+  }, [profileID, listFilter, acceptedGenres, searchText, supabase]);
 
   const updateAcceptedGenres = (e: React.ChangeEvent<HTMLInputElement>) => {
     setAcceptedGenres((current) => {
@@ -221,8 +222,14 @@ const Lists = () => {
             onChange={(e) => setSearchText(e.target.value)}
             spellCheck={false}
           />
-          {queryOngoing && <Loading sx={{ marginTop: "10px" }} />}
-          {!queryOngoing && (
+          {searching && <Loading sx={{ marginTop: "10px" }} />}
+          {!searching && lists.length === 0 && (
+            <div className="my-auto d-flex flex-column align-items-center justify-content-center">
+              <SearchOffOutlinedIcon sx={{ fontSize: "5rem" }} />
+              <p className="fs-5">No lists found</p>
+            </div>
+          )}
+          {!searching && (
             <Masonry
               columns={{ xs: 1, sm: 2, lg: 3, xl: 4 }}
               spacing={1}
