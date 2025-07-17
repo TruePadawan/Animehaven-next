@@ -67,6 +67,7 @@ const SearchBar = ({
         </select>
       )}
       <SearchInput
+        className="flex-grow-1"
         searchFunc={searchHandler}
         value={inputVal}
         onChange={(e) => setInputVal(e.target.value)}
