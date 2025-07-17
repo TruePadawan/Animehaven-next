@@ -17,7 +17,7 @@ import React, {
 import Button from "../../components/Button/Button";
 import Checkbox from "../../components/Checkbox/Checkbox";
 import CheckboxList from "../../components/CheckboxList/CheckboxList";
-import SearchInput from "../../components/Input/SearchInput/SearchInput";
+import Input from "../../components/Input/Input";
 import BodyLayout from "../../components/BodyLayout/BodyLayout";
 import Select from "../../components/Select/Select";
 import { UserAuthContext } from "../../context/authentication/UserAuthContext";
@@ -28,6 +28,9 @@ import HeaderLayout from "../../components/HeaderLayout/HeaderLayout";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import { DISCUSSION_TAGS } from "../../utilities/global-constants";
 import { Database, Tables } from "../../database.types";
+import { NotificationContext } from "../../context/notifications/NotificationContext";
+import { HasErrorMessage } from "../../utilities/global.types";
+import SearchOffOutlinedIcon from "@mui/icons-material/SearchOffOutlined";
 
 export default function Discussions() {
   const supabase = useSupabaseClient<Database>();
@@ -42,35 +45,58 @@ export default function Discussions() {
     DISCUSSION_TAGS.forEach((tag) => (value[tag] = true));
     return value;
   });
-  const [queryingDB, setQueryingDB] = useState(false);
+  const [searching, setSearching] = useState(false);
+  const [searchText, setSearchText] = useState("");
   const router = useRouter();
   const matchesSmallDevice = useMediaQuery("(max-width: 640px)");
+  const { showNotification } = useContext(NotificationContext);
 
-  // TODO: use notification system to notify user of errors in this useEffect
   useEffect(() => {
-    const selectedTags = [];
+    const selectedTags: Array<string> = [];
     for (const tag in discussionTags) {
       if (discussionTags[tag]) {
         selectedTags.push(tag.toLowerCase());
       }
     }
-    setQueryingDB(true);
-    if (filter === "all") {
-      getDiscussionsByTags(supabase, selectedTags).then((data) => {
-        if (data !== null) {
-          setDiscussionsList(data);
+    const timeoutID = setTimeout(async () => {
+      setSearching(true);
+
+      try {
+        if (filter === "all") {
+          const { data: searchResults } = await supabase
+            .from("discussions")
+            .select()
+            .in("tag", selectedTags)
+            .ilike("title", `%${searchText.trim()}%`)
+            .throwOnError();
+
+          if (searchResults !== null) {
+            setDiscussionsList(searchResults);
+          }
+        } else if (filter === "your_discussions" && profileID !== undefined) {
+          const { data: searchResults } = await supabase
+            .from("discussions")
+            .select()
+            .in("tag", selectedTags)
+            .eq("creator_id", profileID)
+            .ilike("title", `%${searchText.trim()}%`)
+            .throwOnError();
+
+          if (searchResults !== null) {
+            setDiscussionsList(searchResults);
+          }
         }
-        setQueryingDB(false);
-      });
-    } else if (filter === "your_discussions" && profileID !== undefined) {
-      getDiscussionsByTags(supabase, selectedTags, profileID).then((data) => {
-        if (data !== null) {
-          setDiscussionsList(data);
-        }
-        setQueryingDB(false);
-      });
-    }
-  }, [discussionTags, filter, profileID, supabase]);
+      } catch (error) {
+        showNotification("Error while trying to search", {
+          severity: "error",
+          error: error as HasErrorMessage,
+        });
+      }
+      setSearching(false);
+    }, 300);
+
+    return () => clearTimeout(timeoutID);
+  }, [discussionTags, filter, profileID, supabase, searchText]);
 
   function toggleFilterDrawer(open: boolean) {
     setFilterDrawerIsOpen(open);
@@ -87,33 +113,17 @@ export default function Discussions() {
     });
   }
 
-  const tagsElements = useMemo(() => {
-    return DISCUSSION_TAGS.map((tag) => (
-      <li key={tag}>
-        <Checkbox
-          id={tag}
-          label={tag}
-          name={tag}
-          checked={discussionTags[tag]}
-          onChange={onCheckboxValueChanged}
-        />
-      </li>
-    ));
-  }, [discussionTags]);
-
-  const discussions = useMemo(() => {
-    return discussionsList.map((discussion) => {
-      return (
-        <DiscussionItem
-          key={discussion.id}
-          id={discussion.id}
-          title={discussion.title}
-          tag={discussion.tag}
-          creator_id={discussion.creator_id}
-        />
-      );
-    });
-  }, [discussionsList]);
+  const tagsElements = DISCUSSION_TAGS.map((tag) => (
+    <li key={tag}>
+      <Checkbox
+        id={tag}
+        label={tag}
+        name={tag}
+        checked={discussionTags[tag]}
+        onChange={onCheckboxValueChanged}
+      />
+    </li>
+  ));
 
   return (
     <Fragment>
@@ -200,14 +210,35 @@ export default function Discussions() {
           )}
         </div>
         <div className="d-flex flex-column flex-grow-1">
-          <SearchInput
-            searchFunc={() => {}}
+          <Input
+            className="py-2"
             placeholder="Search Discussions"
-            minLength={4}
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
             spellCheck={false}
           />
-          {queryingDB && <Loading sx={{ marginTop: "10px" }} />}
-          {!queryingDB && <ul style={{ marginTop: "10px" }}>{discussions}</ul>}
+          {searching && <Loading sx={{ marginTop: "10px" }} />}
+          {!searching && discussionsList.length === 0 && (
+            <div className="my-5 d-flex flex-column align-items-center justify-content-center">
+              <SearchOffOutlinedIcon sx={{ fontSize: "5rem" }} />
+              <p className="fs-5">No discussions found</p>
+            </div>
+          )}
+          {!searching && (
+            <ul style={{ marginTop: "10px" }}>
+              {discussionsList.map((discussion) => {
+                return (
+                  <DiscussionItem
+                    key={discussion.id}
+                    id={discussion.id}
+                    title={discussion.title}
+                    tag={discussion.tag}
+                    creator_id={discussion.creator_id}
+                  />
+                );
+              })}
+            </ul>
+          )}
         </div>
       </div>
     </Fragment>
