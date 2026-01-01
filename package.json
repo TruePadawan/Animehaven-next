@@ -33,7 +33,7 @@
     "framer-motion": "^7.1.1",
     "magic-bytes.js": "^1.0.13",
     "material-ui-popup-state": "^4.1.0",
-    "next": "^15.2.4",
+    "next": "15.2.8",
     "react": "18.3.1",
     "react-dom": "18.2.0",
     "sharp": "^0.33.5",
