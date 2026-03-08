@@ -9,21 +9,58 @@ import { ALLOWED_ANIME_TYPES, FLAGGED_ANIME_GENRES } from "./global-constants";
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 /**
- * Retry a function with exponential backoff on 429 (rate limit) errors.
+ * Global rate limiter for Jikan API.
+ * Enforces: max 3 requests/second, max 60 requests/minute.
+ */
+const rateLimiter = (() => {
+  const timestamps: number[] = [];
+  const PER_SECOND = 3;
+  const PER_MINUTE = 60;
+
+  return async () => {
+    const now = Date.now();
+    // Remove timestamps older than 60s
+    while (timestamps.length > 0 && now - timestamps[0] > 60_000) {
+      timestamps.shift();
+    }
+
+    // If at per-minute limit, wait until the oldest request expires
+    if (timestamps.length >= PER_MINUTE) {
+      const waitTime = 60_000 - (now - timestamps[0]) + 100;
+      console.log(`Per-minute rate limit reached, waiting ${waitTime}ms...`);
+      await delay(waitTime);
+    }
+
+    // Check per-second limit (requests in last 1000ms)
+    const oneSecondAgo = Date.now() - 1000;
+    const recentRequests = timestamps.filter((t) => t > oneSecondAgo).length;
+    if (recentRequests >= PER_SECOND) {
+      const oldestRecent = timestamps.filter((t) => t > oneSecondAgo)[0];
+      const waitTime = 1000 - (Date.now() - oldestRecent) + 100;
+      await delay(waitTime);
+    }
+
+    timestamps.push(Date.now());
+  };
+})();
+
+/**
+ * Execute an API call with global rate limiting and retry on 429.
  */
 async function withRetry<T>(
   fn: () => Promise<T>,
   maxRetries = 5,
-  baseDelay = 1000,
+  baseDelay = 2000,
 ): Promise<T> {
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    await rateLimiter();
     try {
       return await fn();
     } catch (error: any) {
       const status = error?.response?.status ?? error?.status;
       if (status === 429 && attempt < maxRetries) {
         const waitTime = baseDelay * Math.pow(2, attempt);
-        console.log(`Rate limited, retrying in ${waitTime}ms (attempt ${attempt + 1}/${maxRetries})...`);
+        console.log(`Rate limited (429), retrying in ${waitTime}ms (attempt ${attempt + 1}/${maxRetries})...`);
         await delay(waitTime);
       } else {
         throw error;
@@ -56,7 +93,6 @@ export const getRandomAnime = async (): Promise<Anime> => {
   const randomClient = new RandomClient();
   let { data: anime } = await withRetry(() => randomClient.getRandomAnime());
   while (isFlagged(anime)) {
-    await delay(1000);
     const response = await withRetry(() => randomClient.getRandomAnime());
     anime = response.data;
   }
@@ -71,8 +107,6 @@ export const getRandomAnimes = async (number = 1): Promise<Anime[]> => {
     if (!animes.some((randomAnime) => randomAnime.mal_id === anime.mal_id)) {
       animes.push(anime);
     }
-    // Respect Jikan API rate limit (~3 req/s)
-    await delay(1000);
   }
   return animes;
 };
