@@ -29,11 +29,14 @@ export const getRandomAnime = async (): Promise<Anime> => {
   const randomClient = new RandomClient();
   let { data: anime } = await randomClient.getRandomAnime();
   while (isFlagged(anime)) {
+    await delay(350);
     const response = await randomClient.getRandomAnime();
     anime = response.data;
   }
   return anime;
 };
+
+const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export const getRandomAnimes = async (number = 1): Promise<Anime[]> => {
   const animes: Anime[] = [];
@@ -43,6 +46,8 @@ export const getRandomAnimes = async (number = 1): Promise<Anime[]> => {
     if (!animes.some((randomAnime) => randomAnime.mal_id === anime.mal_id)) {
       animes.push(anime);
     }
+    // Respect Jikan API rate limit (~3 req/s)
+    await delay(350);
   }
   return animes;
 };
