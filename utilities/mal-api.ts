@@ -6,6 +6,33 @@ import {
 } from "@tutkli/jikan-ts";
 import { ALLOWED_ANIME_TYPES, FLAGGED_ANIME_GENRES } from "./global-constants";
 
+const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+/**
+ * Retry a function with exponential backoff on 429 (rate limit) errors.
+ */
+async function withRetry<T>(
+  fn: () => Promise<T>,
+  maxRetries = 5,
+  baseDelay = 1000,
+): Promise<T> {
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      return await fn();
+    } catch (error: any) {
+      const status = error?.response?.status ?? error?.status;
+      if (status === 429 && attempt < maxRetries) {
+        const waitTime = baseDelay * Math.pow(2, attempt);
+        console.log(`Rate limited, retrying in ${waitTime}ms (attempt ${attempt + 1}/${maxRetries})...`);
+        await delay(waitTime);
+      } else {
+        throw error;
+      }
+    }
+  }
+  throw new Error("Max retries exceeded");
+}
+
 const isNSFW = (anime: Anime) => {
   return anime.genres.some((genre) => {
     return FLAGGED_ANIME_GENRES.includes(genre.name);
@@ -27,16 +54,14 @@ const isFlagged = (anime: Anime) => {
 
 export const getRandomAnime = async (): Promise<Anime> => {
   const randomClient = new RandomClient();
-  let { data: anime } = await randomClient.getRandomAnime();
+  let { data: anime } = await withRetry(() => randomClient.getRandomAnime());
   while (isFlagged(anime)) {
-    await delay(350);
-    const response = await randomClient.getRandomAnime();
+    await delay(1000);
+    const response = await withRetry(() => randomClient.getRandomAnime());
     anime = response.data;
   }
   return anime;
 };
-
-const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export const getRandomAnimes = async (number = 1): Promise<Anime[]> => {
   const animes: Anime[] = [];
@@ -47,7 +72,7 @@ export const getRandomAnimes = async (number = 1): Promise<Anime[]> => {
       animes.push(anime);
     }
     // Respect Jikan API rate limit (~3 req/s)
-    await delay(350);
+    await delay(1000);
   }
   return animes;
 };
@@ -56,7 +81,7 @@ export const getAnimes = async (
   searchParams: AnimeSearchParams,
 ): Promise<Anime[]> => {
   const animeClient = new AnimeClient();
-  const response = await animeClient.getAnimeSearch(searchParams);
+  const response = await withRetry(() => animeClient.getAnimeSearch(searchParams));
   const animes = response.data;
   const uniqueAnimes: Anime[] = [];
   animes.forEach((anime) => {
@@ -71,17 +96,19 @@ export const getAnimes = async (
 
 export const searchAnime = async (title: string, limit = 20) => {
   const animeClient = new AnimeClient();
-  const response = await animeClient.getAnimeSearch({
-    q: title,
-    order_by: "popularity",
-    limit,
-  });
+  const response = await withRetry(() =>
+    animeClient.getAnimeSearch({
+      q: title,
+      order_by: "popularity",
+      limit,
+    }),
+  );
   return response.data.filter((anime) => !isFlagged(anime));
 };
 
 export const getAnimeById = async (id: number): Promise<Anime> => {
   const animeClient = new AnimeClient();
-  const response = await animeClient.getAnimeById(id);
+  const response = await withRetry(() => animeClient.getAnimeById(id));
 
   // const URL = `https://api.jikan.moe/v4/anime/${id}`;
   // const response = await fetch(URL);

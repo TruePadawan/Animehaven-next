@@ -86,20 +86,24 @@ const Home = (props: HomeProps) => {
 };
 
 export async function getStaticProps() {
+  const delay = (ms: number) => new Promise((r) => setTimeout(r, ms));
   const ANIME_LIMIT = 20;
   const randomAnimes = await getRandomAnimes(ANIME_LIMIT);
+  await delay(1000);
   const airingAnimes = await getAnimes({
     sfw: true,
     status: "airing",
     limit: ANIME_LIMIT,
     order_by: "popularity",
   });
+  await delay(1000);
   const upcomingAnimes = await getAnimes({
     sfw: true,
     status: "upcoming",
     limit: ANIME_LIMIT,
     order_by: "popularity",
   });
+  await delay(1000);
   const popularAnimes = await getAnimes({
     sfw: true,
     order_by: "popularity",
