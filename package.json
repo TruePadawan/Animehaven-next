@@ -43,7 +43,7 @@
     "web-vitals": "^3.0.4"
   },
   "devDependencies": {
-    "@playwright/test": "^1.52.0",
+    "@playwright/test": "^1.58.2",
     "@types/uuid": "^10.0.0",
     "detect-port": "^2.1.0",
     "jest": "^27.5.1",
